@@ -1,0 +1,24 @@
+@code{(require 'iso-8601)}
+@ftindex iso-8601
+
+
+@defun time->iso-8601 time
+
+@var{time} is the time in seconds since 00:00:00 GMT, January 1, 1970.
+@code{time->iso-8601} returns an expanded ISO 8601 format string for the date and time.
+@end defun
+
+
+@defun time->iso8601 time
+
+@var{time} is a time in seconds since 00:00:00 GMT, January 1, 1970.
+@code{time->iso8601} returns a compact ISO 8601 format string for the date and time.
+@end defun
+
+
+@defun iso-8601->time str
+
+@var{str} is a string in ISO 8601 format, either compact or expanded.
+@code{iso-8601->time} returns that time in seconds since 00:00:00 GMT, January 1, 1970.
+@end defun
+
