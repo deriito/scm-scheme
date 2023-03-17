@@ -61,6 +61,10 @@ int set_erase()
 }
 #endif
 
+#ifdef __APPLE__
+# include <ctype.h>
+#endif
+
 unsigned char upcase[CHAR_CODE_LIMIT];
 unsigned char downcase[CHAR_CODE_LIMIT];
 unsigned char lowers[] = "abcdefghijklmnopqrstuvwxyz";

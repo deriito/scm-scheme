@@ -1,8 +1,33 @@
 # targets
-*.o
+**/*.o
+**/*.so
 
 # idea folder
 **/.idea
 
+# vscode folder
+**/.vscode
+
 # macos finder folder
 **/.DS_Store
+
+# config for building
+**/config.status
+
+# intermediate products in building
+scm/require.scm
+scm/implcat
+scm/dlls.opt
+scm/scm
+scm/scm5.opt
+scm/scm-5f3.info
+scm/scmflags.h
+scm/scmlit
+scm/slibcat
+scm/tmp1
+scm/tmp2
+scm/tmp3
+scm/udscm5
+scm/udscm5.opt
+scm/myscript.sh
+slib/collect.sc

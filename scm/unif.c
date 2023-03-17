@@ -109,7 +109,7 @@ SCM resizuve(vect, len)
   return vect;
 }
 
-#ifdef ARRAYS
+
 
 # ifdef FLOATS
 #  ifdef SINGLES
@@ -128,6 +128,7 @@ SCM makflo (x)
 #  else
 #   define makflo(x) makdbl((double)(x), 0.0)
 #  endif
+#ifdef ARRAYS
 # endif
 
 long scm_prot2type(prot)
