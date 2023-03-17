@@ -126,6 +126,13 @@ Wed Feb 21 23:06:35 1996  Aubrey Jaffer
 # ifdef GO32
 #  include <sys/stat.h>
 # endif
+# ifdef __APPLE__
+#  include <string.h>
+#  include <stdlib.h>
+#  include <sys/stat.h>
+#  include <unistd.h>     /* for X_OK define */
+# endif
+
 
 # ifndef DEFAULT_PATH
 #  define DEFAULT_PATH ".:~/bin::/usr/local/bin:/usr/new:/usr/ucb:/usr/bin:/bin:/usr/hosts"
