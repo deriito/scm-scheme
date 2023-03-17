@@ -1,0 +1,8 @@
+# targets
+*.o
+
+# idea folder
+**/.idea
+
+# macos finder folder
+**/.DS_Store
