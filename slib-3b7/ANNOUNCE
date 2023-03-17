@@ -1,0 +1,57 @@
+This message announces the availability of Scheme Library release slib-3b7.
+
+SLIB is a portable Scheme library providing compatibiliy and utility
+functions for all standard Scheme implementations.
+
+SLIB supports Bigloo, Chez, ELK-3.0, Gambit-4.0, Gauche-0.9, Guile,
+JScheme, MacScheme, MITScheme, Pocket-Scheme, RScheme, S7, scheme->C,
+Scheme48, SCM, SCM-Mac, scsh, SISC, Stk, T3.1, umb-scheme, and VSCM.
+
+SLIB is free software.  It has a Permissive-Non-Warranty license
+<http://people.csail.mit.edu/jaffer/SLIB_COPYING.txt>.
+
+Documentation and distributions in several formats are linked from
+SLIB's home page:
+
+	      <http://people.csail.mit.edu/jaffer/SLIB>
+
+Links to distributions of SLIB and related softwares are at the end of
+this message.
+
+			      -=-=-=-=-
+
+slib-3b7 news:
+
+slib-3b7 is a maintenance release with some new functions.  Details at
+<http://cvs.savannah.gnu.org/viewvc/*checkout*/slib/slib/ChangeLog>
+
+	* comlist.scm (butnth): Added.
+	* guile-2.init: patch from
+	https://gist.github.com/alexgian/1fe75b0c3fc95cb46baae2f50ae9211c
+	* grapheps.scm (set-font): Fixed pointsize dependent scaling.
+	* Makefile (INSTALL_INFO): ginstall-info -> install-info.
+	* iso8601.scm (iso-8601->time): Use gmktime rather than mktime.
+	* mkclrnam.scm (load-rgb-txt): Make encoding case insensitive in
+	method m5x (FED-STD-595C1).
+	* Makefile, iso8601.scm, mklibcat.scm, slib.texi:
+	Added feature iso-8601: ISO 8601 Representation of dates and times.
+
+			      -=-=-=-=-
+
+SLIB is available from:
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-3b7.zip>
+Also available as RPM:
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-3b7-1.src.rpm>
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-3b7-1.noarch.rpm>
+Also available as MS-Windows installer:
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-3b7-1.exe>
+
+SLIB-PSD is a portable debugger for Scheme (requires emacs editor):
+ <http://groups.csail.mit.edu/mac/ftpdir/scm/slib-psd1-3.tar.gz>
+
+SCHELOG is an embedding of Prolog in Scheme+SLIB:
+ <http://www.ccs.neu.edu/home/dorai/schelog/schelog.html>
+
+Programs for printing and viewing TexInfo documentation (which SLIB
+has) come with GNU Emacs or can be obtained via ftp from:
+ <ftp://ftp.gnu.org/pub/gnu/texinfo>
