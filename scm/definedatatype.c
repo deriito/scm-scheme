@@ -1,4 +1,4 @@
-// definedatatype.c" code for user definable class-struct.
+// "definedatatype.c" code for user definable class-struct.
 //
 // Created by Guang Yang on 2023/03/29.
 //
