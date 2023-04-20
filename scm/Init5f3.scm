@@ -1609,3 +1609,9 @@ There is no warranty, to the extent permitted by law.
    (else (errno 0)
 	 (set! *interactive* #t)
 	 (for-each load (cdr (program-arguments))))))
+
+;; for Idefinedatatype.scm
+(if (provided? 'definedatatype)
+		(load (in-vicinity (implementation-vicinity)
+						           "Idefinedatatype"
+						           (scheme-file-suffix))))
