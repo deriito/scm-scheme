@@ -69,6 +69,7 @@ void	init_ioext P((void));
 void	init_posix P((void));
 void	init_ramap P((void));
 void	init_record P((void));
+void    init_define_data_type P((void));
 void	init_rgx P((void));
 void	init_rope P((void));
 void	init_repl P((int iverbose));
