@@ -523,6 +523,7 @@ void init_scm(iverbose, buf0stdin, init_heap_size)
     init_debug();
     init_rope();
     init_repl(iverbose);
+    init_define_data_type();
   }
   else reset_time();
 #ifdef HAVE_DYNL
