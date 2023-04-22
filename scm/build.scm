@@ -301,12 +301,6 @@
  'record
  '((define "CCLO") (c-file "record.c") (compiled-init "init_record")))
 
-#;The DefineDatatype package provides a facility for user to define their own
-#;class data types.
-(define-build-feature
- '(definedatatype)
- '((define "CCLO") (c-file "definedatatype.c") (compiled-init "init_define_data_type")))
-
 #;Use if you want to use compiled closures.
 (define-build-feature
  'compiled-closure
