@@ -5,15 +5,28 @@
 
 #include "scm.h"
 
-// 0: DataTypeDef <= ["UserDefinedDataType", internal-type, type-name, [field-name ...]]
+// 0: DataTypeDef <= [module-flag-sym, internal-type, type-name, [field-name ...]]
 // 1: undefined
-// 2: DataTypeInstance <= ["UserDefinedDataType", internal-type, data-type-def, [field-value ...]]
+// 2: DataTypeInstance <= [module-flag-sym, internal-type, data-type-def, [field-value ...]]
 
-static int i_v_least_length_uddt = 4; // UserDefinedDataTypeのvectorの最小長さ
-static char s_user_defined_data_type[] = "UserDefinedDataType";
-static int i_internal_type_dtd = 0;
-static int i_internal_type_undefined = 1;
-static int i_internal_type_dti = 2;
+#define MFS(x) (VELTS(x)[0]) // module-flag-sym
+
+#define DTD_IT(x) (VELTS(x)[1]) // internal-type
+#define DTD_TN(x) (VELTS(x)[2]) // type-name
+#define DTD_FNV(x) (VELTS(x)[3]) // vector of field-names vector
+
+#define DTI_IT(x) (VELTS(x)[1]) // internal-type
+#define DTI_DTD(x) (VELTS(x)[2]) // data-type-def
+#define DTI_FVV(x) (VELTS(x)[3]) // vector of field-values
+
+#define DTD_VECTOR_LEN (MAKINUM(4)) // length of DataTypeDef vector
+#define DTI_VECTOR_LEN (MAKINUM(4)) // length of DataTypeInstance vector
+
+#define DTD_IT_CODE (MAKINUM(0)) // internal type code of DataTypeDef
+#define UNDEFINED_IT_CODE (MAKINUM(1)) // internal type code of undefined item
+#define DTI_IT_CODE (MAKINUM(2)) // internal type code of DataTypeInstance
+
+static SCM module_flag_symbol;
 
 static char s_c_define_data_type[] = "c-define-data-type";
 SCM c_define_data_type(SCM type_name, SCM field_names) {
@@ -30,61 +43,52 @@ SCM c_define_data_type(SCM type_name, SCM field_names) {
     SCM field_names_vector = vector(field_names);
 
     // create a new DataTypeDef
-    SCM data_type_def = make_vector(MAKINUM(4), UNDEFINED);
-    vector_set(data_type_def, MAKINUM(0), makfrom0str(s_user_defined_data_type));
-    vector_set(data_type_def, MAKINUM(1), MAKINUM(i_internal_type_dtd));
-    vector_set(data_type_def, MAKINUM(2), type_name);
-    vector_set(data_type_def, MAKINUM(3), field_names_vector);
+    SCM data_type_def = make_vector(DTD_VECTOR_LEN, UNDEFINED);
+    MFS(data_type_def) = module_flag_symbol;
+    DTD_IT(data_type_def) = DTD_IT_CODE;
+    DTD_TN(data_type_def) = type_name;
+    DTD_FNV(data_type_def) = field_names_vector;
     return data_type_def;
 }
 
 static char s_c_make_instance[] = "c-make-instance";
 SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
-    SCM data_type_instance = make_vector(MAKINUM(4), UNDEFINED);
-    vector_set(data_type_instance, MAKINUM(0), makfrom0str(s_user_defined_data_type));
-    vector_set(data_type_instance, MAKINUM(1), MAKINUM(i_internal_type_dti));
-    vector_set(data_type_instance, MAKINUM(2), data_type_def);
-    vector_set(data_type_instance, MAKINUM(3), field_values_vector);
+    SCM data_type_instance = make_vector(DTI_VECTOR_LEN, UNDEFINED);
+    MFS(data_type_instance) = module_flag_symbol;
+    DTI_IT(data_type_instance) = DTI_IT_CODE;
+    DTI_DTD(data_type_instance) = data_type_def;
+    DTI_FVV(data_type_instance) = field_values_vector;
     return data_type_instance;
+}
+
+// a scm obj is the user defined data type's obj or not?
+char is_user_defined_data_type(SCM scm_obj) {
+    if (BOOL_F == vectorp(scm_obj)) {
+        return 0;
+    }
+    if (INUM(vector_length(scm_obj)) < 1) {
+        return 0;
+    }
+    return BOOL_T == eq(MFS(scm_obj), module_flag_symbol);
 }
 
 static char s_c_data_type_predicate[] = "c-data-type-predicate";
 SCM c_data_type_predicate(SCM data_type_def, SCM obj) {
-    if (BOOL_F == vectorp(data_type_def)) {
-        errout: wta(data_type_def, (char *)ARG2, s_c_data_type_predicate);
-    }
-    if (INUM(vector_length(data_type_def)) < i_v_least_length_uddt) {
-        goto errout;
-    }
-    if (BOOL_F == equal(vector_ref(data_type_def, MAKINUM(0)), makfrom0str(s_user_defined_data_type))) {
-        goto errout;
-    }
-    if (BOOL_F == vectorp(obj)) {
+    if (!is_user_defined_data_type(obj)) {
         return BOOL_F;
     }
-    if (INUM(vector_length(obj)) < i_v_least_length_uddt) {
-        return BOOL_F;
-    }
-    if (BOOL_F == equal(vector_ref(obj, MAKINUM(0)), makfrom0str(s_user_defined_data_type))) {
-        return BOOL_F;
-    }
-    if (BOOL_F == equal(data_type_def, vector_ref(obj, MAKINUM(2)))) {
-        return BOOL_F;
-    }
-    return BOOL_T;
+    return eq(data_type_def, DTI_DTD(obj));
 }
 
 static char s_c_data_type_accessor[] = "c-data-type-accessor";
 SCM c_data_type_accessor(SCM obj, SCM index) {
-    SCM field_values = vector_ref(obj, MAKINUM(3));
-    return vector_ref(field_values, index);
+    return vector_ref(DTI_FVV(obj), index);
 }
 
 static char s_c_data_type_modifier[] = "c-data-type-modifier";
 SCM c_data_type_modifier(SCM obj, SCM index, SCM value) {
-    SCM field_values = vector_ref(obj, MAKINUM(3));
-    vector_set(field_values, index, value);
-    return BOOL_T;
+    vector_set(DTI_FVV(obj), index, value);
+    return UNSPECIFIED;
 }
 
 static iproc subr2s[] = {
@@ -100,6 +104,7 @@ static iproc subr3s[] = {
 };
 
 void init_define_data_type() {
+    module_flag_symbol = string2symbol(makfrom0str("UserDefinedDataType"));
     init_iprocs(subr2s, tc7_subr_2);
     init_iprocs(subr3s, tc7_subr_3);
     add_feature("definedatatype");
