@@ -54,7 +54,7 @@
                     (lambda (obj)
                       (if (,(gen-predicate-name type-name) obj)
                         (c-data-type-accessor obj ,i)
-                        (display "wrong type of obj\n")))))
+                        (error "wrong type of obj")))))
           (loop (+ i 1))))
       #t)))
 
@@ -78,6 +78,6 @@
                     (lambda (obj value)
                       (if (,(gen-predicate-name type-name) obj)
                         (c-data-type-modifier obj ,i value)
-                        (display "wrong type of obj\n")))))
+                        (error "wrong type of obj")))))
           (loop (+ i 1))))
       #t)))

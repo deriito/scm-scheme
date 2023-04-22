@@ -1149,3 +1149,5 @@ SCM_EXPORT SCM scm_trace, scm_trace_env;
 #ifdef __cplusplus
 }
 #endif
+
+SCM_EXPORT char is_user_defined_data_type P((SCM scm_obj));
