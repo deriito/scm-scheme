@@ -5,11 +5,12 @@
 
 #include "scm.h"
 
-// 0: DataTypeDef <= [module-flag-sym, internal-code, type-name, [field-name ...]]
+// 0: DataTypeDef <= [module-flag-sym, internal-code, type-name, [internal-vector-sym, field-name ...]]
 // 1: undefined
-// 2: DataTypeInstance <= [module-flag-sym, internal-code, data-type-def, [field-value ...]]
+// 2: DataTypeInstance <= [module-flag-sym, internal-code, data-type-def, [internal-vector-sym, field-value ...]]
 
 #define MFS(x) (VELTS(x)[0]) // module-flag-sym
+#define IVS(x) (VELTS(x)[0]) // internal-vector-sym
 
 /*
  * internal-code (7bits)
@@ -45,6 +46,7 @@
 #define DTI_IT_CODE (MAKINUM(2)) // internal type code of DataTypeInstance
 
 static SCM module_flag_symbol;
+static SCM internal_vector_symbol;
 
 static char s_c_define_data_type[] = "c-define-data-type";
 SCM c_define_data_type(SCM type_name, SCM field_names) {
@@ -58,7 +60,7 @@ SCM c_define_data_type(SCM type_name, SCM field_names) {
     }
 
     // store it as vector in data type definition object
-    SCM field_names_vector = vector(field_names);
+    SCM field_names_vector = vector(list(cons(internal_vector_symbol, field_names)));
 
     // create a new DataTypeDef
     SCM data_type_def = make_vector(DTD_VECTOR_LEN, UNDEFINED);
@@ -75,7 +77,12 @@ SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
     MFS(data_type_instance) = module_flag_symbol;
     IC(data_type_instance) = DTI_IT_CODE; // for initialization
     DTI_DTD(data_type_instance) = data_type_def;
-    DTI_FVV(data_type_instance) = field_values_vector;
+    long len = INUM(vector_length(field_values_vector));
+    SCM fvv = make_vector(MAKINUM(1L + len), internal_vector_symbol);
+    for (long i = 1L; i < len + 1; ++i) {
+        vector_set(fvv, MAKINUM(i), vector_ref(field_values_vector, MAKINUM(i - 1)));
+    }
+    DTI_FVV(data_type_instance) = fvv;
     return data_type_instance;
 }
 
@@ -121,6 +128,16 @@ char *instance_type_name(SCM ptr) {
     return CHARS(DTD_TN(DTI_DTD(ptr)));
 }
 
+char is_internal_vector(SCM ptr) {
+    if (BOOL_F == vectorp(ptr)) {
+        return 0;
+    }
+    if (INUM(vector_length(ptr)) < 1) {
+        return 0;
+    }
+    return BOOL_T == eq(IVS(ptr), internal_vector_symbol);
+}
+
 static char s_c_data_type_predicate[] = "c-data-type-predicate";
 SCM c_data_type_predicate(SCM data_type_def, SCM obj) {
     if (!is_user_defined_data_type(obj)) {
@@ -154,6 +171,7 @@ static iproc subr3s[] = {
 
 void init_define_data_type() {
     module_flag_symbol = string2symbol(makfrom0str("UserDefinedDataType"));
+    internal_vector_symbol = string2symbol(makfrom0str("InternalVector"));
     init_iprocs(subr2s, tc7_subr_2);
     init_iprocs(subr3s, tc7_subr_3);
     add_feature("definedatatype");

@@ -21,29 +21,29 @@ SCM assert_dead(SCM ptr) {
 
 char *type_str(SCM ptr) {
     if (IMP(ptr)) {
-        return "Immediate";
+        return "immediate";
     }
     switch (TYP7(ptr)) {
         case tcs_cons_nimcar:
         case tcs_cons_imcar:
         case tcs_cons_gloc:
-            return "Cons";
+            return "cons";
         case tcs_closures:
-            return "Closure";
+            return "closure";
         case tc7_specfun:
-            return "Specfun";
+            return "specfun";
         case tc7_vector:
             if (!is_user_defined_data_type_instance(ptr)) {
-                return "Vector";
+                return "vector";
             }
             return instance_type_name(ptr);
         case tc7_contin:
-            return "Contin";
+            return "contin";
         case tc7_string:
-            return "String";
+            return "string";
         case tc7_msymbol:
         case tc7_ssymbol:
-            return "Symbol";
+            return "symbol";
         case tc7_VfixN8:
         case tc7_VfixZ8:
         case tc7_VfixZ16:
@@ -52,31 +52,31 @@ char *type_str(SCM ptr) {
         case tc7_VfixN32:
         case tc7_VfixZ64:
         case tc7_VfixN64:
-            return "Vfix";
+            return "vfix";
         case tc7_VfloR32:
         case tc7_VfloC32:
         case tc7_VfloR64:
         case tc7_VfloC64:
-            return "Vflo";
+            return "vflo";
         case tc7_Vbool:
-            return "Vbool";
+            return "vbool";
         case tcs_subrs:
-            return "Subr";
+            return "subr";
         case tc7_port:
-            return "Port";
+            return "port";
         case tc7_smob:
             switch TYP16(ptr) {
                 case tc_free_cell:
-                    return "FreeCell";
+                    return "freeCell";
                 case tcs_bignums:
-                    return "Bignum";
+                    return "bignum";
                 case tc16_flo:
-                    return "Flo";
+                    return "flo";
                 default:
-                    return "Smob";
+                    return "smob";
             }
         default:
-            return "UnsupportedType";
+            return "unsupported";
     }
 }
 

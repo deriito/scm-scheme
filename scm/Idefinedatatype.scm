@@ -53,7 +53,7 @@
           (eval `(define ,procname
                     (lambda (obj)
                       (if (,(gen-predicate-name type-name) obj)
-                        (c-data-type-accessor obj ,i)
+                        (c-data-type-accessor obj ,(+ i 1))
                         (error "wrong type of obj")))))
           (loop (+ i 1))))
       #t)))
@@ -77,7 +77,7 @@
           (eval `(define ,procname
                     (lambda (obj value)
                       (if (,(gen-predicate-name type-name) obj)
-                        (c-data-type-modifier obj ,i value)
+                        (c-data-type-modifier obj ,(+ i 1) value)
                         (error "wrong type of obj")))))
           (loop (+ i 1))))
       #t)))

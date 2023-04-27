@@ -2574,7 +2574,9 @@ void gc_mark(p, last_gc_traced_index)
                 break;
             }
             SETGC8MARK(ptr);
-            gc_traced[++last_gc_traced_index] = ptr;
+            if (!is_internal_vector(ptr)) {
+                gc_traced[++last_gc_traced_index] = ptr;
+            }
             if (is_user_defined_data_type_instance(ptr) && is_assert_dead_marked(ptr)) {
                 process_dead_marked_obj(ptr, last_gc_traced_index);
             }

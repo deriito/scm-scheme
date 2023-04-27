@@ -1157,3 +1157,4 @@ SCM_EXPORT char is_assert_dead_marked P((SCM scm_obj));
 SCM_EXPORT void process_dead_marked_obj P((SCM ptr, long last_gc_traced_index));
 SCM_EXPORT SCM *gc_traced;
 SCM_EXPORT char *instance_type_name P((SCM ptr));
+SCM_EXPORT char is_internal_vector P((SCM ptr));
