@@ -8,7 +8,7 @@
                               (symbol->string type-name)))))
       (begin
         (eval `(define ,data-type-def-sym ,data-type-def))
-        (gen-other-procedures type-name (list->vector field-names) data-type-def)))))
+        (gen-other-procedures type-name (list->vector field-names) data-type-def-sym)))))
 
 (define (gen-other-procedures type-name field-names-v data-type-def)
   (begin
