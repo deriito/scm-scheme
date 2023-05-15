@@ -722,7 +722,7 @@ SCM_EXPORT void repl_report P((void));
 SCM_EXPORT void growth_mon P((char *obj, long size, char *units, int grewp));
 SCM_EXPORT void gc_start P((const char *what));
 SCM_EXPORT void gc_end P((void));
-SCM_EXPORT void gc_mark P((SCM p));
+SCM_EXPORT void gc_mark P((SCM p, long last_gc_traced_index));
 SCM_EXPORT void scm_gc_hook P((void));
 SCM_EXPORT SCM     scm_gc_protect P((SCM obj));
 SCM_EXPORT SCM  scm_add_finalizer P((SCM value, SCM finalizer));
@@ -1151,3 +1151,10 @@ SCM_EXPORT SCM scm_trace, scm_trace_env;
 #endif
 
 SCM_EXPORT char is_user_defined_data_type P((SCM scm_obj));
+SCM_EXPORT char is_user_defined_data_type_instance P((SCM scm_obj));
+SCM_EXPORT void set_assert_mark P((SCM scm_obj));
+SCM_EXPORT char is_assert_dead_marked P((SCM scm_obj));
+SCM_EXPORT void process_dead_marked_obj P((SCM ptr, long last_gc_traced_index));
+SCM_EXPORT SCM *gc_traced;
+SCM_EXPORT char *instance_type_name P((SCM ptr));
+SCM_EXPORT char is_internal_vector P((SCM ptr));

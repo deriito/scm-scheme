@@ -94,7 +94,7 @@ cfiles = scmmain.c scm.c time.c repl.c ioext.c scl.c sys.c eval.c	\
 	subr.c sc2.c unif.c rgx.c crs.c dynl.c record.c posix.c socket.c\
 	unix.c rope.c ramap.c gsubr.c edline.c continue.c	\
 	findexec.c script.c debug.c byte.c bytenumb.c differ.c \
-	definedatatype.c
+	definedatatype.c ega.c
 ufiles = pre-crt0.c ecrt0.c gmalloc.c unexec.c unexelf.c unexhp9k800.c	\
 	unexsunos4.c unexalpha.c unexsgi.c unexmacosx.c			\
 	macosx-config.h lastfile.c
@@ -104,7 +104,7 @@ ufiles = pre-crt0.c ecrt0.c gmalloc.c unexec.c unexelf.c unexhp9k800.c	\
 #	unexnext.c unexnt.c unexsgi.c unexsni.c unexsunos4.c
 ofiles = scm.o time.o repl.o scl.o sys.o eval.o subr.o unif.o rope.o \
 	continue.o findexec.o script.o debug.o \
-	definedatatype.o
+	definedatatype.o ega.o
 # continue-ia64.o
 ifiles = Init$(VERSION).scm Transcen.scm Link.scm Macro.scm Macexp.scm \
 	Tscript.scm compile.scm Iedline.scm Idiffer.scm

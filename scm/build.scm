@@ -132,6 +132,7 @@
      ("Idiffer.scm"	Scheme	optional	"Linear-space O(PN) sequence comparison.")
      ("record.c"	c-source	linkable	"proposed `Record' user definable datatypes.")
      ("definedatatype.c"	c-source	core	"proposed `DefineDatatype' user definable datatypes.")
+     ("ega.c"	c-source	core	"proposed `EnhancedGCAssertions' Enhanced version of GC assertions.")
      ("gsubr.c"	c-source	linkable	"make_gsubr for arbitrary (< 11) arguments to C functions.")
      ("ioext.c"	c-source	linkable	"system calls in common between PC compilers and unix.")
      ("posix.c"	c-source	linkable	"posix library interface.")

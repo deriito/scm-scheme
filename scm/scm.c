@@ -70,6 +70,7 @@ void	init_posix P((void));
 void	init_ramap P((void));
 void	init_record P((void));
 void    init_define_data_type P((void));
+void    init_ega P((void));
 void	init_rgx P((void));
 void	init_rope P((void));
 void	init_repl P((int iverbose));
@@ -524,6 +525,7 @@ void init_scm(iverbose, buf0stdin, init_heap_size)
     init_rope();
     init_repl(iverbose);
     init_define_data_type();
+    init_ega();
   }
   else reset_time();
 #ifdef HAVE_DYNL
