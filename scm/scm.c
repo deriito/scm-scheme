@@ -99,7 +99,7 @@ under certain conditions; type `(terms)' for details.\n", stderr);
 
 void scm_init_INITS()
 {
-  if (!dumped) {
+  if (!dumped && !disk_saved) {
 #ifdef INITS
     INITS;			/* call initialization of extension files */
 #endif
@@ -156,9 +156,9 @@ SCM scm_init_extensions()
 #define SIGNAL_BASE HUP_SIGNAL
 /* PROF_SIGNAL appears below because it is the last signal
    defined in scm.h and in errmsgs in repl.c  */
-static struct {
+struct {
   int signo; SIGRETTYPE (*osig)(); SIGRETTYPE (*nsig)();
-} sigdesc[PROF_SIGNAL - SIGNAL_BASE + 1];
+} sigdesc[PROF_SIGNAL - SIGNAL_BASE + 1]; // 不需要被写入dump file，在init_signals()中被初始化
 
 #define NUM_SIGNALS (sizeof(sigdesc)/sizeof(sigdesc[0]))
 
@@ -329,7 +329,7 @@ SCM lalarm(i)
 # ifdef SIGPROF
 #  include <sys/time.h>
 static char s_setitimer[] = "setitimer";
-static struct {SCM sym; int which;} setitimer_tab[3] = {
+setitimer_tab_info setitimer_tab[3] = {
   {UNDEFINED, 0}, {UNDEFINED, 0}, {UNDEFINED, 0}};
 /* VALUE and INTERVAL are milliseconds */
 SCM scm_setitimer(which, value, interval)
@@ -481,11 +481,12 @@ SCM lticks(i)
 #endif
 
 #ifdef SIGPIPE
-static SIGRETTYPE (*oldpipe) ();
+static SIGRETTYPE (*oldpipe) (); // 不需要被写入dump file，在init_signals()中被初始化
 #endif
 
 int case_sensitize_symbols = 0;	/* set to 8 to read case-sensitive symbols */
 int dumped = 0;			/* Is this an invocation of unexec exe? */
+int disk_saved = 0; /* for heap memory dump feature (disk-save) */
 
 #ifdef SHORT_ALIGN
 typedef short STACKITEM;
@@ -502,7 +503,7 @@ void init_scm(iverbose, buf0stdin, init_heap_size)
 {
   STACKITEM i;
   if (2 <= iverbose) init_banner();
-  if (!dumped) {
+  if (!dumped && !disk_saved) {
     init_types();
     init_tables();
     init_storage(&i, init_heap_size); /* CONT(rootcont)->stkbse gets set here */
@@ -514,7 +515,7 @@ void init_scm(iverbose, buf0stdin, init_heap_size)
   }
   if (buf0stdin) SCM_PORTFLAGS(def_inp) |= BUF0;
   else SCM_PORTFLAGS(def_inp) &= ~BUF0;
-  if (!dumped) {
+  if (!dumped && !disk_saved) {
     init_features();
     init_subrs();
     init_scl();
@@ -858,13 +859,13 @@ SCM scm_execpath(newpath)
   if (UNBNDP(newpath))
     return retval;
   if (FALSEP(newpath)) {
-    if (execpath) free(execpath);
+    if (execpath) my_free(execpath);
     execpath = 0;
     return retval;
   }
   ASRTER(NIMP(newpath) && STRINGP(newpath), newpath, ARG1, s_execpath);
-  if (execpath) free(execpath);
-  execpath = (char *)malloc((sizet)(LENGTH(newpath) + 1));
+  if (execpath) my_free(execpath);
+  execpath = (char *)my_malloc((sizet)(LENGTH(newpath) + 1));
   ASRTER(execpath, newpath, NALLOC, s_execpath);
   strncpy(execpath, CHARS(newpath), LENGTH(newpath) + 1);
   return retval;
@@ -1018,6 +1019,7 @@ void add_feature(str)
 {
   *loc_features = cons(CAR(sysintern(str, UNDEFINED)), *loc_features);
 }
+
 void init_features()
 {
   loc_features = &CDR(sysintern("slib:features", EOL));

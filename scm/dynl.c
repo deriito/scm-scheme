@@ -41,7 +41,7 @@ void listundefs()
     fputs(undefs[i], stdout);
     puts("\"");
   }
-  free(undefs);
+  my_free(undefs);
 }
 
 static char s_link[] = "dyn:link", s_call[] = "dyn:call";

@@ -890,12 +890,12 @@ static char s_expr[] = "bad expression";
 
 /* These symbols are needed by the reader, in repl.c */
 SCM i_dot, i_quote, i_quasiquote, i_unquote, i_uq_splicing;
-static SCM i_lambda, i_define, i_let, i_begin, i_arrow, i_else;	/* , i_atbind */
+SCM i_lambda, i_define, i_let, i_begin, i_arrow, i_else;	/* , i_atbind */
 /* These symbols are passed in the context argument to macro expanders. */
-static SCM i_bind, i_anon, i_side_effect, i_test, i_procedure,
+SCM i_bind, i_anon, i_side_effect, i_test, i_procedure,
   i_argument, i_check_defines;
 
-static SCM f_begin, f_define;
+SCM f_begin, f_define;
 
 #define ASRTSYNTAX(cond_, msg_) if (!(cond_))wta(xorig, (msg_), what);
 #ifdef MACRO
@@ -1061,8 +1061,8 @@ SCM m_or(xorig, env, ctxt)
 #ifdef INUMS_ONLY
 # define memv memq
 #endif
-static SCM *loc_atcase_aux = 0;
-static int in_atcase_aux = 0;
+SCM *loc_atcase_aux = 0;
+int in_atcase_aux = 0;
 SCM m_case(xorig, env, ctxt)
      SCM xorig, env, ctxt;
 {

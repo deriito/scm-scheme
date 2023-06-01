@@ -681,7 +681,7 @@ static ptobfuns clptob = {
    written to cur_errp as soon as interrupts are enabled. There will only
    ever be one of these. */
 int output_deferred = 0;
-static int tc16_sysport;
+int tc16_sysport;
 #define SYS_ERRP_SIZE 480
 static char errbuf[SYS_ERRP_SIZE];
 static sizet errbuf_end = 0;
@@ -897,8 +897,8 @@ scm_gra finals_gra;
 static char s_final[] = "final";
 
 /* statically allocated ports for diagnostic messages */
-static cell tmp_errpbuf[3];
-static SCM tmp_errp;
+cell tmp_errpbuf[3];
+SCM tmp_errp;
 extern sizet num_protects;	/* sys_protects now in scl.c */
 void init_types()
 {
@@ -946,7 +946,7 @@ void add_final(final)
     scm_grow_gra(&finals_gra, (char *)&final);
 }
 
-static SCM gc_finalizers = EOL, gc_finalizers_pending = EOL;
+SCM gc_finalizers = EOL, gc_finalizers_pending = EOL;
 static char s_add_finalizer[] = "add-finalizer";
 SCM scm_add_finalizer(value, finalizer)
         SCM value, finalizer;
@@ -965,12 +965,12 @@ SCM scm_add_finalizer(value, finalizer)
 }
 
 static char s_estk[] = "environment stack";
-static cell ecache_v[ECACHE_SIZE];
+cell ecache_v[ECACHE_SIZE];
 SCM scm_egc_roots[ECACHE_SIZE/20];
 CELLPTR scm_ecache;
 VOLATILE long scm_ecache_index, scm_ecache_len, scm_egc_root_index;
 SCM scm_estk = UNDEFINED, *scm_estk_ptr;
-static SCM estk_pool = EOL;
+SCM estk_pool = EOL;
 long scm_estk_size;
 static SCM make_stk_seg(size, contents)
         sizet size;
@@ -1262,8 +1262,8 @@ static char *igc_for_alloc(where, olen, size, what)
         if (nm > mtrigger) grew_lim(nm + nm/2);
         else grew_lim(mtrigger + mtrigger/2);
     }
-    if (where) SYSCALL(ptr = (char *)realloc(where, size););
-    else SYSCALL(ptr = (char *)malloc(size););
+    if (where) SYSCALL(ptr = (char *)my_realloc(where, size););
+    else SYSCALL(ptr = (char *)my_malloc(size););
     ASRTER(ptr, MAKINUM(size), NALLOC, what);
     if (nm > mltrigger) {
         if (nm > mtrigger) mtrigger = nm + nm/2;
@@ -1284,7 +1284,7 @@ char *must_malloc(len, what)
 #ifdef SHORT_SIZET
     ASRTER(len==size, MAKINUM(len), NALLOC, what);
 #endif
-    if (nm <= mtrigger) SYSCALL(ptr = (char *)malloc(size););
+    if (nm <= mtrigger) SYSCALL(ptr = (char *)my_malloc(size););
     else ptr = 0;
     if (!ptr) ptr = igc_for_alloc(0L, 0L, size+0L, what);
     else mallocated = nm;
@@ -1305,7 +1305,7 @@ SCM must_malloc_cell(len, c, what)
     ASRTER(len==size, MAKINUM(len), NALLOC, what);
 #endif
     NEWCELL(z);
-    if (nm <= mtrigger) SYSCALL(ptr = (char *)malloc(size););
+    if (nm <= mtrigger) SYSCALL(ptr = (char *)my_malloc(size););
     else ptr = 0;
     if (!ptr) ptr = igc_for_alloc(0L, 0L, size+0L, what);
     else mallocated = nm;
@@ -1329,7 +1329,7 @@ char *must_realloc(where, olen, len, what)
     ASRTER(!errjmp_bad, MAKINUM(len), NALLOC, what);
 /* printf("must_realloc(%lx, %lu, %lu, %s)\n", where, olen, len, what); fflush(stdout);
    printf("nm = %ld <= mtrigger = %ld: %d; size = %u\n", nm, mtrigger, (nm <= mtrigger), size); fflush(stdout); */
-    if (nm <= mtrigger) SYSCALL(ptr = (char *)realloc(where, size););
+    if (nm <= mtrigger) SYSCALL(ptr = (char *)my_realloc(where, size););
     else ptr = 0;
     if (!ptr) ptr = igc_for_alloc(where, olen, size+0L, what);
     else mallocated = nm;
@@ -1349,7 +1349,7 @@ void must_realloc_cell(z, olen, len, what)
 #endif
     ASRTER(!errjmp_bad, MAKINUM(len), NALLOC, what);
 /* printf("must_realloc_cell(%lx, %lu, %lu, %s)\n", z, olen, len, what); fflush(stdout); */
-    if (nm <= mtrigger) SYSCALL(ptr = (char *)realloc(where, size););
+    if (nm <= mtrigger) SYSCALL(ptr = (char *)my_realloc(where, size););
     else ptr = 0;
     if (!ptr) ptr = igc_for_alloc(where, olen, size+0L, what);
     else mallocated = nm;
@@ -1364,7 +1364,7 @@ void must_free(obj, len)
         while (len--) obj[len] = '#';
 #endif
 /* printf("free(%lx)\n", obj); fflush(stdout); */
-        free(obj);
+        my_free(obj);
         mallocated = mallocated - len;
     }
     else wta(INUM0, "already free", "");
@@ -1869,7 +1869,7 @@ static void alloc_some_heap()
     tmplims = (CELLPTR *)must_realloc((char *)hplims,
                                       len-2L*sizeof(CELLPTR), (long)len,
                                       s_heap);
-    /*  SYSCALL(tmplims = (CELLPTR *)realloc((char *)hplims, len);); */
+    /*  SYSCALL(tmplims = (CELLPTR *)my_realloc((char *)hplims, len);); */
     if (!tmplims)
         badhplims:
         wta(UNDEFINED, s_nogrow, s_hplims);
@@ -1881,7 +1881,7 @@ static void alloc_some_heap()
     }
     else len = HEAP_SEG_SIZE;
     while (len >= MIN_HEAP_SEG_SIZE) {
-        SYSCALL(ptr = (CELLPTR) malloc(len););
+        SYSCALL(ptr = (CELLPTR) my_malloc(len););
         if (ptr) {
             init_heap_seg(ptr, len);
             return;
@@ -1901,7 +1901,7 @@ void scm_init_gra(gra, eltsize, len, maxlen, what)
     char *nelts;
     /* DEFER_INTS; */
     /* Can't call must_malloc, because heap may not be initialized yet. */
-    /*  SYSCALL(nelts = malloc(len*eltsize););
+    /*  SYSCALL(nelts = my_malloc(len*eltsize););
         if (!nelts) wta(MAKINUM(len*eltsize), (char *)NALLOC, what);
         mallocated += len*eltsize;
     */
@@ -1927,7 +1927,7 @@ int scm_grow_gra(gra, elt)
         if (gra->maxlen && nlen > gra->maxlen)
             /* growerr: */ wta(MAKINUM(nlen), (char *)NALLOC, gra->what);
         /*
-          SYSCALL(tmp = realloc(gra->elts, nlen*gra->eltsize););
+          SYSCALL(tmp = my_realloc(gra->elts, nlen*gra->eltsize););
           if (!tmp) goto growerr;
           mallocated += (nlen - gra->alloclen)*gra->eltsize;
         */
@@ -1959,7 +1959,7 @@ void scm_trim_gra(gra)
 void scm_free_gra(gra)
         scm_gra *gra;
 {
-    free(gra->elts);
+    my_free(gra->elts);
     gra->elts = 0;
     mallocated -= gra->maxlen*gra->eltsize;
 }
@@ -1996,7 +1996,7 @@ long newptob(ptob)
     return tc7_port + 256*scm_grow_gra(&ptobs_gra, (char *)ptob);
 }
 port_info *scm_port_table = 0;
-static sizet scm_port_table_len = 0;
+sizet scm_port_table_len = 0;
 static char s_port_table[] = "port table";
 SCM scm_port_entry(stream, ptype, flags)
         FILE *stream;
@@ -2148,10 +2148,10 @@ void init_storage(stack_start_ptr, init_heap_size)
     if (0L==init_heap_size) init_heap_size = INIT_HEAP_SIZE;
     j = init_heap_size;
 /*  	printf("j = %u; init_heap_size = %lu\n", j, init_heap_size); */
-    if ((init_heap_size != j) || !init_heap_seg((CELLPTR) malloc(j), j)) {
+    if ((init_heap_size != j) || !init_heap_seg((CELLPTR) my_malloc(j), j)) {
         j = HEAP_SEG_SIZE;
 /*  	  printf("j = %u; HEAP_SEG_SIZE = %lu\n", j, HEAP_SEG_SIZE); */
-        if (!init_heap_seg((CELLPTR) malloc(j), j))
+        if (!init_heap_seg((CELLPTR) my_malloc(j), j))
             wta(MAKINUM(j), (char *)NALLOC, s_heap);
     }
     else expmem = 1;
@@ -2336,7 +2336,7 @@ void scm_run_finalizers(exiting)
     }
 }
 
-static SCM *loc_gc_hook = 0;
+SCM *loc_gc_hook = 0;
 void scm_gc_hook ()
 {
     if (gc_hook_active) {
@@ -2449,7 +2449,7 @@ void free_storage()
             CELLPTR ptr = CELL_UP(hplims[hplim_ind]);
             sizet seg_cells = CELL_DN(hplims[hplim_ind+1]) - ptr;
             heap_cells -= seg_cells;
-            free((char *)hplims[hplim_ind]);
+            my_free((char *)hplims[hplim_ind]);
             hplims[hplim_ind] = 0;
             /* At this point, sys_errp is no longer valid */
             /* growth_mon(s_heap, heap_cells, s_cells, 0); fflush(stderr); */
@@ -2872,7 +2872,7 @@ static void gc_sweep(contin_bad)
         if (n==seg_cells) {
             heap_cells -= seg_cells;
             n = 0;
-            free((char *)hplims[i-2]);
+            my_free((char *)hplims[i-2]);
             /*      must_free((char *)hplims[i-2],
               sizeof(cell) * (hplims[i-1] - hplims[i-2])); */
             hplims[i-2] = 0;

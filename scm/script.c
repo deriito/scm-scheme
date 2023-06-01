@@ -53,12 +53,12 @@ char *scm_cat_path(str1, str2, n)
   if (str1)
     {
       long len = strlen(str1);
-      str1 = (char *)realloc(str1, (sizet)(len + n + 1));
+      str1 = (char *)my_realloc(str1, (sizet)(len + n + 1));
       if (!str1) return 0L;
       strncat(str1 + len, str2, n);
       return str1;
     }
-  str1 = (char *)malloc((sizet)(n + 1));
+  str1 = (char *)my_malloc((sizet)(n + 1));
   if (!str1) return 0L;
   str1[0] = 0;
   strncat(str1, str2, n);
@@ -76,7 +76,7 @@ char *scm_try_path(path)
     fclose(f);
     return path;
   }
-  free(path);
+  my_free(path);
   return 0L;
 }
 
@@ -283,14 +283,14 @@ char *script_read_arg(f)
 {
   sizet tlen = 1;
   int tind = 0, qted = 0, chr;
-  char *tbuf = (char *)malloc((1 + tlen) * sizeof(char));
+  char *tbuf = (char *)my_malloc((1 + tlen) * sizeof(char));
   if (!tbuf) return 0L;
   while (1) switch (chr = getc(f)) {
   case WHITE_SPACES:
     continue;
   case LINE_INCREMENTORS:
   case EOF:
-    free(tbuf);
+    my_free(tbuf);
     return 0L;
   default:
     goto morearg;
@@ -325,7 +325,7 @@ morearg:
     default:;
     }
     if (tind >= tlen) {
-      tbuf = (char *)realloc(tbuf, (1 + (2 * tlen)) * sizeof(char));
+      tbuf = (char *)my_realloc(tbuf, (1 + (2 * tlen)) * sizeof(char));
       if (!tbuf) return 0L;
       tlen = 2 * tlen;
     }
@@ -358,7 +358,7 @@ char **script_process_argv(argc, argv)
   int nargc = argc, argi = 1, nargi = 1;
   char *narg, **nargv;
   if (!(argc > 2 && script_meta_arg_P(argv[1]))) return 0L;
-  if (!(nargv = (char **)malloc((1 + nargc) * sizeof(char *)))) return 0L;
+  if (!(nargv = (char **)my_malloc((1 + nargc) * sizeof(char *)))) return 0L;
   nargv[0] = argv[0];
   while (((argi+1) < argc) && (script_meta_arg_P(argv[argi]))) {
     FILE *f = fopen(argv[++argi], "r");
@@ -370,7 +370,7 @@ char **script_process_argv(argc, argv)
       case '\n': goto found_args;
       }
     found_args: while ((narg = script_read_arg(f)))
-      if (!(nargv = (char **)realloc(nargv, (1 + ++nargc) * sizeof(char *))))
+      if (!(nargv = (char **)my_realloc(nargv, (1 + ++nargc) * sizeof(char *))))
 	return 0L;
       else nargv[nargi++] = narg;
       fclose(f);

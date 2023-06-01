@@ -83,15 +83,15 @@ static start1 ();
 #endif
 
 #ifdef APOLLO
-extern	char   *malloc(), *realloc(), *(*_libc_malloc) (), *(*_libc_realloc)();
-extern	void	free(),	(*_libc_free) (); extern int main();
+extern	char   *my_malloc(), *my_realloc(), *(*_libc_malloc) (), *(*_libc_realloc)();
+extern	void	my_free(),	(*_libc_free) (); extern int main();
 std_$call void  unix_$main();
 
 _start()
 {
-	_libc_malloc = malloc;
-	_libc_realloc = realloc;
-	_libc_free = free;
+	_libc_malloc = my_malloc;
+	_libc_realloc = my_realloc;
+	_libc_free = my_free;
 	unix_$main(main);	/* no return */
 }
 #endif /* APOLLO */

@@ -579,7 +579,7 @@ SCM eof_objectp(x)
 	return (EOF_VAL==x) ? BOOL_T : BOOL_F;
 }
 
-static SCM *loc_broken_pipe = 0;
+SCM *loc_broken_pipe = 0;
 /* returning non-zero means try again. */
 int scm_io_error(port, what)
      SCM port;
@@ -845,7 +845,7 @@ static int flush_ws(port)
 }
 
 /* Top-level readers */
-static SCM p_read_for_load, p_read;
+SCM p_read_for_load, p_read;
 static char s_read[] = "read";
 static char s_read_for_load[] = "read-for-load";
 #ifndef MEMOIZE_LOCALS
@@ -889,7 +889,7 @@ static SCM scm_lread1(port, flgs, what)
   } while (EOF_VAL==(tok_buf = scm_lreadr(tok_buf, port, flgs)));
   return tok_buf;
 }
-static SCM *loc_loadsharp = 0, *loc_readsharp = 0, *loc_charsharp = 0;
+SCM *loc_loadsharp = 0, *loc_readsharp = 0, *loc_charsharp = 0;
 static SCM scm_lreadpr(tok_buf, port, flgs)
      SCM tok_buf;
      SCM port;
@@ -1248,9 +1248,9 @@ VOLATILE int ints_disabled = 1;
 unsigned long SIG_deferred = 0;
 int scm_verbose = 1;		/* Low so that monitor info won't be */
 				/* printed while in init_storage. (BOOM) */
-static int errjmp_recursive = 0;
-static int errobj_codep;
-static SCM err_exp, err_env;
+int errjmp_recursive = 0;
+int errobj_codep;
+SCM err_exp, err_env;
 static char *err_pos, *err_s_subr;
 static cell tmp_errobj = {(SCM)UNDEFINED, (SCM)EOL};
 static cell tmp_loadpath = {(SCM)BOOL_F, (SCM)EOL};
@@ -1365,7 +1365,7 @@ SCM scm_top_level(initpath, toplvl_fun)
     deferred_proc = 0;
     ints_disabled = 0;
     scm_init_INITS();
-    if (dumped) {
+    if (dumped || disk_saved) {
       lcells_allocated = cells_allocated;
       lmallocated = mallocated;
       rt = INUM(my_time());
@@ -1380,7 +1380,7 @@ SCM scm_top_level(initpath, toplvl_fun)
       SCM boot_tail = scm_evstr("boot-tail");
       /* initialization tail-call */
       if (NIMP(boot_tail))
-        apply(boot_tail, (dumped ? makfrom0str(initpath) : BOOL_F), listofnull);
+        apply(boot_tail, ((dumped || disk_saved) ? makfrom0str(initpath) : BOOL_F), listofnull);
     }
   case -2:			/* abrt */
   reset_toplvl:
@@ -1646,7 +1646,7 @@ void repl_report()
 unsigned long scm_init_brk = 0, scm_dumped_brk = 0;
 void init_sbrk()
 {
-  if (dumped)
+  if (dumped || disk_saved)
     scm_dumped_brk = (unsigned long)sbrk(0);
   else
     scm_init_brk = (unsigned long)sbrk(0);
@@ -1654,12 +1654,12 @@ void init_sbrk()
 void scm_brk_report()
 {
   unsigned long scm_curbrk = (unsigned long)sbrk(0),
-    dif1 = ((dumped ? scm_dumped_brk : scm_curbrk) - scm_init_brk)/1024,
+    dif1 = (((dumped || disk_saved) ? scm_dumped_brk : scm_curbrk) - scm_init_brk)/1024,
     dif2 = (scm_curbrk - scm_dumped_brk)/1024;
 
   lputs("initial brk = 0x", cur_errp);
   scm_intprint(scm_init_brk, -16, cur_errp);
-  if (dumped) {
+  if (dumped || disk_saved) {
     lputs(", dumped = 0x", cur_errp);
     scm_intprint(scm_dumped_brk, -16, cur_errp);
   }
@@ -1667,7 +1667,7 @@ void scm_brk_report()
   scm_intprint(scm_curbrk, -16, cur_errp);
   lputs("; ", cur_errp);
   scm_intprint(dif1, 10, cur_errp);
-  if (dumped) {
+  if (dumped || disk_saved) {
     lputs(dif2 < 0 ? " - " : " + ", cur_errp);
     scm_intprint(dif2 < 0 ? -dif2 : dif2, 10, cur_errp);
   }
@@ -1727,7 +1727,7 @@ SCM prolixity(arg)
   return MAKINUM(old);
 }
 
-static SCM i_repl;
+SCM i_repl;
 SCM repl()
 {
   SCM x;
@@ -1909,7 +1909,7 @@ SCM tryload(filename, reader)
 }
 static char s_eval_string[] = "eval-string";
 static char s_load_string[] = "load-string";
-static SCM i_eval_string = 0;
+SCM i_eval_string = 0;
 SCM scm_eval_string(str)
      SCM str;
 {
@@ -1922,7 +1922,7 @@ SCM scm_eval_string(str)
   str = scm_read(str);
   return EVAL(str, env, EOL);
 }
-static SCM i_load_string = 0;
+SCM i_load_string = 0;
 SCM scm_load_string(str)
      SCM str;
 {

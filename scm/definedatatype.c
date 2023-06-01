@@ -45,8 +45,8 @@
 #define UNDEFINED_IT_CODE (MAKINUM(1)) // internal type code of undefined item
 #define DTI_IT_CODE (MAKINUM(2)) // internal type code of DataTypeInstance
 
-static SCM module_flag_symbol;
-static SCM internal_vector_symbol;
+SCM module_flag_symbol;
+SCM internal_vector_symbol;
 
 static char s_c_define_data_type[] = "c-define-data-type";
 SCM c_define_data_type(SCM type_name, SCM field_names) {

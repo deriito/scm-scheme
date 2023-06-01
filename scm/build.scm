@@ -134,6 +134,7 @@
      ("definedatatype.c"	c-source	core	"proposed `DefineDatatype' user definable datatypes.")
      ("ega.c"	c-source	core	"proposed `EnhancedGCAssertions' Enhanced version of GC assertions.")
      ("disksave.c" c-source	core	"proposed `DiskSave' Save the image of current SCM session into file.")
+     ("mymalloc.c" c-source core "my_malloc, my_free, my_realloc")
      ("gsubr.c"	c-source	linkable	"make_gsubr for arbitrary (< 11) arguments to C functions.")
      ("ioext.c"	c-source	linkable	"system calls in common between PC compilers and unix.")
      ("posix.c"	c-source	linkable	"posix library interface.")
