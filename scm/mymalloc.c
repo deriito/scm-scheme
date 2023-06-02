@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include "scm.h"
+#include "setjump.h"
 
 HEADER base; /* empty list to get started */
 HEADER *freep = NULL; /* start of free list */
@@ -63,7 +64,7 @@ void init_my_zone() {
     fread(&setitimer_tab[2].which, sizeof(int), 1, fp);
 
     // sys.c
-    fread(&ecache_v, sizeof(cell *), 1, fp);
+    fread(ecache_v, sizeof(cell), ECACHE_SIZE, fp);
     fread(&estk_pool, sizeof(SCM), 1, fp);
     fread(&expmem, sizeof(int), 1, fp);
     fread(&finals_gra, sizeof(scm_gra), 1, fp);
@@ -88,7 +89,7 @@ void init_my_zone() {
     fread(&scm_ecache_index, sizeof(long), 1, fp);
     fread(&scm_ecache_len, sizeof(long), 1, fp);
     fread(&scm_egc_root_index, sizeof(long), 1, fp);
-    fread(&scm_egc_roots, sizeof(SCM *), 1, fp);
+    fread(scm_egc_roots, sizeof(SCM), ECACHE_SIZE/20, fp);
     fread(&scm_estk, sizeof(SCM), 1, fp);
     fread(&scm_estk_ptr, sizeof(SCM *), 1, fp);
     fread(&scm_estk_size, sizeof(long), 1, fp);
@@ -102,14 +103,14 @@ void init_my_zone() {
     fread(&tc16_safeport, sizeof(int), 1, fp);
     fread(&tc16_sysport, sizeof(int), 1, fp);
     fread(&tmp_errp, sizeof(SCM), 1, fp);
-    fread(&tmp_errpbuf, sizeof(cell *), 1, fp);
+    fread(tmp_errpbuf, sizeof(cell), 3, fp);
 
     // subr.c
     // nothing
 
     // repl.c
-    fread(&upcase, sizeof(unsigned char), CHAR_CODE_LIMIT, fp);
-    fread(&downcase, sizeof(unsigned char), CHAR_CODE_LIMIT, fp);
+    fread(upcase, sizeof(unsigned char), CHAR_CODE_LIMIT, fp);
+    fread(downcase, sizeof(unsigned char), CHAR_CODE_LIMIT, fp);
     fread(&loc_broken_pipe, sizeof(SCM *), 1, fp);
     fread(&p_read_for_load, sizeof(SCM), 1, fp);
     fread(&p_read, sizeof(SCM), 1, fp);
@@ -208,7 +209,7 @@ void init_my_zone() {
     fread(&internal_vector_symbol, sizeof(SCM), 1, fp);
 
     // ega.c
-    fread(&gc_traced, sizeof(SCM) * heap_cells, 1, fp);
+    fread(&gc_traced, sizeof(SCM *), 1, fp);
 
     // disksave.c
     // nothing
@@ -217,8 +218,8 @@ void init_my_zone() {
     fread(&tc16_sknm, sizeof(long), 1, fp);
 
     // scl.c
-//    fread(sys_protects, sizeof(SCM) * NUM_PROTECTS, 1, fp);
-//    fread(&num_protects, sizeof(sizet), 1, fp);
+    fread(sys_protects, sizeof(SCM), NUM_PROTECTS, fp);
+    fread(&num_protects, sizeof(sizet), 1, fp);
 
     fclose(fp);
 }

@@ -3,6 +3,7 @@
 //
 
 #include "scm.h"
+#include "setjump.h"
 
 static char s_disk_save[] = "disk-save";
 SCM disk_save() {
@@ -38,7 +39,7 @@ SCM disk_save() {
     fwrite(&setitimer_tab[2].which, sizeof(int), 1, fp);
 
     // sys.c
-    fwrite(&ecache_v, sizeof(cell *), 1, fp);
+    fwrite(ecache_v, sizeof(cell), ECACHE_SIZE, fp);
     fwrite(&estk_pool, sizeof(SCM), 1, fp);
     fwrite(&expmem, sizeof(int), 1, fp);
     fwrite(&finals_gra, sizeof(scm_gra), 1, fp);
@@ -63,7 +64,7 @@ SCM disk_save() {
     fwrite(&scm_ecache_index, sizeof(long), 1, fp);
     fwrite(&scm_ecache_len, sizeof(long), 1, fp);
     fwrite(&scm_egc_root_index, sizeof(long), 1, fp);
-    fwrite(&scm_egc_roots, sizeof(SCM *), 1, fp);
+    fwrite(scm_egc_roots, sizeof(SCM), ECACHE_SIZE/20, fp);
     fwrite(&scm_estk, sizeof(SCM), 1, fp);
     fwrite(&scm_estk_ptr, sizeof(SCM *), 1, fp);
     fwrite(&scm_estk_size, sizeof(long), 1, fp);
@@ -77,14 +78,14 @@ SCM disk_save() {
     fwrite(&tc16_safeport, sizeof(int), 1, fp);
     fwrite(&tc16_sysport, sizeof(int), 1, fp);
     fwrite(&tmp_errp, sizeof(SCM), 1, fp);
-    fwrite(&tmp_errpbuf, sizeof(cell *), 1, fp);
+    fwrite(tmp_errpbuf, sizeof(cell), 3, fp);
 
     // subr.c
     // nothing
 
     // repl.c
-    fwrite(&upcase, sizeof(unsigned char), CHAR_CODE_LIMIT, fp);
-    fwrite(&downcase, sizeof(unsigned char), CHAR_CODE_LIMIT, fp);
+    fwrite(upcase, sizeof(unsigned char), CHAR_CODE_LIMIT, fp);
+    fwrite(downcase, sizeof(unsigned char), CHAR_CODE_LIMIT, fp);
     fwrite(&loc_broken_pipe, sizeof(SCM *), 1, fp);
     fwrite(&p_read_for_load, sizeof(SCM), 1, fp);
     fwrite(&p_read, sizeof(SCM), 1, fp);
@@ -183,7 +184,7 @@ SCM disk_save() {
     fwrite(&internal_vector_symbol, sizeof(SCM), 1, fp);
 
     // ega.c
-    fwrite(&gc_traced, sizeof(SCM) * heap_cells, 1, fp);
+    fwrite(&gc_traced, sizeof(SCM *), 1, fp);
 
     // disksave.c
     // nothing
@@ -192,8 +193,8 @@ SCM disk_save() {
     fwrite(&tc16_sknm, sizeof(long), 1, fp);
 
     // scl.c
-//    fwrite(sys_protects, sizeof(SCM) * NUM_PROTECTS, 1, fp);
-//    fwrite(&num_protects, sizeof(sizet), 1, fp);
+    fwrite(sys_protects, sizeof(SCM), NUM_PROTECTS, fp);
+    fwrite(&num_protects, sizeof(sizet), 1, fp);
 
     fclose(fp);
     return UNSPECIFIED;
