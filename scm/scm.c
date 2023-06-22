@@ -62,29 +62,40 @@ void	init_sbrk P((void));
 void	init_dynl P((void));
 void	init_edline P((void));
 void	init_eval P((void));
+void	init_eval_disk_saved P((void));
 void	init_features P((void));
+void    init_features_disk_saved P((void));
 void	init_gsubr P((void));
 void	init_io P((void));
+void	init_io_disk_saved P((void));
 void	init_ioext P((void));
 void	init_posix P((void));
 void	init_ramap P((void));
 void	init_record P((void));
 void    init_define_data_type P((void));
+void    init_define_data_type_disk_saved P((void));
 void    init_ega P((void));
+void    init_ega_disk_saved P((void));
 void    init_disk_save P((void));
+void    init_disk_save_disk_saved P((void));
 void	init_rgx P((void));
 void	init_rope P((void));
 void	init_repl P((int iverbose));
+void	init_repl_disk_saved P((void));
 void	init_sc2 P((void));
 void	init_scl P((void));
+void	init_scl_disk_saved P((void));
 void	init_signals P((void));
 void	init_socket P((void));
 void	init_subrs P((void));
 void	init_tables P((void));
 void	init_time P((void));
+void    init_time_disk_saved P((void));
 void	init_types P((void));
+void    init_types_disk_saved P((void));
 void	init_unif P((void));
 void	init_debug P((void));
+void	init_debug_disk_saved P((void));
 void	reset_time P((void));
 void	final_repl P((void));
 
@@ -508,6 +519,9 @@ void init_scm(iverbose, buf0stdin, init_heap_size)
     init_tables();
     init_storage(&i, init_heap_size); /* CONT(rootcont)->stkbse gets set here */
   } else {
+    if (disk_saved) {
+        init_types_disk_saved();
+    }
     /* The streams when the program was dumped need to be reset. */
     SETSTREAM(def_inp, stdin);
     SETSTREAM(def_outp, stdout);
@@ -529,8 +543,23 @@ void init_scm(iverbose, buf0stdin, init_heap_size)
     init_define_data_type();
     init_ega();
     init_disk_save();
+  } else {
+      if (disk_saved) {
+          init_features_disk_saved();
+          init_subrs();
+          init_scl_disk_saved();
+          init_unif();
+          init_time_disk_saved();
+          init_io_disk_saved();
+          init_eval_disk_saved();
+          init_debug_disk_saved();
+          init_repl_disk_saved();
+          init_define_data_type_disk_saved();
+          init_ega_disk_saved();
+          init_disk_save_disk_saved();
+      }
+      reset_time();
   }
-  else reset_time();
 #ifdef HAVE_DYNL
   /* init_dynl() must check dumped to avoid redefining subrs */
   init_dynl();
@@ -1058,4 +1087,19 @@ void init_features()
   add_feature(s_ed);
 #endif
   sysintern("*scm-version*", CAR(sysintern(SCMVERSION, UNDEFINED)));
+}
+
+void init_features_disk_saved() {
+    init_iprocs(subr0s, tc7_subr_0);
+    init_iprocs(subr1s, tc7_subr_1);
+    make_subr(s_execpath, tc7_subr_1o, scm_execpath);
+    make_subr(s_getenv, tc7_subr_1o, scm_getenv);
+#ifdef SIGALRM
+# ifdef SIGPROF
+    make_subr(s_setitimer, tc7_subr_3, scm_setitimer);
+# endif
+#endif
+#ifdef TICKS
+  make_subr(s_ticks, tc7_subr_1o, lticks);
+#endif
 }

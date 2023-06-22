@@ -2325,6 +2325,24 @@ void init_repl( iverbose )
 #endif
 	tc16_arbiter = newsmob(&arbsmob);
 }
+
+void init_repl_disk_saved() {
+    init_iprocs(subr0s, tc7_subr_0);
+    init_iprocs(subr1os, tc7_subr_1o);
+    init_iprocs(subr1s, tc7_subr_1);
+    init_iprocs(subr2os, tc7_subr_2o);
+    make_subr(s_swapcar, tc7_subr_2, swapcar);
+    make_subr(s_wfi, tc7_lsubr, wait_for_input);
+#ifndef MEMOIZE_LOCALS
+    p_read_numbered =
+	  make_subr(s_read_numbered, tc7_subr_1, scm_read_numbered);
+#endif
+    p_read_for_load =
+            make_subr(s_read_for_load, tc7_subr_1, scm_read_for_load);
+    p_read =
+            make_subr(s_read, tc7_subr_1o, scm_read);
+}
+
 void final_repl()
 {
   i_eval_string = i_load_string = 0;

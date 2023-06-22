@@ -49,7 +49,7 @@ typedef struct {SCM car, cdr;} cell;
 typedef struct {long sname;SCM (*cproc)();} subr;
 typedef struct {long sname;double (*dproc)();} dsubr;
 typedef struct {const char *string;SCM (*cproc)();} iproc;
-typedef struct {const char *name;} subr_info;
+typedef struct {const char *name;SCM subr_obj;} subr_info;
 
 #include <stdio.h>
 #include "scmfig.h"
@@ -1185,7 +1185,7 @@ typedef struct {SCM sym; int which;} setitimer_tab_info;
 SCM_EXPORT setitimer_tab_info setitimer_tab[3];
 
 // sys.c
-SCM_EXPORT cell ecache_v[];
+SCM_EXPORT cell *ecache_v;
 SCM_EXPORT SCM estk_pool;
 SCM_EXPORT int expmem;
 SCM_EXPORT SCM gc_finalizers, gc_finalizers_pending;

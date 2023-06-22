@@ -25,6 +25,9 @@ SCM disk_save() {
     fwrite(&base, sizeof(HEADER), 1, fp);
     fwrite(&freep, sizeof(HEADER *), 1, fp);
 
+    sizet base_addr = (sizet) &base;
+    fwrite(&base_addr, sizeof(sizet), 1, fp);
+
     /* Cのグローバル変数 */
     // scm.c
     fwrite(&case_sensitize_symbols, sizeof(int), 1, fp);
@@ -39,7 +42,7 @@ SCM disk_save() {
     fwrite(&setitimer_tab[2].which, sizeof(int), 1, fp);
 
     // sys.c
-    fwrite(ecache_v, sizeof(cell), ECACHE_SIZE, fp);
+    fwrite(&ecache_v, sizeof(cell), 1, fp);
     fwrite(&estk_pool, sizeof(SCM), 1, fp);
     fwrite(&expmem, sizeof(int), 1, fp);
     fwrite(&finals_gra, sizeof(scm_gra), 1, fp);
@@ -208,4 +211,8 @@ static iproc subr0s[] = {
 void init_disk_save() {
     init_iprocs(subr0s, tc7_subr_0);
     add_feature("disksave");
+}
+
+void init_disk_save_disk_saved() {
+    init_iprocs(subr0s, tc7_subr_0);
 }

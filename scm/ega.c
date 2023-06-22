@@ -120,3 +120,7 @@ void init_ega() {
     init_iprocs(subr1s, tc7_subr_1);
     add_feature("ega");
 }
+
+void init_ega_disk_saved() {
+    init_iprocs(subr1s, tc7_subr_1);
+}

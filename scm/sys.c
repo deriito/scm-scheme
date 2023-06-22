@@ -934,6 +934,25 @@ void init_types()
     scm_init_gra(&finals_gra, sizeof(void (*)()), 4, 0, s_final);
 }
 
+void init_types_disk_saved() {
+    scm_init_gra(&ptobs_gra, sizeof(ptobfuns), 8, 255, "ptobs");
+    /* These newptob calls must be done in this order */
+    /* tc16_fport = */ newptob(&fptob);
+    /* tc16_pipe = */ newptob(&pipob);
+    /* tc16_strport = */ newptob(&stptob);
+    /* tc16_sfport = */ newptob(&sfptob);
+    tc16_clport = newptob(&clptob);
+    tc16_sysport = newptob(&sysptob);
+    tc16_safeport = newptob(&safeptob);
+    scm_init_gra(&smobs_gra, sizeof(smobfuns), 16, 255, "smobs");
+    /* These newsmob calls must be done in this order */
+    newsmob(&freecell);
+    newsmob(&flob);
+    newsmob(&bigob);
+    newsmob(&bigob);
+    scm_init_gra(&finals_gra, sizeof(void (*)()), 4, 0, s_final);
+}
+
 #ifdef TEST_FINAL
 void test_final()
 {
@@ -965,7 +984,7 @@ SCM scm_add_finalizer(value, finalizer)
 }
 
 static char s_estk[] = "environment stack";
-cell ecache_v[ECACHE_SIZE];
+cell *ecache_v;
 SCM scm_egc_roots[ECACHE_SIZE/20];
 CELLPTR scm_ecache;
 VOLATILE long scm_ecache_index, scm_ecache_len, scm_egc_root_index;
@@ -1231,6 +1250,18 @@ void init_io()
 #endif
 }
 
+void init_io_disk_saved() {
+    make_subr("dynamic-wind", tc7_subr_3, dynwind);
+    make_subr(s_gc, tc7_subr_1o, gc);
+    init_iprocs(subr0s, tc7_subr_0);
+    init_iprocs(subr1s, tc7_subr_1);
+    init_iprocs(subr2s, tc7_subr_2);
+    loc_open_file =
+            &CDR(sysintern(s_open_file,
+                           CDR(sysintern(s_try_open_file, UNDEFINED))));
+    loc_try_create_file = &CDR(sysintern(s_try_create_file, UNDEFINED));
+}
+
 void grew_lim(nm)
         long nm;
 {
@@ -1442,18 +1473,30 @@ SCM sysintern(name, val)
         z = CAR(lsym);
         z = CAR(z);
         tmp = UCHARS(z);
-        if (LENGTH(z) != len) goto trynext;
-        for (i = len;i--;) if (((unsigned char *)name)[i] != tmp[i]) goto trynext;
+        if (LENGTH(z) != len) {
+            goto trynext;
+        }
+        for (i = len;i--;) {
+            if (((unsigned char *)name)[i] != tmp[i]) {
+                goto trynext;
+            }
+        }
         lsym = CAR(lsym);
-        if (!UNBNDP(val)) CDR(lsym) = val;
-        else if (UNBNDP(CDR(lsym)) && tc7_msymbol==TYP7(CAR(lsym)))
+        if (!UNBNDP(val)) {
+            CDR(lsym) = val;
+        } else if (UNBNDP(CDR(lsym)) && tc7_msymbol==TYP7(CAR(lsym))) {
             scm_gc_protect(lsym);
+        }
         return lsym;
         trynext: ;
     }
     NEWCELL(lsym);
     SETLENGTH(lsym, len, tc7_ssymbol);
-            SETCHARS(lsym, name);
+    char *tmp_name = my_malloc(sizeof(char) * (len + 1L));
+    sizet j = len;
+    while (j--) tmp_name[j] = name[j];
+    tmp_name[len] = 0;
+    SETCHARS(lsym, tmp_name);
     lsym = cons(lsym, val);
     z = cons(lsym, UNDEFINED);
     CDR(z) = VELTS(symhash)[hash];
@@ -1520,15 +1563,20 @@ SCM scm_maksubr(name, type, fcn)
     subr_info info;
     int isubr;
     register SCM z;
-    info.name = name;
+    sizet name_len = strlen(name);
+    char *tmp_name = (char *) my_malloc(sizeof(char) * (name_len + 1L));
+    sizet j = name_len;
+    while (j--) tmp_name[j] = name[j];
+    tmp_name[name_len] = 0;
+    info.name = tmp_name;
     for (isubr = subrs_gra.len; 0 < isubr--;) {
-        if (0==strcmp(((char **)subrs_gra.elts)[isubr], name)) {
-            scm_warn(s_redefining, (char *)name, UNDEFINED);
+        if (0==strcmp((((subr_info *)subrs_gra.elts)[isubr]).name, name)) {
+            my_free(tmp_name);
+            if (!disk_saved) scm_warn(s_redefining, (char *)name, UNDEFINED);
             goto foundit;
         }
     }
     isubr = scm_grow_gra(&subrs_gra, (char *)&info);
-    foundit:
     NEWCELL(z);
     if (!fcn && tc7_cxr==type) {
         const char *p = name;
@@ -1542,6 +1590,11 @@ SCM scm_maksubr(name, type, fcn)
         type += (code << 8);
     }
     CAR(z) = (isubr<<16) + type;
+    SUBRF(z) = fcn;
+    (((subr_info *)subrs_gra.elts)[isubr]).subr_obj = z;
+    return z;
+    foundit:
+    z = (((subr_info *) subrs_gra.elts)[isubr]).subr_obj;
     SUBRF(z) = fcn;
     return z;
 }
@@ -1911,7 +1964,12 @@ void scm_init_gra(gra, eltsize, len, maxlen, what)
     gra->elts = nelts;
     gra->alloclen = len;
     gra->maxlen = maxlen;
-    gra->what = what;
+    sizet what_len = strlen(what);
+    sizet j = what_len;
+    char *tmp_what = (char *) my_malloc(sizeof(char) * (what_len + 1L));
+    while (j--) tmp_what[j] = what[j];
+    tmp_what[what_len] = 0;
+    gra->what = tmp_what;
     /* ALLOW_INTS; */
 }
 /* Returns the index into the elt array */
@@ -2210,7 +2268,8 @@ void init_storage(stack_start_ptr, init_heap_size)
     CDR(undefineds) = undefineds;
     /* flo0 is now setup in scl.c */
     /* Set up environment cache */
-    scm_ecache_len = sizeof(ecache_v)/sizeof(cell);
+    ecache_v = my_malloc(sizeof(cell) * ECACHE_SIZE);
+    scm_ecache_len = (sizeof(cell) * ECACHE_SIZE)/sizeof(cell);
     scm_ecache = CELL_UP(ecache_v);
     scm_ecache_len = CELL_DN(ecache_v + scm_ecache_len - 1) - scm_ecache + 1;
     scm_ecache_index = scm_ecache_len;
@@ -2344,8 +2403,12 @@ void scm_gc_hook ()
         return;
     }
     gc_hook_active = !0;
-    if (! loc_gc_hook) loc_gc_hook = &CDR(sysintern("gc-hook", UNDEFINED));
-    if (NIMP(*loc_gc_hook)) apply(*loc_gc_hook, EOL, EOL);
+    if (! loc_gc_hook) {
+        loc_gc_hook = &CDR(sysintern("gc-hook", UNDEFINED));
+    }
+    if (NIMP(*loc_gc_hook)) {
+        apply(*loc_gc_hook, EOL, EOL);
+    }
     scm_run_finalizers(0);
     gc_hook_active = 0;
 }

@@ -5,7 +5,6 @@
 #define PREPARED_MEMORY_BYTES (5 * 1024 * 1024)
 #define OFFSET_OF_STARTS (1024 * 1024)
 
-#include <stdio.h>
 #include "scm.h"
 #include "setjump.h"
 
@@ -19,9 +18,6 @@ char *managed_memory_end;
 
 void init_my_zone() {
     char *cp = (char *) malloc(PREPARED_MEMORY_BYTES);
-    if (cp == NULL) {
-        exit(253);
-    }
     prepared_memory_start = cp;
 
     FILE *fp;
@@ -50,6 +46,18 @@ void init_my_zone() {
     fread(&base, sizeof(HEADER), 1, fp);
     fread(&freep, sizeof(HEADER *), 1, fp);
 
+    sizet old_base_addr;
+    fread(&old_base_addr, sizeof(sizet), 1, fp);
+    for (HEADER *p = &base; ; p = p->ptr) {
+        if (p->ptr == (HEADER *)old_base_addr) {
+            p->ptr = &base;
+            break;
+        }
+    }
+    if (freep == (HEADER *)old_base_addr) {
+        freep = &base;
+    }
+
     /* Cのグローバル変数 */
     // scm.c
     fread(&case_sensitize_symbols, sizeof(int), 1, fp);
@@ -64,7 +72,7 @@ void init_my_zone() {
     fread(&setitimer_tab[2].which, sizeof(int), 1, fp);
 
     // sys.c
-    fread(ecache_v, sizeof(cell), ECACHE_SIZE, fp);
+    fread(&ecache_v, sizeof(cell), 1, fp);
     fread(&estk_pool, sizeof(SCM), 1, fp);
     fread(&expmem, sizeof(int), 1, fp);
     fread(&finals_gra, sizeof(scm_gra), 1, fp);
@@ -264,7 +272,7 @@ static HEADER *morecore(unsigned nu) {
 
     size_t want_bytes = nu * sizeof(HEADER);
     if (prepared_memory_start + PREPARED_MEMORY_BYTES - managed_memory_end < want_bytes) {
-        return NULL;
+        return (NULL);
     }
 
     cp = managed_memory_end;
@@ -273,15 +281,15 @@ static HEADER *morecore(unsigned nu) {
     up = (HEADER *) cp;
     up->size = nu;
     my_free((void *) (up + 1));
-    return freep;
+    return (freep);
 }
 
 void *my_malloc(size_t nbytes) {
-    HEADER * p, *prevp;
+    HEADER *p, *prevp;
     unsigned nunits;
 
     if (0 == nbytes) {
-        return NULL;
+        return (NULL);
     }
 
     nunits = (nbytes + sizeof(HEADER) - 1) / sizeof(HEADER) + 1;
@@ -340,10 +348,12 @@ void *my_realloc(void *oldptr_arg, size_t size) {
     }
 }
 
-HEADER *get_malloc_base() {
-    return (&base);
-}
-
-HEADER **get_malloc_freep() {
-    return (&freep);
+void *my_calloc(size_t nelem, size_t elsize) {
+    char *ptr;
+    int i;
+    ptr = my_malloc(i = nelem * elsize);
+    while (--i >= 0) {
+        ptr[i] = 0;
+    }
+    return (ptr);
 }
