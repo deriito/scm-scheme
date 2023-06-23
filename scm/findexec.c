@@ -143,7 +143,7 @@ Wed Feb 21 23:06:35 1996  Aubrey Jaffer
 static char *copy_of(s)
      register const char *s;
 {
-  register char *p = (char *) my_malloc(strlen(s)+1);
+  register char *p = (char *) malloc(strlen(s) + 1);
   if (!p) return 0;
   *p = 0;
   strcpy(p, s);

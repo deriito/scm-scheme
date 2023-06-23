@@ -1172,9 +1172,6 @@ SCM_EXPORT char *managed_memory_start;
 SCM_EXPORT char *managed_memory_end;
 
 SCM_EXPORT void init_my_zone(void);
-SCM_EXPORT void *my_malloc(size_t nbytes);
-SCM_EXPORT void *my_realloc(void *oldptr_arg, size_t size);
-SCM_EXPORT void my_free(void *ap_arg);
 
 /* 之前没有声明在全局的变量 */
 // scm.c
@@ -1238,7 +1235,9 @@ SCM_EXPORT long scm_protidx;
 SCM_EXPORT SCM module_flag_symbol, internal_vector_symbol;
 
 // socket.c
+#ifdef COMPILED_INITS
 SCM_EXPORT long tc16_sknm;
+#endif
 
 // scl.c
 SCM_EXPORT sizet num_protects;

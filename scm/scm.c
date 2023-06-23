@@ -888,13 +888,13 @@ SCM scm_execpath(newpath)
   if (UNBNDP(newpath))
     return retval;
   if (FALSEP(newpath)) {
-    if (execpath) my_free(execpath);
+    if (execpath) free(execpath);
     execpath = 0;
     return retval;
   }
   ASRTER(NIMP(newpath) && STRINGP(newpath), newpath, ARG1, s_execpath);
-  if (execpath) my_free(execpath);
-  execpath = (char *)my_malloc((sizet)(LENGTH(newpath) + 1));
+  if (execpath) free(execpath);
+  execpath = (char *) malloc((sizet) (LENGTH(newpath) + 1));
   ASRTER(execpath, newpath, NALLOC, s_execpath);
   strncpy(execpath, CHARS(newpath), LENGTH(newpath) + 1);
   return retval;

@@ -193,7 +193,9 @@ SCM disk_save() {
     // nothing
 
     // socket.c
+#ifdef COMPILED_INITS
     fwrite(&tc16_sknm, sizeof(long), 1, fp);
+#endif
 
     // scl.c
     fwrite(sys_protects, sizeof(SCM), NUM_PROTECTS, fp);

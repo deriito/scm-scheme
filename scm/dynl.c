@@ -18,7 +18,6 @@
 
 /* Author: Aubrey Jaffer */
 
-#include "scm.h"
 #ifndef STDC_HEADERS
 	int free ();		/* P((char *ptr)) */
 #endif
@@ -41,7 +40,7 @@ void listundefs()
     fputs(undefs[i], stdout);
     puts("\"");
   }
-  my_free(undefs);
+  free(undefs);
 }
 
 static char s_link[] = "dyn:link", s_call[] = "dyn:call";

@@ -5,6 +5,7 @@
 #define PREPARED_MEMORY_BYTES (5 * 1024 * 1024)
 #define OFFSET_OF_STARTS (1024 * 1024)
 
+#include <sys/mman.h>
 #include "scm.h"
 #include "setjump.h"
 
@@ -17,7 +18,11 @@ char *managed_memory_start;
 char *managed_memory_end;
 
 void init_my_zone() {
-    char *cp = (char *) malloc(PREPARED_MEMORY_BYTES);
+    char *cp = (char *) mmap(NULL, PREPARED_MEMORY_BYTES, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0);
+    if (MAP_FAILED == cp) {
+        exit(253);
+    }
+
     prepared_memory_start = cp;
 
     FILE *fp;
@@ -223,7 +228,9 @@ void init_my_zone() {
     // nothing
 
     // socket.c
+#ifdef COMPILED_INITS
     fread(&tc16_sknm, sizeof(long), 1, fp);
+#endif
 
     // scl.c
     fread(sys_protects, sizeof(SCM), NUM_PROTECTS, fp);
@@ -232,7 +239,7 @@ void init_my_zone() {
     fclose(fp);
 }
 
-void my_free(void *ap_arg) {
+void free(void *ap_arg) {
     HEADER *bp, *p;
     char *ap = ap_arg;
 
@@ -280,11 +287,11 @@ static HEADER *morecore(unsigned nu) {
 
     up = (HEADER *) cp;
     up->size = nu;
-    my_free((void *) (up + 1));
+    free((void *) (up + 1));
     return (freep);
 }
 
-void *my_malloc(size_t nbytes) {
+void *malloc(size_t nbytes) {
     HEADER *p, *prevp;
     unsigned nunits;
 
@@ -319,7 +326,7 @@ void *my_malloc(size_t nbytes) {
     }
 }
 
-void *my_realloc(void *oldptr_arg, size_t size) {
+void *realloc(void *oldptr_arg, size_t size) {
     HEADER *bp;
     unsigned nunits;
     char *p;
@@ -327,7 +334,7 @@ void *my_realloc(void *oldptr_arg, size_t size) {
     char *old_ptr = oldptr_arg;
 
     if (NULL == old_ptr) {
-        return (my_malloc(size));
+        return (malloc(size));
     }
 
     bp = (HEADER *) old_ptr - 1;
@@ -337,10 +344,10 @@ void *my_realloc(void *oldptr_arg, size_t size) {
     } else if (bp->size > nunits) {
         (bp + nunits)->size = bp->size -nunits;
         bp->size = nunits;
-        my_free((char *) (bp + nunits + 1));
+        free((char *) (bp + nunits + 1));
         return ((char *) (bp + 1));
     } else {
-        p = my_malloc(size);
+        p = malloc(size);
         for (i = 0; i < (bp->size - 1) * sizeof(HEADER); i++) {
             p[i] = old_ptr[i];
         }
@@ -348,10 +355,10 @@ void *my_realloc(void *oldptr_arg, size_t size) {
     }
 }
 
-void *my_calloc(size_t nelem, size_t elsize) {
+void *calloc(size_t nelem, size_t elsize) {
     char *ptr;
     int i;
-    ptr = my_malloc(i = nelem * elsize);
+    ptr = malloc(i = nelem * elsize);
     while (--i >= 0) {
         ptr[i] = 0;
     }

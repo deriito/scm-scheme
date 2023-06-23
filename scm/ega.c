@@ -107,7 +107,7 @@ void process_dead_marked_obj(SCM ptr, long last_gc_traced_index) {
 }
 
 void init_gc_traced() {
-    gc_traced = (SCM *) my_malloc(heap_cells * sizeof(SCM));
+    gc_traced = (SCM *) malloc(heap_cells * sizeof(SCM));
 }
 
 static iproc subr1s[] = {

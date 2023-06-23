@@ -168,10 +168,10 @@ int main(int argc, const char **argv) {
     }
     fflush(stderr);
     if (implpath) {
-        my_free(implpath);
+        free(implpath);
     }
     if (execpath) {
-        my_free(execpath);
+        free(execpath);
     }
     execpath = 0;
 /* added by Dai Inukai 2001-03-27 */
