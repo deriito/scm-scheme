@@ -725,3 +725,12 @@ void init_debug()
   make_subr(s_frame_eval, tc7_subr_3, scm_frame_eval);
 #endif
 }
+
+void init_debug_disk_saved() {
+    init_iprocs(subr1os, tc7_subr_1o);
+    init_iprocs(subr1s, tc7_subr_1);
+    init_iprocs(subr2s, tc7_subr_2);
+#ifdef CAUTIOUS
+    make_subr(s_frame_eval, tc7_subr_3, scm_frame_eval);
+#endif
+}

@@ -424,3 +424,7 @@ void init_time()
 	reset_time();
 	init_iprocs(subr0s, tc7_subr_0);
 }
+
+void init_time_disk_saved() {
+    init_iprocs(subr0s, tc7_subr_0);
+}

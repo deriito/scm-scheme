@@ -31,3 +31,6 @@ scm/udscm5
 scm/udscm5.opt
 slib/collect.sc
 scm/scm~
+
+# runtime generated files
+**/saved_image

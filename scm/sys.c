@@ -681,7 +681,7 @@ static ptobfuns clptob = {
    written to cur_errp as soon as interrupts are enabled. There will only
    ever be one of these. */
 int output_deferred = 0;
-static int tc16_sysport;
+int tc16_sysport;
 #define SYS_ERRP_SIZE 480
 static char errbuf[SYS_ERRP_SIZE];
 static sizet errbuf_end = 0;
@@ -897,8 +897,8 @@ scm_gra finals_gra;
 static char s_final[] = "final";
 
 /* statically allocated ports for diagnostic messages */
-static cell tmp_errpbuf[3];
-static SCM tmp_errp;
+cell tmp_errpbuf[3];
+SCM tmp_errp;
 extern sizet num_protects;	/* sys_protects now in scl.c */
 void init_types()
 {
@@ -934,6 +934,25 @@ void init_types()
     scm_init_gra(&finals_gra, sizeof(void (*)()), 4, 0, s_final);
 }
 
+void init_types_disk_saved() {
+    scm_init_gra(&ptobs_gra, sizeof(ptobfuns), 8, 255, "ptobs");
+    /* These newptob calls must be done in this order */
+    /* tc16_fport = */ newptob(&fptob);
+    /* tc16_pipe = */ newptob(&pipob);
+    /* tc16_strport = */ newptob(&stptob);
+    /* tc16_sfport = */ newptob(&sfptob);
+    tc16_clport = newptob(&clptob);
+    tc16_sysport = newptob(&sysptob);
+    tc16_safeport = newptob(&safeptob);
+    scm_init_gra(&smobs_gra, sizeof(smobfuns), 16, 255, "smobs");
+    /* These newsmob calls must be done in this order */
+    newsmob(&freecell);
+    newsmob(&flob);
+    newsmob(&bigob);
+    newsmob(&bigob);
+    scm_init_gra(&finals_gra, sizeof(void (*)()), 4, 0, s_final);
+}
+
 #ifdef TEST_FINAL
 void test_final()
 {
@@ -946,7 +965,7 @@ void add_final(final)
     scm_grow_gra(&finals_gra, (char *)&final);
 }
 
-static SCM gc_finalizers = EOL, gc_finalizers_pending = EOL;
+SCM gc_finalizers = EOL, gc_finalizers_pending = EOL;
 static char s_add_finalizer[] = "add-finalizer";
 SCM scm_add_finalizer(value, finalizer)
         SCM value, finalizer;
@@ -965,12 +984,12 @@ SCM scm_add_finalizer(value, finalizer)
 }
 
 static char s_estk[] = "environment stack";
-static cell ecache_v[ECACHE_SIZE];
+cell *ecache_v;
 SCM scm_egc_roots[ECACHE_SIZE/20];
 CELLPTR scm_ecache;
 VOLATILE long scm_ecache_index, scm_ecache_len, scm_egc_root_index;
 SCM scm_estk = UNDEFINED, *scm_estk_ptr;
-static SCM estk_pool = EOL;
+SCM estk_pool = EOL;
 long scm_estk_size;
 static SCM make_stk_seg(size, contents)
         sizet size;
@@ -1231,6 +1250,18 @@ void init_io()
 #endif
 }
 
+void init_io_disk_saved() {
+    make_subr("dynamic-wind", tc7_subr_3, dynwind);
+    make_subr(s_gc, tc7_subr_1o, gc);
+    init_iprocs(subr0s, tc7_subr_0);
+    init_iprocs(subr1s, tc7_subr_1);
+    init_iprocs(subr2s, tc7_subr_2);
+    loc_open_file =
+            &CDR(sysintern(s_open_file,
+                           CDR(sysintern(s_try_open_file, UNDEFINED))));
+    loc_try_create_file = &CDR(sysintern(s_try_create_file, UNDEFINED));
+}
+
 void grew_lim(nm)
         long nm;
 {
@@ -1262,8 +1293,8 @@ static char *igc_for_alloc(where, olen, size, what)
         if (nm > mtrigger) grew_lim(nm + nm/2);
         else grew_lim(mtrigger + mtrigger/2);
     }
-    if (where) SYSCALL(ptr = (char *)realloc(where, size););
-    else SYSCALL(ptr = (char *)malloc(size););
+    if (where) SYSCALL(ptr = (char *) realloc(where, size););
+    else SYSCALL(ptr = (char *) malloc(size););
     ASRTER(ptr, MAKINUM(size), NALLOC, what);
     if (nm > mltrigger) {
         if (nm > mtrigger) mtrigger = nm + nm/2;
@@ -1284,7 +1315,7 @@ char *must_malloc(len, what)
 #ifdef SHORT_SIZET
     ASRTER(len==size, MAKINUM(len), NALLOC, what);
 #endif
-    if (nm <= mtrigger) SYSCALL(ptr = (char *)malloc(size););
+    if (nm <= mtrigger) SYSCALL(ptr = (char *) malloc(size););
     else ptr = 0;
     if (!ptr) ptr = igc_for_alloc(0L, 0L, size+0L, what);
     else mallocated = nm;
@@ -1305,7 +1336,7 @@ SCM must_malloc_cell(len, c, what)
     ASRTER(len==size, MAKINUM(len), NALLOC, what);
 #endif
     NEWCELL(z);
-    if (nm <= mtrigger) SYSCALL(ptr = (char *)malloc(size););
+    if (nm <= mtrigger) SYSCALL(ptr = (char *) malloc(size););
     else ptr = 0;
     if (!ptr) ptr = igc_for_alloc(0L, 0L, size+0L, what);
     else mallocated = nm;
@@ -1329,7 +1360,7 @@ char *must_realloc(where, olen, len, what)
     ASRTER(!errjmp_bad, MAKINUM(len), NALLOC, what);
 /* printf("must_realloc(%lx, %lu, %lu, %s)\n", where, olen, len, what); fflush(stdout);
    printf("nm = %ld <= mtrigger = %ld: %d; size = %u\n", nm, mtrigger, (nm <= mtrigger), size); fflush(stdout); */
-    if (nm <= mtrigger) SYSCALL(ptr = (char *)realloc(where, size););
+    if (nm <= mtrigger) SYSCALL(ptr = (char *) realloc(where, size););
     else ptr = 0;
     if (!ptr) ptr = igc_for_alloc(where, olen, size+0L, what);
     else mallocated = nm;
@@ -1349,7 +1380,7 @@ void must_realloc_cell(z, olen, len, what)
 #endif
     ASRTER(!errjmp_bad, MAKINUM(len), NALLOC, what);
 /* printf("must_realloc_cell(%lx, %lu, %lu, %s)\n", z, olen, len, what); fflush(stdout); */
-    if (nm <= mtrigger) SYSCALL(ptr = (char *)realloc(where, size););
+    if (nm <= mtrigger) SYSCALL(ptr = (char *) realloc(where, size););
     else ptr = 0;
     if (!ptr) ptr = igc_for_alloc(where, olen, size+0L, what);
     else mallocated = nm;
@@ -1442,18 +1473,30 @@ SCM sysintern(name, val)
         z = CAR(lsym);
         z = CAR(z);
         tmp = UCHARS(z);
-        if (LENGTH(z) != len) goto trynext;
-        for (i = len;i--;) if (((unsigned char *)name)[i] != tmp[i]) goto trynext;
+        if (LENGTH(z) != len) {
+            goto trynext;
+        }
+        for (i = len;i--;) {
+            if (((unsigned char *)name)[i] != tmp[i]) {
+                goto trynext;
+            }
+        }
         lsym = CAR(lsym);
-        if (!UNBNDP(val)) CDR(lsym) = val;
-        else if (UNBNDP(CDR(lsym)) && tc7_msymbol==TYP7(CAR(lsym)))
+        if (!UNBNDP(val)) {
+            CDR(lsym) = val;
+        } else if (UNBNDP(CDR(lsym)) && tc7_msymbol==TYP7(CAR(lsym))) {
             scm_gc_protect(lsym);
+        }
         return lsym;
         trynext: ;
     }
     NEWCELL(lsym);
     SETLENGTH(lsym, len, tc7_ssymbol);
-            SETCHARS(lsym, name);
+    char *tmp_name = malloc(sizeof(char) * (len + 1L));
+    sizet j = len;
+    while (j--) tmp_name[j] = name[j];
+    tmp_name[len] = 0;
+    SETCHARS(lsym, tmp_name);
     lsym = cons(lsym, val);
     z = cons(lsym, UNDEFINED);
     CDR(z) = VELTS(symhash)[hash];
@@ -1520,15 +1563,20 @@ SCM scm_maksubr(name, type, fcn)
     subr_info info;
     int isubr;
     register SCM z;
-    info.name = name;
+    sizet name_len = strlen(name);
+    char *tmp_name = (char *) malloc(sizeof(char) * (name_len + 1L));
+    sizet j = name_len;
+    while (j--) tmp_name[j] = name[j];
+    tmp_name[name_len] = 0;
+    info.name = tmp_name;
     for (isubr = subrs_gra.len; 0 < isubr--;) {
-        if (0==strcmp(((char **)subrs_gra.elts)[isubr], name)) {
-            scm_warn(s_redefining, (char *)name, UNDEFINED);
+        if (0==strcmp((((subr_info *)subrs_gra.elts)[isubr]).name, name)) {
+            free(tmp_name);
+            if (!disk_saved) scm_warn(s_redefining, (char *)name, UNDEFINED);
             goto foundit;
         }
     }
     isubr = scm_grow_gra(&subrs_gra, (char *)&info);
-    foundit:
     NEWCELL(z);
     if (!fcn && tc7_cxr==type) {
         const char *p = name;
@@ -1542,6 +1590,11 @@ SCM scm_maksubr(name, type, fcn)
         type += (code << 8);
     }
     CAR(z) = (isubr<<16) + type;
+    SUBRF(z) = fcn;
+    (((subr_info *)subrs_gra.elts)[isubr]).subr_obj = z;
+    return z;
+    foundit:
+    z = (((subr_info *) subrs_gra.elts)[isubr]).subr_obj;
     SUBRF(z) = fcn;
     return z;
 }
@@ -1911,7 +1964,12 @@ void scm_init_gra(gra, eltsize, len, maxlen, what)
     gra->elts = nelts;
     gra->alloclen = len;
     gra->maxlen = maxlen;
-    gra->what = what;
+    sizet what_len = strlen(what);
+    sizet j = what_len;
+    char *tmp_what = (char *) malloc(sizeof(char) * (what_len + 1L));
+    while (j--) tmp_what[j] = what[j];
+    tmp_what[what_len] = 0;
+    gra->what = tmp_what;
     /* ALLOW_INTS; */
 }
 /* Returns the index into the elt array */
@@ -1996,7 +2054,7 @@ long newptob(ptob)
     return tc7_port + 256*scm_grow_gra(&ptobs_gra, (char *)ptob);
 }
 port_info *scm_port_table = 0;
-static sizet scm_port_table_len = 0;
+sizet scm_port_table_len = 0;
 static char s_port_table[] = "port table";
 SCM scm_port_entry(stream, ptype, flags)
         FILE *stream;
@@ -2210,7 +2268,8 @@ void init_storage(stack_start_ptr, init_heap_size)
     CDR(undefineds) = undefineds;
     /* flo0 is now setup in scl.c */
     /* Set up environment cache */
-    scm_ecache_len = sizeof(ecache_v)/sizeof(cell);
+    ecache_v = malloc(sizeof(cell) * ECACHE_SIZE);
+    scm_ecache_len = (sizeof(cell) * ECACHE_SIZE)/sizeof(cell);
     scm_ecache = CELL_UP(ecache_v);
     scm_ecache_len = CELL_DN(ecache_v + scm_ecache_len - 1) - scm_ecache + 1;
     scm_ecache_index = scm_ecache_len;
@@ -2336,7 +2395,7 @@ void scm_run_finalizers(exiting)
     }
 }
 
-static SCM *loc_gc_hook = 0;
+SCM *loc_gc_hook = 0;
 void scm_gc_hook ()
 {
     if (gc_hook_active) {
@@ -2344,8 +2403,12 @@ void scm_gc_hook ()
         return;
     }
     gc_hook_active = !0;
-    if (! loc_gc_hook) loc_gc_hook = &CDR(sysintern("gc-hook", UNDEFINED));
-    if (NIMP(*loc_gc_hook)) apply(*loc_gc_hook, EOL, EOL);
+    if (! loc_gc_hook) {
+        loc_gc_hook = &CDR(sysintern("gc-hook", UNDEFINED));
+    }
+    if (NIMP(*loc_gc_hook)) {
+        apply(*loc_gc_hook, EOL, EOL);
+    }
     scm_run_finalizers(0);
     gc_hook_active = 0;
 }
@@ -2449,7 +2512,7 @@ void free_storage()
             CELLPTR ptr = CELL_UP(hplims[hplim_ind]);
             sizet seg_cells = CELL_DN(hplims[hplim_ind+1]) - ptr;
             heap_cells -= seg_cells;
-            free((char *)hplims[hplim_ind]);
+            free((char *) hplims[hplim_ind]);
             hplims[hplim_ind] = 0;
             /* At this point, sys_errp is no longer valid */
             /* growth_mon(s_heap, heap_cells, s_cells, 0); fflush(stderr); */
@@ -2872,7 +2935,7 @@ static void gc_sweep(contin_bad)
         if (n==seg_cells) {
             heap_cells -= seg_cells;
             n = 0;
-            free((char *)hplims[i-2]);
+            free((char *) hplims[i - 2]);
             /*      must_free((char *)hplims[i-2],
               sizeof(cell) * (hplims[i-1] - hplims[i-2])); */
             hplims[i-2] = 0;

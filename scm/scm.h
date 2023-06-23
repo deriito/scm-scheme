@@ -49,7 +49,7 @@ typedef struct {SCM car, cdr;} cell;
 typedef struct {long sname;SCM (*cproc)();} subr;
 typedef struct {long sname;double (*dproc)();} dsubr;
 typedef struct {const char *string;SCM (*cproc)();} iproc;
-typedef struct {const char *name;} subr_info;
+typedef struct {const char *name;SCM subr_obj;} subr_info;
 
 #include <stdio.h>
 #include "scmfig.h"
@@ -1158,3 +1158,87 @@ SCM_EXPORT void process_dead_marked_obj P((SCM ptr, long last_gc_traced_index));
 SCM_EXPORT SCM *gc_traced;
 SCM_EXPORT char *instance_type_name P((SCM ptr));
 SCM_EXPORT char is_internal_vector P((SCM ptr));
+
+typedef struct bheader {
+    struct bheader *ptr;
+    unsigned size;
+} HEADER;
+
+SCM_EXPORT HEADER base; /* empty list to get started */
+SCM_EXPORT HEADER *freep; /* start of free list */
+
+SCM_EXPORT char *prepared_memory_start;
+SCM_EXPORT char *managed_memory_start;
+SCM_EXPORT char *managed_memory_end;
+
+SCM_EXPORT void init_my_zone(void);
+
+/* 之前没有声明在全局的变量 */
+// scm.c
+SCM_EXPORT int case_sensitize_symbols;
+SCM_EXPORT int disk_saved;
+SCM_EXPORT SCM *loc_features;
+typedef struct {SCM sym; int which;} setitimer_tab_info;
+SCM_EXPORT setitimer_tab_info setitimer_tab[3];
+
+// sys.c
+SCM_EXPORT cell *ecache_v;
+SCM_EXPORT SCM estk_pool;
+SCM_EXPORT int expmem;
+SCM_EXPORT SCM gc_finalizers, gc_finalizers_pending;
+SCM_EXPORT sizet hplim_ind;
+SCM_EXPORT CELLPTR *hplims;
+SCM_EXPORT SCM *loc_gc_hook;
+SCM_EXPORT SCM *loc_open_file;
+SCM_EXPORT SCM *loc_try_create_file;
+SCM_EXPORT long mltrigger;
+SCM_EXPORT sizet scm_port_table_len;
+SCM_EXPORT int tc16_safeport;
+SCM_EXPORT int tc16_sysport;
+SCM_EXPORT SCM tmp_errp;
+SCM_EXPORT cell tmp_errpbuf[];
+
+// repl.c
+SCM_EXPORT SCM *loc_broken_pipe;
+SCM_EXPORT SCM p_read_for_load, p_read;
+SCM_EXPORT SCM *loc_loadsharp, *loc_readsharp, *loc_charsharp;
+SCM_EXPORT long tc16_arbiter;
+SCM_EXPORT int errjmp_recursive;
+SCM_EXPORT int errobj_codep;
+SCM_EXPORT SCM err_exp, err_env;
+SCM_EXPORT long rt, gc_rt, gc_time_taken, scm_env_work, scm_gcs, scm_egcs, scm_stk_moved, scm_clo_moved, scm_egc_rt;
+SCM_EXPORT SCM i_repl;
+SCM_EXPORT SCM i_eval_string;
+SCM_EXPORT SCM i_load_string;
+
+// eval.c
+SCM_EXPORT long tc16_macro;
+SCM_EXPORT SCM i_lambda, i_define, i_let, i_begin, i_arrow, i_else;
+SCM_EXPORT SCM i_bind, i_anon, i_side_effect, i_test, i_procedure, i_argument, i_check_defines;
+SCM_EXPORT SCM f_begin, f_define;
+SCM_EXPORT SCM *loc_atcase_aux;
+SCM_EXPORT int in_atcase_aux;
+SCM_EXPORT long tc16_promise;
+
+// continue.c
+#ifdef SHORT_INT
+SCM_EXPORT long thrown_value;
+#endif
+
+// debug.c
+SCM_EXPORT long tc16_codeptr;
+
+// rope.c
+SCM_EXPORT long scm_protidx;
+
+// defineddatatype.c
+SCM_EXPORT SCM module_flag_symbol, internal_vector_symbol;
+
+// socket.c
+#ifdef COMPILED_INITS
+SCM_EXPORT long tc16_sknm;
+#endif
+
+// scl.c
+SCM_EXPORT sizet num_protects;
+/* 之前没有声明在全局的变量 end */

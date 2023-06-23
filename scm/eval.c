@@ -890,12 +890,12 @@ static char s_expr[] = "bad expression";
 
 /* These symbols are needed by the reader, in repl.c */
 SCM i_dot, i_quote, i_quasiquote, i_unquote, i_uq_splicing;
-static SCM i_lambda, i_define, i_let, i_begin, i_arrow, i_else;	/* , i_atbind */
+SCM i_lambda, i_define, i_let, i_begin, i_arrow, i_else;	/* , i_atbind */
 /* These symbols are passed in the context argument to macro expanders. */
-static SCM i_bind, i_anon, i_side_effect, i_test, i_procedure,
+SCM i_bind, i_anon, i_side_effect, i_test, i_procedure,
   i_argument, i_check_defines;
 
-static SCM f_begin, f_define;
+SCM f_begin, f_define;
 
 #define ASRTSYNTAX(cond_, msg_) if (!(cond_))wta(xorig, (msg_), what);
 #ifdef MACRO
@@ -1061,8 +1061,8 @@ SCM m_or(xorig, env, ctxt)
 #ifdef INUMS_ONLY
 # define memv memq
 #endif
-static SCM *loc_atcase_aux = 0;
-static int in_atcase_aux = 0;
+SCM *loc_atcase_aux = 0;
+int in_atcase_aux = 0;
 SCM m_case(xorig, env, ctxt)
      SCM xorig, env, ctxt;
 {
@@ -3739,4 +3739,60 @@ void init_eval()
   eval_env = EOL;
 #endif
   f_apply_closure = scm_evstr("(let ((ap apply)) (lambda (p . a) (ap p a)))");
+}
+
+void init_eval_disk_saved() {
+    tc16_promise = newsmob(&promsmob);
+    tc16_macro = newsmob(&macrosmob);
+    tc16_env = newsmob(&envsmob);
+
+    init_iprocs(subr1s, tc7_subr_1);
+    init_iprocs(subr2s, tc7_subr_2);
+    init_iprocs(lsubr2s, tc7_lsubr_2);
+    init_iprocs(subr3s, tc7_subr_3);
+
+    make_specfun(s_apply, tc16_apply, 0);
+    make_specfun(s_call_cc, tc16_call_cc, 0);
+    make_specfun(s_eval, tc16_eval, 0);
+    make_specfun(s_values, tc16_values, 0);
+    make_specfun(s_call_wv, tc16_call_wv, 0);
+
+    i_quasiquote = make_synt(s_quasiquote, MAC_MMACRO, m_quasiquote);
+    i_define = make_synt(s_define, MAC_MMACRO, m_define);
+    make_synt(s_delay, MAC_MMACRO, m_delay);
+
+    /* acros */
+    make_synt(s_definedp, MAC_ACRO, definedp);
+    /* end of acros */
+
+    make_synt(s_and, MAC_MMACRO, m_and);
+    i_begin = make_synt(s_begin, MAC_MMACRO, m_begin);
+    make_synt(s_case, MAC_MMACRO, m_case);
+    make_synt(s_cond, MAC_MMACRO, m_cond);
+    make_synt(s_do, MAC_MMACRO, m_do);
+    make_synt(s_if, MAC_MMACRO, m_if);
+    i_lambda = make_synt(s_lambda, MAC_MMACRO, m_lambda);
+    i_let = make_synt(s_let, MAC_MMACRO, m_let);
+    make_synt(s_letrec, MAC_MMACRO, m_letrec);
+    make_synt(s_letstar, MAC_MMACRO, m_letstar);
+    make_synt(s_or, MAC_MMACRO, m_or);
+    i_quote = make_synt(s_quote, MAC_MMACRO, m_quote);
+    make_synt(s_set, MAC_MMACRO, m_set);
+    make_synt(s_atapply, MAC_MMACRO, m_apply);
+    /*  make_synt(s_atcall_cc, MAC_MMACRO, m_cont); */
+#ifdef MAC_INLINE
+    make_synt("@inline-lambda", MAC_MMACRO, m_inline_lambda);
+#endif
+#ifdef MACRO
+  make_subr(s_renamed_ident, tc7_subr_2, renamed_ident);
+  make_synt(s_syn_quote, MAC_MMACRO, m_syn_quote);
+  make_synt(s_defsyntax, MAC_MMACRO, m_defsyntax);
+  make_synt(s_let_syntax, MAC_MMACRO, m_let_syntax);
+  make_synt(s_letrec_syntax, MAC_MMACRO, m_letrec_syntax);
+
+  make_synt(s_the_macro, MAC_ACRO, m_the_macro);
+#endif
+
+    f_begin = CDR(CDR(KEYWORD_MACRO(sym2vcell(i_begin))));
+    f_define = CDR(CDR(KEYWORD_MACRO(sym2vcell(i_define))));
 }

@@ -62,28 +62,40 @@ void	init_sbrk P((void));
 void	init_dynl P((void));
 void	init_edline P((void));
 void	init_eval P((void));
+void	init_eval_disk_saved P((void));
 void	init_features P((void));
+void    init_features_disk_saved P((void));
 void	init_gsubr P((void));
 void	init_io P((void));
+void	init_io_disk_saved P((void));
 void	init_ioext P((void));
 void	init_posix P((void));
 void	init_ramap P((void));
 void	init_record P((void));
 void    init_define_data_type P((void));
+void    init_define_data_type_disk_saved P((void));
 void    init_ega P((void));
+void    init_ega_disk_saved P((void));
+void    init_disk_save P((void));
+void    init_disk_save_disk_saved P((void));
 void	init_rgx P((void));
 void	init_rope P((void));
 void	init_repl P((int iverbose));
+void	init_repl_disk_saved P((void));
 void	init_sc2 P((void));
 void	init_scl P((void));
+void	init_scl_disk_saved P((void));
 void	init_signals P((void));
 void	init_socket P((void));
 void	init_subrs P((void));
 void	init_tables P((void));
 void	init_time P((void));
+void    init_time_disk_saved P((void));
 void	init_types P((void));
+void    init_types_disk_saved P((void));
 void	init_unif P((void));
 void	init_debug P((void));
+void	init_debug_disk_saved P((void));
 void	reset_time P((void));
 void	final_repl P((void));
 
@@ -98,7 +110,7 @@ under certain conditions; type `(terms)' for details.\n", stderr);
 
 void scm_init_INITS()
 {
-  if (!dumped) {
+  if (!dumped && !disk_saved) {
 #ifdef INITS
     INITS;			/* call initialization of extension files */
 #endif
@@ -155,9 +167,9 @@ SCM scm_init_extensions()
 #define SIGNAL_BASE HUP_SIGNAL
 /* PROF_SIGNAL appears below because it is the last signal
    defined in scm.h and in errmsgs in repl.c  */
-static struct {
+struct {
   int signo; SIGRETTYPE (*osig)(); SIGRETTYPE (*nsig)();
-} sigdesc[PROF_SIGNAL - SIGNAL_BASE + 1];
+} sigdesc[PROF_SIGNAL - SIGNAL_BASE + 1]; // 不需要被写入dump file，在init_signals()中被初始化
 
 #define NUM_SIGNALS (sizeof(sigdesc)/sizeof(sigdesc[0]))
 
@@ -328,7 +340,7 @@ SCM lalarm(i)
 # ifdef SIGPROF
 #  include <sys/time.h>
 static char s_setitimer[] = "setitimer";
-static struct {SCM sym; int which;} setitimer_tab[3] = {
+setitimer_tab_info setitimer_tab[3] = {
   {UNDEFINED, 0}, {UNDEFINED, 0}, {UNDEFINED, 0}};
 /* VALUE and INTERVAL are milliseconds */
 SCM scm_setitimer(which, value, interval)
@@ -480,11 +492,12 @@ SCM lticks(i)
 #endif
 
 #ifdef SIGPIPE
-static SIGRETTYPE (*oldpipe) ();
+static SIGRETTYPE (*oldpipe) (); // 不需要被写入dump file，在init_signals()中被初始化
 #endif
 
 int case_sensitize_symbols = 0;	/* set to 8 to read case-sensitive symbols */
 int dumped = 0;			/* Is this an invocation of unexec exe? */
+int disk_saved = 0; /* for heap memory dump feature (disk-save) */
 
 #ifdef SHORT_ALIGN
 typedef short STACKITEM;
@@ -501,11 +514,14 @@ void init_scm(iverbose, buf0stdin, init_heap_size)
 {
   STACKITEM i;
   if (2 <= iverbose) init_banner();
-  if (!dumped) {
+  if (!dumped && !disk_saved) {
     init_types();
     init_tables();
     init_storage(&i, init_heap_size); /* CONT(rootcont)->stkbse gets set here */
   } else {
+    if (disk_saved) {
+        init_types_disk_saved();
+    }
     /* The streams when the program was dumped need to be reset. */
     SETSTREAM(def_inp, stdin);
     SETSTREAM(def_outp, stdout);
@@ -513,7 +529,7 @@ void init_scm(iverbose, buf0stdin, init_heap_size)
   }
   if (buf0stdin) SCM_PORTFLAGS(def_inp) |= BUF0;
   else SCM_PORTFLAGS(def_inp) &= ~BUF0;
-  if (!dumped) {
+  if (!dumped && !disk_saved) {
     init_features();
     init_subrs();
     init_scl();
@@ -526,8 +542,24 @@ void init_scm(iverbose, buf0stdin, init_heap_size)
     init_repl(iverbose);
     init_define_data_type();
     init_ega();
+    init_disk_save();
+  } else {
+      if (disk_saved) {
+          init_features_disk_saved();
+          init_subrs();
+          init_scl_disk_saved();
+          init_unif();
+          init_time_disk_saved();
+          init_io_disk_saved();
+          init_eval_disk_saved();
+          init_debug_disk_saved();
+          init_repl_disk_saved();
+          init_define_data_type_disk_saved();
+          init_ega_disk_saved();
+          init_disk_save_disk_saved();
+      }
+      reset_time();
   }
-  else reset_time();
 #ifdef HAVE_DYNL
   /* init_dynl() must check dumped to avoid redefining subrs */
   init_dynl();
@@ -862,7 +894,7 @@ SCM scm_execpath(newpath)
   }
   ASRTER(NIMP(newpath) && STRINGP(newpath), newpath, ARG1, s_execpath);
   if (execpath) free(execpath);
-  execpath = (char *)malloc((sizet)(LENGTH(newpath) + 1));
+  execpath = (char *) malloc((sizet) (LENGTH(newpath) + 1));
   ASRTER(execpath, newpath, NALLOC, s_execpath);
   strncpy(execpath, CHARS(newpath), LENGTH(newpath) + 1);
   return retval;
@@ -1016,6 +1048,7 @@ void add_feature(str)
 {
   *loc_features = cons(CAR(sysintern(str, UNDEFINED)), *loc_features);
 }
+
 void init_features()
 {
   loc_features = &CDR(sysintern("slib:features", EOL));
@@ -1054,4 +1087,19 @@ void init_features()
   add_feature(s_ed);
 #endif
   sysintern("*scm-version*", CAR(sysintern(SCMVERSION, UNDEFINED)));
+}
+
+void init_features_disk_saved() {
+    init_iprocs(subr0s, tc7_subr_0);
+    init_iprocs(subr1s, tc7_subr_1);
+    make_subr(s_execpath, tc7_subr_1o, scm_execpath);
+    make_subr(s_getenv, tc7_subr_1o, scm_getenv);
+#ifdef SIGALRM
+# ifdef SIGPROF
+    make_subr(s_setitimer, tc7_subr_3, scm_setitimer);
+# endif
+#endif
+#ifdef TICKS
+  make_subr(s_ticks, tc7_subr_1o, lticks);
+#endif
 }

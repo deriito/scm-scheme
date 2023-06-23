@@ -18,7 +18,6 @@
 
 /* Author: Aubrey Jaffer */
 
-#include "scm.h"
 #ifndef STDC_HEADERS
 	int free ();		/* P((char *ptr)) */
 #endif
