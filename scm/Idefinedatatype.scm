@@ -72,12 +72,42 @@
                                       "-"
                                       (string-append
                                         (symbol->string (vector-ref field-names-v i))
-                                        "!"))))))))
+                                        "!")))))))
+             (procname-bakup
+               (string->symbol (string-append
+                                 "set"
+                                 (string-append
+                                   "-"
+                                   (string-append
+                                     (symbol->string type-name)
+                                     (string-append
+                                       "-"
+                                       (string-append
+                                         (symbol->string (vector-ref field-names-v i))
+                                         "!-bakup")))))))
+             (procname-with-wb
+               (string->symbol (string-append
+                                 "set"
+                                 (string-append
+                                   "-"
+                                   (string-append
+                                     (symbol->string type-name)
+                                     (string-append
+                                       "-"
+                                       (string-append
+                                         (symbol->string (vector-ref field-names-v i))
+                                         "!-with-wb"))))))))
         (begin
           (eval `(define ,procname
-                    (lambda (obj value)
-                      (if (,(gen-predicate-name type-name) obj)
-                        (c-data-type-modifier obj ,(+ i 1) value)
-                        (error "wrong type of obj")))))
+                         (lambda (obj value)
+                           (if (,(gen-predicate-name type-name) obj)
+                             (c-data-type-modifier obj ,(+ i 1) value)
+                             (error "wrong type of obj")))))
+          (eval `(define ,procname-bakup ,procname))
+          (eval `(define ,procname-with-wb
+                         (lambda (obj value)
+                           (if (,(gen-predicate-name type-name) obj)
+                             (c-data-type-modifier-with-wb obj ,(+ i 1) value)
+                             (error "wrong type of obj")))))
           (loop (+ i 1))))
       #t)))

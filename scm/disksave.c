@@ -187,7 +187,14 @@ SCM disk_save() {
     fwrite(&internal_vector_symbol, sizeof(SCM), 1, fp);
 
     // ega.c
-    fwrite(&gc_traced, sizeof(SCM *), 1, fp);
+    fwrite(&is_process_all_ref_paths, sizeof(char), 1, fp);
+    fwrite(&line_num_quantity_of_a_ref_pattern_at_least, sizeof(long), 1, fp);
+    fwrite(&gc_count_of_a_ref_pattern_at_most, sizeof(long), 1, fp);
+    fwrite(&is_print_result, sizeof(char), 1, fp);
+    fwrite(&current_gc_count, sizeof(unsigned long), 1, fp);
+    fwrite(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
+    fwrite(&focusing_ref_path_list, sizeof(FocusingRefPathList *), 1, fp);
+    fwrite(&collect_info_hash_map, sizeof(CollectedInfoHash **), 1, fp);
 
     // disksave.c
     // nothing
