@@ -551,6 +551,9 @@ void ega_process_at_gc_start() {
 }
 
 void ega_process_after_gc() {
+    if (NULL == focusing_ref_path_list->paths) {
+        return; // 如果没有focusing path的话就不用执行后面的了
+    }
     check_ref_path_list_after_gc();
     scm_evstr("(begin"
               "(display \"System will be exit!\\n\")"
