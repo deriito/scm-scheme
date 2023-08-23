@@ -1584,6 +1584,7 @@ void gc_start(what)
   gc_malloc_collected = 0;
   gc_ports_collected = 0;
   gc_syms_collected = 0;
+  ega_process_at_gc_start();
 }
 void gc_end()
 {
@@ -1601,6 +1602,7 @@ void gc_end()
     scm_intprint(gc_ports_collected, -10, sys_errp);
     lputs(" ports collected\n", sys_errp);
   }
+  ega_process_after_gc();
 }
 void scm_egc_start()
 {

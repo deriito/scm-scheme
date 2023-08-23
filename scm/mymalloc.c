@@ -222,7 +222,14 @@ void init_my_zone() {
     fread(&internal_vector_symbol, sizeof(SCM), 1, fp);
 
     // ega.c
-    fread(&gc_traced, sizeof(SCM *), 1, fp);
+    fread(&is_process_all_ref_paths, sizeof(char), 1, fp);
+    fread(&line_num_quantity_of_a_ref_pattern_at_least, sizeof(long), 1, fp);
+    fread(&gc_count_of_a_ref_pattern_at_most, sizeof(long), 1, fp);
+    fread(&is_print_result, sizeof(char), 1, fp);
+    fread(&current_gc_count, sizeof(unsigned long), 1, fp);
+    fread(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
+    fread(&focusing_ref_path_list, sizeof(FocusingRefPathList *), 1, fp);
+    fread(&collect_info_hash_map, sizeof(CollectedInfoHash **), 1, fp);
 
     // disksave.c
     // nothing
@@ -342,7 +349,7 @@ void *realloc(void *oldptr_arg, size_t size) {
     if (bp->size == nunits) {
         return (old_ptr);
     } else if (bp->size > nunits) {
-        (bp + nunits)->size = bp->size -nunits;
+        (bp + nunits)->size = bp->size - nunits;
         bp->size = nunits;
         free((char *) (bp + nunits + 1));
         return ((char *) (bp + 1));

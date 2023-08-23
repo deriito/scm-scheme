@@ -140,6 +140,52 @@ typedef struct {SCM type;float num;} flo;
 typedef struct {SCM type;double *real;} dbl;
 #endif
 
+typedef struct bheader {
+    struct bheader *ptr;
+    unsigned size;
+} HEADER;
+
+typedef struct gc_traced_info {
+    SCM ptr;
+    long ref_field_index;
+} GcTracedInfo;
+
+typedef struct ref_path_entry {
+    SCM ptr;
+    long ref_field_index;
+    long line_num_quantity;
+    long *line_nums;
+} RefPathEntry;
+
+typedef struct ref_path {
+    long active_index;
+    long gc_count_of_active_index;
+    long len;
+    RefPathEntry *entries;
+    struct ref_path *prev;
+    struct ref_path *next;
+} RefPath;
+
+typedef struct focusing_ref_path_list {
+    RefPath *paths;
+    RefPath *last;
+} FocusingRefPathList;
+
+#define FIELD_REF_INFO_ALLOCATED_LEN (6)
+#define FIELD_REF_INFO_ALLOCATED_LEN_EXPAND_TIMES (2)
+typedef struct field_ref_data_type_info {
+    SCM *ref_data_types;
+    int *is_to_add; // 各の値に対し, 0: 削除 1: 追加
+    long allocated_len;
+    long len;
+} FieldRefDataTypeInfo;
+
+typedef struct collected_info_hash {
+    SCM data_type_def;
+    FieldRefDataTypeInfo *field_ref_info; // len is num of the data type fields
+    struct collected_info_hash* next;
+} CollectedInfoHash;
+
   /* Conditionals should always expect immediates */
   /* GCC __builtin_expect() is stubbed in scmfig.h */
 #define IMP(x) SCM_EXPECT_TRUE(6 & PTR2INT(x))
@@ -722,7 +768,7 @@ SCM_EXPORT void repl_report P((void));
 SCM_EXPORT void growth_mon P((char *obj, long size, char *units, int grewp));
 SCM_EXPORT void gc_start P((const char *what));
 SCM_EXPORT void gc_end P((void));
-SCM_EXPORT void gc_mark P((SCM p, long last_gc_traced_index));
+SCM_EXPORT void gc_mark P((SCM p, long last_gc_traced_index, long previous_ref_field_index));
 SCM_EXPORT void scm_gc_hook P((void));
 SCM_EXPORT SCM     scm_gc_protect P((SCM obj));
 SCM_EXPORT SCM  scm_add_finalizer P((SCM value, SCM finalizer));
@@ -973,6 +1019,7 @@ SCM_EXPORT SCM  scm_write P((SCM obj, SCM port));
 SCM_EXPORT SCM  scm_display P((SCM obj, SCM port));
 SCM_EXPORT SCM  scm_newline P((SCM port));
 SCM_EXPORT SCM  scm_write_char P((SCM chr, SCM port));
+SCM_EXPORT SCM  line_num P((void));
 SCM_EXPORT SCM  scm_port_line P((SCM port));
 SCM_EXPORT SCM  scm_port_col P((SCM port));
 SCM_EXPORT void scm_line_msg P((SCM file, SCM linum, SCM port));
@@ -1154,15 +1201,29 @@ SCM_EXPORT char is_user_defined_data_type P((SCM scm_obj));
 SCM_EXPORT char is_user_defined_data_type_instance P((SCM scm_obj));
 SCM_EXPORT void set_assert_mark P((SCM scm_obj));
 SCM_EXPORT char is_assert_dead_marked P((SCM scm_obj));
-SCM_EXPORT void process_dead_marked_obj P((SCM ptr, long last_gc_traced_index));
-SCM_EXPORT SCM *gc_traced;
+SCM_EXPORT void set_ref_path_info_recorded P((SCM scm_obj));
+SCM_EXPORT char is_ref_path_info_recorded P((SCM scm_obj));
+SCM_EXPORT SCM get_data_type_def_identifier P((SCM scm_obj));
+SCM_EXPORT void try_gather_new_ref_path P((SCM ptr, long last_gc_traced_index));
+SCM_EXPORT void try_gather_new_line_num P((SCM ptr, long last_gc_traced_index));
+SCM_EXPORT void ega_process_at_gc_start P((void));
+SCM_EXPORT void ega_process_after_gc P((void));
+SCM_EXPORT char is_process_all_ref_paths;
+SCM_EXPORT long line_num_quantity_of_a_ref_pattern_at_least;
+SCM_EXPORT long gc_count_of_a_ref_pattern_at_most;
+SCM_EXPORT char is_print_result;
+SCM_EXPORT unsigned long current_gc_count;
+SCM_EXPORT GcTracedInfo *gc_traced;
+SCM_EXPORT FocusingRefPathList *focusing_ref_path_list;
+SCM_EXPORT CollectedInfoHash **collect_info_hash_map;
+SCM_EXPORT long field_number P((SCM data_type_def));
+SCM_EXPORT char *data_type_field_name P((SCM data_type_def, long field_index));
+SCM_EXPORT char *data_type_name P((SCM data_type_def));
 SCM_EXPORT char *instance_type_name P((SCM ptr));
 SCM_EXPORT char is_internal_vector P((SCM ptr));
-
-typedef struct bheader {
-    struct bheader *ptr;
-    unsigned size;
-} HEADER;
+SCM_EXPORT char is_user_defined_data_type_instance_with_rec_slots P((SCM scm_obj));
+SCM_EXPORT SCM get_rec_slot_of_field P((SCM scm_obj, long field_index));
+SCM_EXPORT void try_update_data_type_def P((CollectedInfoHash *collected_info));
 
 SCM_EXPORT HEADER base; /* empty list to get started */
 SCM_EXPORT HEADER *freep; /* start of free list */
@@ -1242,3 +1303,15 @@ SCM_EXPORT long tc16_sknm;
 // scl.c
 SCM_EXPORT sizet num_protects;
 /* 之前没有声明在全局的变量 end */
+
+// data structure field indexes
+#define CONS_CAR_IDX 0
+#define CONS_CDR_IDX 1
+#define CLOSURE_CODE_IDX 0
+#define CLOSURE_ENV_IDX 1
+#define SPECFUN_CDR_IDX 1
+#define PROBFUN_MARK_IDX 1
+#define SMOBS_MARK_IDX 1
+
+// max quantity of recorded line num of per field
+#define PER_FIELD_REC_LINE_NUM_QUANTITY 3
