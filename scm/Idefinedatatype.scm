@@ -54,7 +54,7 @@
                     (lambda (obj)
                       (if (,(gen-predicate-name type-name) obj)
                         (c-data-type-accessor obj ,(+ i 1))
-                        (error "wrong type of obj")))))
+                        (error "accessor: wrong type of obj")))))
           (loop (+ i 1))))
       #t)))
 
@@ -102,12 +102,83 @@
                          (lambda (obj value)
                            (if (,(gen-predicate-name type-name) obj)
                              (c-data-type-modifier obj ,(+ i 1) value)
-                             (error "wrong type of obj")))))
+                             (error "modifier: wrong type of obj")))))
           (eval `(define ,procname-bakup ,procname))
           (eval `(define ,procname-with-wb
                          (lambda (obj value)
                            (if (,(gen-predicate-name type-name) obj)
                              (c-data-type-modifier-with-wb obj ,(+ i 1) value)
-                             (error "wrong type of obj")))))
+                             (error "modifier-with-wb: wrong type of obj")))))
           (loop (+ i 1))))
       #t)))
+
+;; ====================== utils for define-data-type ======================
+
+;; LinkedList
+(define-data-type 'linked-list-node '(entry next-node))
+
+(define-data-type 'linked-list '(size first-node last-node))
+
+(define (new-linked-list accepted-type-name-sym)
+  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?")))
+         (accepted-type-name-str (symbol->string accepted-type-name-sym)))
+    (begin
+      (eval `(define (linked-list-add linked-list value)
+               (if (not (,pred-proc-sym value))
+                 (begin
+                   (error (string-append
+                              "ERROR: You are trying to add a object of wrong type to linked-list<"
+                              ,accepted-type-name-str
+                              ">\n"))
+                   #f)
+                 (begin
+                   (let ((tmp-node (make-linked-list-node value '())))
+                     (begin
+                       (if (null? (linked-list-first-node linked-list))
+                         (begin
+                           (set-linked-list-first-node! linked-list tmp-node)
+                           (set-linked-list-last-node! linked-list tmp-node))
+                         (begin
+                           (set-linked-list-node-next-node! (linked-list-last-node linked-list) tmp-node)
+                           (set-linked-list-last-node! linked-list tmp-node)))
+                       (set-linked-list-size! linked-list (+ 1 (linked-list-size linked-list)))))))))
+      (eval `(define (get-linked-list-size linked-list)
+               (linked-list-size linked-list)))
+      (eval `(define (linked-list-ref linked-list index)
+               (let ((list-size (get-linked-list-size linked-list)))
+                 (if (or (< index 0) (> index (- list-size 1)) (null? (linked-list-first-node linked-list)))
+                   (error "ERROR: Index out of bounds!")
+                   (let loop ((i 0)
+                               (tmp-node (linked-list-first-node linked-list)))
+                     (if (= i index)
+                       (linked-list-node-entry tmp-node)
+                       (loop (+ i 1) (linked-list-node-next-node tmp-node))))))))
+      (eval `(define (linked-list-rm-ref linked-list index)
+               (let ((list-size (get-linked-list-size linked-list)))
+                 (if (or (< index 0) (> index (- list-size 1)) (null? (linked-list-first-node linked-list)))
+                   (error "ERROR: Index out of bounds!")
+                   (let loop ((i 0)
+                               (prev-node '())
+                               (curr-node (linked-list-first-node linked-list))
+                               (post-node (linked-list-node-next-node (linked-list-first-node linked-list))))
+                     (if (= i index)
+                       (begin
+                         (set-linked-list-node-next-node! curr-node '())
+                         (cond
+                           ((and (null? prev-node) (null? post-node))
+                             (begin
+                               (set-linked-list-first-node! linked-list '())
+                               (set-linked-list-last-node! linked-list '())))
+                           ((and (null? prev-node) (not (null? post-node)))
+                             (set-linked-list-first-node! linked-list post-node))
+                           ((and (not (null? prev-node)) (null? post-node))
+                             (begin
+                               (set-linked-list-node-next-node! prev-node '())
+                               (set-linked-list-last-node! linked-list prev-node)))
+                           (else
+                             (set-linked-list-node-next-node! prev-node post-node)))
+                         (set-linked-list-size! linked-list (- list-size 1)))
+                       (loop (+ i 1) curr-node post-node (linked-list-node-next-node post-node))))))))
+      (make-linked-list 0 '() '()))))
+
+;; ====================== utils for define-data-type ======================
