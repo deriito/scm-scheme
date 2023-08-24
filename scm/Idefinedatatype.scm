@@ -117,69 +117,90 @@
 ;; LinkedList
 (define-data-type 'linked-list-node '(entry next-node))
 
-(define-data-type 'linked-list '(size first-node last-node))
+(define-data-type 'linked-list '(size pred-proc-sym first-node last-node))
 
 (define (new-linked-list accepted-type-name-sym)
-  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?")))
-         (accepted-type-name-str (symbol->string accepted-type-name-sym)))
+  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?"))))
+    (make-linked-list 0 pred-proc-sym '() '())))
+
+(define (linked-list-add linked-list value)
+  (if (not ((eval (linked-list-pred-proc-sym linked-list)) value))
     (begin
-      (eval `(define (linked-list-add linked-list value)
-               (if (not (,pred-proc-sym value))
-                 (begin
-                   (error (string-append
-                              "ERROR: You are trying to add a object of wrong type to linked-list<"
-                              ,accepted-type-name-str
-                              ">\n"))
-                   #f)
-                 (begin
-                   (let ((tmp-node (make-linked-list-node value '())))
-                     (begin
-                       (if (null? (linked-list-first-node linked-list))
-                         (begin
-                           (set-linked-list-first-node! linked-list tmp-node)
-                           (set-linked-list-last-node! linked-list tmp-node))
-                         (begin
-                           (set-linked-list-node-next-node! (linked-list-last-node linked-list) tmp-node)
-                           (set-linked-list-last-node! linked-list tmp-node)))
-                       (set-linked-list-size! linked-list (+ 1 (linked-list-size linked-list)))))))))
-      (eval `(define (get-linked-list-size linked-list)
-               (linked-list-size linked-list)))
-      (eval `(define (linked-list-ref linked-list index)
-               (let ((list-size (get-linked-list-size linked-list)))
-                 (if (or (< index 0) (> index (- list-size 1)) (null? (linked-list-first-node linked-list)))
-                   (error "ERROR: Index out of bounds!")
-                   (let loop ((i 0)
-                               (tmp-node (linked-list-first-node linked-list)))
-                     (if (= i index)
-                       (linked-list-node-entry tmp-node)
-                       (loop (+ i 1) (linked-list-node-next-node tmp-node))))))))
-      (eval `(define (linked-list-rm-ref linked-list index)
-               (let ((list-size (get-linked-list-size linked-list)))
-                 (if (or (< index 0) (> index (- list-size 1)) (null? (linked-list-first-node linked-list)))
-                   (error "ERROR: Index out of bounds!")
-                   (let loop ((i 0)
-                               (prev-node '())
-                               (curr-node (linked-list-first-node linked-list))
-                               (post-node (linked-list-node-next-node (linked-list-first-node linked-list))))
-                     (if (= i index)
-                       (begin
-                         (set-linked-list-node-next-node! curr-node '())
-                         (cond
-                           ((and (null? prev-node) (null? post-node))
-                             (begin
-                               (set-linked-list-first-node! linked-list '())
-                               (set-linked-list-last-node! linked-list '())))
-                           ((and (null? prev-node) (not (null? post-node)))
-                             (set-linked-list-first-node! linked-list post-node))
-                           ((and (not (null? prev-node)) (null? post-node))
-                             (begin
-                               (set-linked-list-node-next-node! prev-node '())
-                               (set-linked-list-last-node! linked-list prev-node)))
-                           (else
-                             (set-linked-list-node-next-node! prev-node post-node)))
-                         (set-linked-list-size! linked-list (- list-size 1)))
-                       (loop (+ i 1) curr-node post-node (linked-list-node-next-node post-node))))))))
-      (make-linked-list 0 '() '()))))
+      (error (string-append
+               "ERROR: You are trying to add a object of wrong type to linked-list<"
+               (symbol->string (linked-list-pred-proc-sym linked-list))
+               ">\n"))
+      #f)
+    (begin
+      (let ((tmp-node (make-linked-list-node value '())))
+        (begin
+          (if (null? (linked-list-first-node linked-list))
+            (begin
+              (set-linked-list-first-node! linked-list tmp-node)
+              (set-linked-list-last-node! linked-list tmp-node))
+            (begin
+              (set-linked-list-node-next-node! (linked-list-last-node linked-list) tmp-node)
+              (set-linked-list-last-node! linked-list tmp-node)))
+          (set-linked-list-size! linked-list (+ 1 (linked-list-size linked-list))))))))
+
+(define (get-linked-list-size linked-list)
+  (linked-list-size linked-list))
+
+(define (linked-list-ref linked-list index)
+  (let ((list-size (linked-list-size linked-list)))
+    (if (or (null? (linked-list-first-node linked-list)) (< index 0) (> index (- list-size 1)))
+      (error "ERROR: Index out of bounds!")
+      (let loop ((i 0)
+                  (tmp-node (linked-list-first-node linked-list)))
+        (if (= i index)
+          (linked-list-node-entry tmp-node)
+          (loop (+ i 1) (linked-list-node-next-node tmp-node)))))))
+
+(define (linked-list-set! linked-list index value)
+  (let ((list-size (linked-list-size linked-list)))
+    (cond
+      ((not ((eval (linked-list-pred-proc-sym linked-list)) value))
+        (begin
+          (error (string-append
+                   "ERROR: You are trying to set a object of wrong type to linked-list<"
+                   (symbol->string (linked-list-pred-proc-sym linked-list))
+                   ">\n"))
+          #f))
+      ((or (null? (linked-list-first-node linked-list)) (< index 0) (> index (- list-size 1)))
+        (error "ERROR: Index out of bounds!"))
+      (else
+        (let loop ((i 0)
+                    (tmp-node (linked-list-first-node linked-list)))
+          (if (= i index)
+            (set-linked-list-node-entry! tmp-node value)
+            (loop (+ i 1) (linked-list-node-next-node tmp-node))))))))
+
+(define (linked-list-rm-ref linked-list index)
+  (let ((list-size (linked-list-size linked-list)))
+    (if (or (null? (linked-list-first-node linked-list)) (< index 0) (> index (- list-size 1)))
+      (error "ERROR: Index out of bounds!")
+      (let loop ((i 0)
+                  (prev-node '())
+                  (curr-node (linked-list-first-node linked-list))
+                  (post-node (linked-list-node-next-node (linked-list-first-node linked-list))))
+        (if (= i index)
+          (begin
+            (set-linked-list-node-next-node! curr-node '())
+            (cond
+              ((and (null? prev-node) (null? post-node))
+                (begin
+                  (set-linked-list-first-node! linked-list '())
+                  (set-linked-list-last-node! linked-list '())))
+              ((and (null? prev-node) (not (null? post-node)))
+                (set-linked-list-first-node! linked-list post-node))
+              ((and (not (null? prev-node)) (null? post-node))
+                (begin
+                  (set-linked-list-node-next-node! prev-node '())
+                  (set-linked-list-last-node! linked-list prev-node)))
+              (else
+                (set-linked-list-node-next-node! prev-node post-node)))
+            (set-linked-list-size! linked-list (- list-size 1)))
+          (loop (+ i 1) curr-node post-node (linked-list-node-next-node post-node)))))))
 
 ;; ArrayList
 (define-data-type 'array-list '(size pred-proc-sym data))
