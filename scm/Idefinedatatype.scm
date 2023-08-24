@@ -181,4 +181,93 @@
                        (loop (+ i 1) curr-node post-node (linked-list-node-next-node post-node))))))))
       (make-linked-list 0 '() '()))))
 
+;; ArrayList
+(define-data-type 'array-list '(size pred-proc-sym data))
+
+(define init-array-list-data-capacity 10)
+(define default-array-list-grow-time 2)
+
+(define (new-array-list accepted-type-name-sym)
+  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?"))))
+    (make-array-list 0 pred-proc-sym (make-vector init-array-list-data-capacity '()))))
+
+(define (array-list-add array-list value)
+  (if (not ((eval (array-list-pred-proc-sym array-list)) value))
+    (begin
+      (error (string-append
+               "ERROR: You are trying to add a object of wrong type to array-list<"
+               (symbol->string (array-list-pred-proc-sym array-list))
+               ">\n"))
+      #f)
+    (begin
+      ((lambda (array-list)
+         (let ((curr-size (array-list-size array-list))
+                (curr-capacity (vector-length (array-list-data array-list))))
+           (cond
+             ((>= curr-size curr-capacity)
+               (let ((new-vector (make-vector (* curr-capacity default-array-list-grow-time) '()))
+                      (curr-vector (array-list-data array-list)))
+                 (begin
+                   (let loop ((i 0))
+                     (cond
+                       ((< i curr-size)
+                         (vector-set! new-vector i (vector-ref curr-vector i)))))
+                   (set-array-list-data! array-list new-vector)))))))
+        array-list)
+      (let ((curr-size (array-list-size array-list)))
+        (begin
+          (vector-set! (array-list-data array-list) curr-size value)
+          (set-array-list-size! array-list (+ curr-size 1)))))))
+
+(define (get-array-list-size array-list)
+  (array-list-size array-list))
+
+(define (get-array-list-data-capacity array-list)
+  (vector-length (array-list-data array-list)))
+
+(define (array-list-ref array-list index)
+  (let ((list-size (array-list-size array-list)))
+    (if (or (<= list-size 0) (< index 0) (> index (- list-size 1)))
+      (error "ERROR: Index out of bounds!")
+      (vector-ref (array-list-data array-list) index))))
+
+(define (array-list-set! array-list index value)
+  (cond
+    ((not ((eval (array-list-pred-proc-sym array-list)) value))
+      (begin
+        (error (string-append
+                 "ERROR: You are trying to set a object of wrong type to array-list<"
+                 (symbol->string (array-list-pred-proc-sym array-list))
+                 ">\n"))
+        #f))
+    ((or (<= (array-list-size array-list) 0) (< index 0) (> index (- (array-list-size array-list) 1)))
+      (error "ERROR: Index out of bounds!"))
+    (else
+      (vector-set! (array-list-data array-list) index value))
+    ))
+
+(define (array-list-rm-ref array-list index)
+  (let ((list-size (array-list-size array-list))
+         (curr-capacity (vector-length (array-list-data array-list))))
+    (if (or (<= list-size 0) (< index 0) (> index (- list-size 1)))
+      (error "ERROR: Index out of bounds!")
+      (let ((new-vector (make-vector curr-capacity '()))
+             (curr-vector (array-list-data array-list)))
+        (begin
+          (let loop ((i 0))
+            (cond
+              ((< i list-size)
+                (begin
+                  (cond
+                    ((< i index)
+                      (vector-set! new-vector i (vector-ref curr-vector i)))
+                    ((> i index)
+                      (vector-set! new-vector (- i 1) (vector-ref curr-vector i))))
+                  (loop (+ i 1))))))
+          (set-array-list-data! array-list new-vector)
+          (set-array-list-size! array-list (- list-size 1)))))))
+
+;; HashMap
+;; TODO
+
 ;; ====================== utils for define-data-type ======================
