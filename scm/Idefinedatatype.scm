@@ -289,6 +289,169 @@
           (set-array-list-size! array-list (- list-size 1)))))))
 
 ;; HashMap
-;; TODO
+(define-data-type 'hash-map-entry '(k v))
+
+(define-data-type 'hash-map-internal '(size key-pred-proc-sym value-pred-proc-sym used-bucket-size buckets-vector))
+
+(define-data-type 'hash-map '(hash-map-internal))
+
+(define init-buckets-capacity 1)
+(define buscket-capacity-expand-time 2)
+
+(define (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym capacity)
+  (make-hash-map-internal 0 key-pred-proc-sym value-pred-proc-sym 0 (make-vector capacity '())))
+
+(define (new-hash-map-with-buckets-capacity key-pred-proc-sym value-pred-proc-sym capacity)
+  (make-hash-map
+    (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym capacity)))
+
+(define (new-hash-map accepted-key-type-name-sym accepted-value-type-name-sym)
+  (let ((key-pred-proc-sym (string->symbol (string-append (symbol->string accepted-key-type-name-sym) "?")))
+         (value-pred-proc-sym (string->symbol (string-append (symbol->string accepted-value-type-name-sym) "?"))))
+    (new-hash-map-with-buckets-capacity key-pred-proc-sym value-pred-proc-sym init-buckets-capacity)))
+
+(define (hash-map-internal-simple-put hash-map-internal key value)
+  (letrec ((buckets-vector (hash-map-internal-buckets-vector hash-map-internal))
+            (key-hash (hash key (vector-length buckets-vector)))
+            (entry-list (vector-ref buckets-vector key-hash)))
+    (begin
+      (let ((entry-to-add (make-hash-map-entry key value)))
+        (if (null? entry-list)
+          (begin
+            (set! entry-list (new-linked-list 'hash-map-entry))
+            (linked-list-add entry-list entry-to-add)
+            (vector-set! buckets-vector key-hash entry-list)
+            (set-hash-map-internal-used-bucket-size! hash-map-internal (+ 1 (hash-map-internal-used-bucket-size hash-map-internal)))
+            (set-hash-map-internal-size! hash-map-internal (+ 1 (hash-map-internal-size hash-map-internal))))
+          (let ((have-found-key #f))
+            (begin
+              (let loop ((curr-list-node (linked-list-first-node entry-list)))
+                (cond
+                  ((not (null? curr-list-node))
+                    (if (eq? (hash-map-entry-k (linked-list-node-entry curr-list-node)) key)
+                      (begin
+                        (set! have-found-key #t)
+                        (set-linked-list-node-entry! curr-list-node entry-to-add))
+                      (loop (linked-list-node-next-node curr-list-node))))))
+              (cond
+                ((not have-found-key)
+                  (begin
+                    (linked-list-add entry-list entry-to-add)
+                    (set-hash-map-internal-size! hash-map-internal (+ 1 (hash-map-internal-size hash-map-internal)))))))))))))
+
+(define (hash-map-simple-put hash-map key value)
+  (hash-map-internal-simple-put (hash-map-hash-map-internal hash-map) key value))
+
+(define (hash-map-put hash-map key value)
+  (letrec ((hash-map-internal (hash-map-hash-map-internal hash-map))
+            (key-pred-proc-sym (hash-map-internal-key-pred-proc-sym hash-map-internal))
+            (value-pred-proc-sym (hash-map-internal-value-pred-proc-sym hash-map-internal)))
+    (cond
+      ((or (not ((eval key-pred-proc-sym) key)) (not ((eval value-pred-proc-sym) value)))
+        (error (string-append
+                 "ERROR: A wrong key or value is put in the hash-map<"
+                 (symbol->string key-pred-proc-sym)
+                 ", "
+                 (symbol->string value-pred-proc-sym)
+                 ">")))
+      (else
+        (begin
+          ((lambda (hash-map)
+             (letrec ((hash-map-internal (hash-map-hash-map-internal hash-map))
+                       (buckets-vector (hash-map-internal-buckets-vector hash-map-internal))
+                       (buckets-capacity (vector-length buckets-vector))
+                       (used-buckets-size (hash-map-internal-used-bucket-size hash-map-internal)))
+               (cond
+                 ((>= used-buckets-size buckets-capacity)
+                   (letrec ((new-buckets-capacity (* buckets-capacity buscket-capacity-expand-time))
+                             (key-pred-proc-sym (hash-map-internal-key-pred-proc-sym hash-map-internal))
+                             (value-pred-proc-sym (hash-map-internal-value-pred-proc-sym hash-map-internal))
+                             (new-hash-map-internal (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym new-buckets-capacity))
+                             (new-buckets-vector (hash-map-internal-buckets-vector new-hash-map-internal)))
+                     (begin
+                       (let loop ((i 0))
+                         (cond
+                           ((< i buckets-capacity)
+                             (begin
+                               (let ((entry-list (vector-ref buckets-vector i)))
+                                 (cond
+                                   ((not (null? entry-list))
+                                     (let loop-internal ((curr-list-node (linked-list-first-node entry-list)))
+                                       (cond
+                                         ((not (null? curr-list-node))
+                                           (begin
+                                             (hash-map-internal-simple-put
+                                               new-hash-map-internal
+                                               (hash-map-entry-k (linked-list-node-entry curr-list-node))
+                                               (hash-map-entry-v (linked-list-node-entry curr-list-node)))
+                                             (loop-internal (linked-list-node-next-node curr-list-node)))))))))
+                               (loop (+ i 1))))))
+                       (set-hash-map-hash-map-internal! hash-map new-hash-map-internal)))))))
+            hash-map)
+          (hash-map-simple-put hash-map key value))))))
+
+(define (get-hash-map-size hash-map)
+  (hash-map-internal-size (hash-map-hash-map-internal hash-map)))
+
+(define (get-hash-map-buckets-vector-capacity hash-map)
+  (vector-length (hash-map-internal-buckets-vector (hash-map-hash-map-internal hash-map))))
+
+(define (get-hash-map-used-bucket-size hash-map)
+  (hash-map-internal-used-bucket-size (hash-map-hash-map-internal hash-map)))
+
+(define (hash-map-get hash-map key)
+  (letrec ((hash-map-internal (hash-map-hash-map-internal hash-map))
+            (key-pred-proc-sym (hash-map-internal-key-pred-proc-sym hash-map-internal)))
+    (cond
+      ((not ((eval key-pred-proc-sym) key))
+        (error "hash-map-get: Wrong type of the key givened!"))
+      (else
+        (letrec ((buckets-vector-capacity (get-hash-map-buckets-vector-capacity hash-map))
+                  (key-hash (hash key buckets-vector-capacity))
+                  (buckets-vector (hash-map-internal-buckets-vector hash-map-internal))
+                  (entry-list (vector-ref buckets-vector key-hash)))
+          (if (null? entry-list)
+            '()
+            (let loop ((i 0)
+                        (curr-list-node (linked-list-first-node entry-list)))
+              (cond
+                ((not (null? curr-list-node))
+                  (if (eq? key (hash-map-entry-k (linked-list-node-entry curr-list-node)))
+                    (hash-map-entry-v (linked-list-node-entry curr-list-node))
+                    (loop (+ i 1) (linked-list-node-next-node curr-list-node))))
+                ((and (null? curr-list-node) (= i (get-linked-list-size entry-list)))
+                  '())))))))))
+
+(define (hash-map-rm hash-map key)
+  (letrec ((hash-map-internal (hash-map-hash-map-internal hash-map))
+            (key-pred-proc-sym (hash-map-internal-key-pred-proc-sym hash-map-internal)))
+    (cond
+      ((not ((eval key-pred-proc-sym) key))
+        (error "hash-map-get: Wrong type of the key givened!"))
+      (else
+        (letrec ((buckets-vector-capacity (get-hash-map-buckets-vector-capacity hash-map))
+                  (key-hash (hash key buckets-vector-capacity))
+                  (buckets-vector (hash-map-internal-buckets-vector hash-map-internal))
+                  (entry-list (vector-ref buckets-vector key-hash)))
+          (if (null? entry-list)
+            #t
+            (let ((found-index -1))
+              (begin
+                (let loop ((i 0)
+                            (curr-list-node (linked-list-first-node entry-list)))
+                  (cond
+                    ((not (null? curr-list-node))
+                      (if (eq? key (hash-map-entry-k (linked-list-node-entry curr-list-node)))
+                        (set! found-index i)
+                        (loop (+ i 1) (linked-list-node-next-node curr-list-node))))))
+                (if (>= found-index 0)
+                  (begin
+                    (linked-list-rm-ref entry-list found-index)
+                    (set-hash-map-internal-size! hash-map-internal (- (hash-map-internal-size hash-map-internal) 1))
+                    (cond
+                      ((= 0 (get-linked-list-size entry-list))
+                        (begin
+                          (vector-set! buckets-vector key-hash '())
+                          (set-hash-map-internal-used-bucket-size! hash-map-internal (- (hash-map-internal-used-bucket-size hash-map-internal) 1)))))))))))))))
 
 ;; ====================== utils for define-data-type ======================
