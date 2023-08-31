@@ -54,7 +54,7 @@
                     (lambda (obj)
                       (if (,(gen-predicate-name type-name) obj)
                         (c-data-type-accessor obj ,(+ i 1))
-                        (error "wrong type of obj")))))
+                        (error "accessor: wrong type of obj")))))
           (loop (+ i 1))))
       #t)))
 
@@ -102,12 +102,356 @@
                          (lambda (obj value)
                            (if (,(gen-predicate-name type-name) obj)
                              (c-data-type-modifier obj ,(+ i 1) value)
-                             (error "wrong type of obj")))))
+                             (error "modifier: wrong type of obj")))))
           (eval `(define ,procname-bakup ,procname))
           (eval `(define ,procname-with-wb
                          (lambda (obj value)
                            (if (,(gen-predicate-name type-name) obj)
                              (c-data-type-modifier-with-wb obj ,(+ i 1) value)
-                             (error "wrong type of obj")))))
+                             (error "modifier-with-wb: wrong type of obj")))))
           (loop (+ i 1))))
       #t)))
+
+;; ====================== utils for define-data-type ======================
+
+;; LinkedList
+(define-data-type 'linked-list-node '(entry next-node))
+
+(define-data-type 'linked-list '(size pred-proc-sym first-node last-node))
+
+(define (new-linked-list accepted-type-name-sym)
+  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?"))))
+    (make-linked-list 0 pred-proc-sym '() '())))
+
+(define (linked-list-add linked-list value)
+  (if (not ((eval (linked-list-pred-proc-sym linked-list)) value))
+    (begin
+      (error (string-append
+               "ERROR: You are trying to add a object of wrong type to linked-list<"
+               (symbol->string (linked-list-pred-proc-sym linked-list))
+               ">\n"))
+      #f)
+    (begin
+      (let ((tmp-node (make-linked-list-node value '())))
+        (begin
+          (if (null? (linked-list-first-node linked-list))
+            (begin
+              (set-linked-list-first-node! linked-list tmp-node)
+              (set-linked-list-last-node! linked-list tmp-node))
+            (begin
+              (set-linked-list-node-next-node! (linked-list-last-node linked-list) tmp-node)
+              (set-linked-list-last-node! linked-list tmp-node)))
+          (set-linked-list-size! linked-list (+ 1 (linked-list-size linked-list))))))))
+
+(define (get-linked-list-size linked-list)
+  (linked-list-size linked-list))
+
+(define (linked-list-ref linked-list index)
+  (let ((list-size (linked-list-size linked-list)))
+    (if (or (null? (linked-list-first-node linked-list)) (< index 0) (> index (- list-size 1)))
+      (error "ERROR: Index out of bounds!")
+      (let loop ((i 0)
+                  (tmp-node (linked-list-first-node linked-list)))
+        (if (= i index)
+          (linked-list-node-entry tmp-node)
+          (loop (+ i 1) (linked-list-node-next-node tmp-node)))))))
+
+(define (linked-list-set! linked-list index value)
+  (let ((list-size (linked-list-size linked-list)))
+    (cond
+      ((not ((eval (linked-list-pred-proc-sym linked-list)) value))
+        (begin
+          (error (string-append
+                   "ERROR: You are trying to set a object of wrong type to linked-list<"
+                   (symbol->string (linked-list-pred-proc-sym linked-list))
+                   ">\n"))
+          #f))
+      ((or (null? (linked-list-first-node linked-list)) (< index 0) (> index (- list-size 1)))
+        (error "ERROR: Index out of bounds!"))
+      (else
+        (let loop ((i 0)
+                    (tmp-node (linked-list-first-node linked-list)))
+          (if (= i index)
+            (set-linked-list-node-entry! tmp-node value)
+            (loop (+ i 1) (linked-list-node-next-node tmp-node))))))))
+
+(define (linked-list-rm-ref linked-list index)
+  (let ((list-size (linked-list-size linked-list)))
+    (if (or (null? (linked-list-first-node linked-list)) (< index 0) (> index (- list-size 1)))
+      (error "ERROR: Index out of bounds!")
+      (let loop ((i 0)
+                  (prev-node '())
+                  (curr-node (linked-list-first-node linked-list))
+                  (post-node (linked-list-node-next-node (linked-list-first-node linked-list))))
+        (if (= i index)
+          (begin
+            (set-linked-list-node-next-node! curr-node '())
+            (cond
+              ((and (null? prev-node) (null? post-node))
+                (begin
+                  (set-linked-list-first-node! linked-list '())
+                  (set-linked-list-last-node! linked-list '())))
+              ((and (null? prev-node) (not (null? post-node)))
+                (set-linked-list-first-node! linked-list post-node))
+              ((and (not (null? prev-node)) (null? post-node))
+                (begin
+                  (set-linked-list-node-next-node! prev-node '())
+                  (set-linked-list-last-node! linked-list prev-node)))
+              (else
+                (set-linked-list-node-next-node! prev-node post-node)))
+            (set-linked-list-size! linked-list (- list-size 1)))
+          (loop (+ i 1) curr-node post-node (linked-list-node-next-node post-node)))))))
+
+;; ArrayList
+(define-data-type 'array-list '(size pred-proc-sym data))
+
+(define init-array-list-data-capacity 10)
+(define default-array-list-grow-time 2)
+
+(define (new-array-list accepted-type-name-sym)
+  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?"))))
+    (make-array-list 0 pred-proc-sym (make-vector init-array-list-data-capacity '()))))
+
+(define (array-list-add array-list value)
+  (if (not ((eval (array-list-pred-proc-sym array-list)) value))
+    (begin
+      (error (string-append
+               "ERROR: You are trying to add a object of wrong type to array-list<"
+               (symbol->string (array-list-pred-proc-sym array-list))
+               ">\n"))
+      #f)
+    (begin
+      ((lambda (array-list)
+         (let ((curr-size (array-list-size array-list))
+                (curr-capacity (vector-length (array-list-data array-list))))
+           (cond
+             ((>= curr-size curr-capacity)
+               (let ((new-vector (make-vector (* curr-capacity default-array-list-grow-time) '()))
+                      (curr-vector (array-list-data array-list)))
+                 (begin
+                   (let loop ((i 0))
+                     (cond
+                       ((< i curr-size)
+                         (vector-set! new-vector i (vector-ref curr-vector i)))))
+                   (set-array-list-data! array-list new-vector)))))))
+        array-list)
+      (let ((curr-size (array-list-size array-list)))
+        (begin
+          (vector-set! (array-list-data array-list) curr-size value)
+          (set-array-list-size! array-list (+ curr-size 1)))))))
+
+(define (get-array-list-size array-list)
+  (array-list-size array-list))
+
+(define (get-array-list-data-capacity array-list)
+  (vector-length (array-list-data array-list)))
+
+(define (array-list-ref array-list index)
+  (let ((list-size (array-list-size array-list)))
+    (if (or (<= list-size 0) (< index 0) (> index (- list-size 1)))
+      (error "ERROR: Index out of bounds!")
+      (vector-ref (array-list-data array-list) index))))
+
+(define (array-list-set! array-list index value)
+  (cond
+    ((not ((eval (array-list-pred-proc-sym array-list)) value))
+      (begin
+        (error (string-append
+                 "ERROR: You are trying to set a object of wrong type to array-list<"
+                 (symbol->string (array-list-pred-proc-sym array-list))
+                 ">\n"))
+        #f))
+    ((or (<= (array-list-size array-list) 0) (< index 0) (> index (- (array-list-size array-list) 1)))
+      (error "ERROR: Index out of bounds!"))
+    (else
+      (vector-set! (array-list-data array-list) index value))
+    ))
+
+(define (array-list-rm-ref array-list index)
+  (let ((list-size (array-list-size array-list))
+         (curr-capacity (vector-length (array-list-data array-list))))
+    (if (or (<= list-size 0) (< index 0) (> index (- list-size 1)))
+      (error "ERROR: Index out of bounds!")
+      (let ((new-vector (make-vector curr-capacity '()))
+             (curr-vector (array-list-data array-list)))
+        (begin
+          (let loop ((i 0))
+            (cond
+              ((< i list-size)
+                (begin
+                  (cond
+                    ((< i index)
+                      (vector-set! new-vector i (vector-ref curr-vector i)))
+                    ((> i index)
+                      (vector-set! new-vector (- i 1) (vector-ref curr-vector i))))
+                  (loop (+ i 1))))))
+          (set-array-list-data! array-list new-vector)
+          (set-array-list-size! array-list (- list-size 1)))))))
+
+;; HashMap
+(define-data-type 'hash-map-entry '(k v))
+
+(define-data-type 'hash-map-internal '(size key-pred-proc-sym value-pred-proc-sym used-bucket-size buckets-vector))
+
+(define-data-type 'hash-map '(hash-map-internal))
+
+(define init-buckets-capacity 1)
+(define buscket-capacity-expand-time 2)
+
+(define (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym capacity)
+  (make-hash-map-internal 0 key-pred-proc-sym value-pred-proc-sym 0 (make-vector capacity '())))
+
+(define (new-hash-map-with-buckets-capacity key-pred-proc-sym value-pred-proc-sym capacity)
+  (make-hash-map
+    (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym capacity)))
+
+(define (new-hash-map accepted-key-type-name-sym accepted-value-type-name-sym)
+  (let ((key-pred-proc-sym (string->symbol (string-append (symbol->string accepted-key-type-name-sym) "?")))
+         (value-pred-proc-sym (string->symbol (string-append (symbol->string accepted-value-type-name-sym) "?"))))
+    (new-hash-map-with-buckets-capacity key-pred-proc-sym value-pred-proc-sym init-buckets-capacity)))
+
+(define (hash-map-internal-simple-put hash-map-internal key value)
+  (letrec ((buckets-vector (hash-map-internal-buckets-vector hash-map-internal))
+            (key-hash (hash key (vector-length buckets-vector)))
+            (entry-list (vector-ref buckets-vector key-hash)))
+    (begin
+      (let ((entry-to-add (make-hash-map-entry key value)))
+        (if (null? entry-list)
+          (begin
+            (set! entry-list (new-linked-list 'hash-map-entry))
+            (linked-list-add entry-list entry-to-add)
+            (vector-set! buckets-vector key-hash entry-list)
+            (set-hash-map-internal-used-bucket-size! hash-map-internal (+ 1 (hash-map-internal-used-bucket-size hash-map-internal)))
+            (set-hash-map-internal-size! hash-map-internal (+ 1 (hash-map-internal-size hash-map-internal))))
+          (let ((have-found-key #f))
+            (begin
+              (let loop ((curr-list-node (linked-list-first-node entry-list)))
+                (cond
+                  ((not (null? curr-list-node))
+                    (if (eq? (hash-map-entry-k (linked-list-node-entry curr-list-node)) key)
+                      (begin
+                        (set! have-found-key #t)
+                        (set-linked-list-node-entry! curr-list-node entry-to-add))
+                      (loop (linked-list-node-next-node curr-list-node))))))
+              (cond
+                ((not have-found-key)
+                  (begin
+                    (linked-list-add entry-list entry-to-add)
+                    (set-hash-map-internal-size! hash-map-internal (+ 1 (hash-map-internal-size hash-map-internal)))))))))))))
+
+(define (hash-map-simple-put hash-map key value)
+  (hash-map-internal-simple-put (hash-map-hash-map-internal hash-map) key value))
+
+(define (hash-map-put hash-map key value)
+  (letrec ((hash-map-internal (hash-map-hash-map-internal hash-map))
+            (key-pred-proc-sym (hash-map-internal-key-pred-proc-sym hash-map-internal))
+            (value-pred-proc-sym (hash-map-internal-value-pred-proc-sym hash-map-internal)))
+    (cond
+      ((or (not ((eval key-pred-proc-sym) key)) (not ((eval value-pred-proc-sym) value)))
+        (error (string-append
+                 "ERROR: A wrong key or value is put in the hash-map<"
+                 (symbol->string key-pred-proc-sym)
+                 ", "
+                 (symbol->string value-pred-proc-sym)
+                 ">")))
+      (else
+        (begin
+          ((lambda (hash-map)
+             (letrec ((hash-map-internal (hash-map-hash-map-internal hash-map))
+                       (buckets-vector (hash-map-internal-buckets-vector hash-map-internal))
+                       (buckets-capacity (vector-length buckets-vector))
+                       (used-buckets-size (hash-map-internal-used-bucket-size hash-map-internal)))
+               (cond
+                 ((>= used-buckets-size buckets-capacity)
+                   (letrec ((new-buckets-capacity (* buckets-capacity buscket-capacity-expand-time))
+                             (key-pred-proc-sym (hash-map-internal-key-pred-proc-sym hash-map-internal))
+                             (value-pred-proc-sym (hash-map-internal-value-pred-proc-sym hash-map-internal))
+                             (new-hash-map-internal (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym new-buckets-capacity))
+                             (new-buckets-vector (hash-map-internal-buckets-vector new-hash-map-internal)))
+                     (begin
+                       (let loop ((i 0))
+                         (cond
+                           ((< i buckets-capacity)
+                             (begin
+                               (let ((entry-list (vector-ref buckets-vector i)))
+                                 (cond
+                                   ((not (null? entry-list))
+                                     (let loop-internal ((curr-list-node (linked-list-first-node entry-list)))
+                                       (cond
+                                         ((not (null? curr-list-node))
+                                           (begin
+                                             (hash-map-internal-simple-put
+                                               new-hash-map-internal
+                                               (hash-map-entry-k (linked-list-node-entry curr-list-node))
+                                               (hash-map-entry-v (linked-list-node-entry curr-list-node)))
+                                             (loop-internal (linked-list-node-next-node curr-list-node)))))))))
+                               (loop (+ i 1))))))
+                       (set-hash-map-hash-map-internal! hash-map new-hash-map-internal)))))))
+            hash-map)
+          (hash-map-simple-put hash-map key value))))))
+
+(define (get-hash-map-size hash-map)
+  (hash-map-internal-size (hash-map-hash-map-internal hash-map)))
+
+(define (get-hash-map-buckets-vector-capacity hash-map)
+  (vector-length (hash-map-internal-buckets-vector (hash-map-hash-map-internal hash-map))))
+
+(define (get-hash-map-used-bucket-size hash-map)
+  (hash-map-internal-used-bucket-size (hash-map-hash-map-internal hash-map)))
+
+(define (hash-map-get hash-map key)
+  (letrec ((hash-map-internal (hash-map-hash-map-internal hash-map))
+            (key-pred-proc-sym (hash-map-internal-key-pred-proc-sym hash-map-internal)))
+    (cond
+      ((not ((eval key-pred-proc-sym) key))
+        (error "hash-map-get: Wrong type of the key givened!"))
+      (else
+        (letrec ((buckets-vector-capacity (get-hash-map-buckets-vector-capacity hash-map))
+                  (key-hash (hash key buckets-vector-capacity))
+                  (buckets-vector (hash-map-internal-buckets-vector hash-map-internal))
+                  (entry-list (vector-ref buckets-vector key-hash)))
+          (if (null? entry-list)
+            '()
+            (let loop ((i 0)
+                        (curr-list-node (linked-list-first-node entry-list)))
+              (cond
+                ((not (null? curr-list-node))
+                  (if (eq? key (hash-map-entry-k (linked-list-node-entry curr-list-node)))
+                    (hash-map-entry-v (linked-list-node-entry curr-list-node))
+                    (loop (+ i 1) (linked-list-node-next-node curr-list-node))))
+                ((and (null? curr-list-node) (= i (get-linked-list-size entry-list)))
+                  '())))))))))
+
+(define (hash-map-rm hash-map key)
+  (letrec ((hash-map-internal (hash-map-hash-map-internal hash-map))
+            (key-pred-proc-sym (hash-map-internal-key-pred-proc-sym hash-map-internal)))
+    (cond
+      ((not ((eval key-pred-proc-sym) key))
+        (error "hash-map-get: Wrong type of the key givened!"))
+      (else
+        (letrec ((buckets-vector-capacity (get-hash-map-buckets-vector-capacity hash-map))
+                  (key-hash (hash key buckets-vector-capacity))
+                  (buckets-vector (hash-map-internal-buckets-vector hash-map-internal))
+                  (entry-list (vector-ref buckets-vector key-hash)))
+          (if (null? entry-list)
+            #t
+            (let ((found-index -1))
+              (begin
+                (let loop ((i 0)
+                            (curr-list-node (linked-list-first-node entry-list)))
+                  (cond
+                    ((not (null? curr-list-node))
+                      (if (eq? key (hash-map-entry-k (linked-list-node-entry curr-list-node)))
+                        (set! found-index i)
+                        (loop (+ i 1) (linked-list-node-next-node curr-list-node))))))
+                (if (>= found-index 0)
+                  (begin
+                    (linked-list-rm-ref entry-list found-index)
+                    (set-hash-map-internal-size! hash-map-internal (- (hash-map-internal-size hash-map-internal) 1))
+                    (cond
+                      ((= 0 (get-linked-list-size entry-list))
+                        (begin
+                          (vector-set! buckets-vector key-hash '())
+                          (set-hash-map-internal-used-bucket-size! hash-map-internal (- (hash-map-internal-used-bucket-size hash-map-internal) 1)))))))))))))))
+
+;; ====================== utils for define-data-type ======================
