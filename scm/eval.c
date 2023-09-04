@@ -609,7 +609,8 @@ static SCM evalatomcar(x, no_error)
     return ret;
   case tc7_vector:
 #ifndef RECKLESS
-    if (2 <= scm_verbose) scm_warn("unquoted ", s_vector, CAR(x));
+    // TODO dirty handling: ignoring the "unquoted vector warning"
+    // if (2 <= scm_verbose) scm_warn("unquoted ", s_vector, CAR(x));
 #endif
     ret = cons2(IM_QUOTE, CAR(x), EOL);
     CAR(x) = ret;
