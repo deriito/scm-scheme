@@ -295,7 +295,7 @@
 
 (define-data-type 'hash-map '(hash-map-internal))
 
-(define init-buckets-capacity 1)
+(define init-buckets-capacity 16)
 (define buscket-capacity-expand-time 2)
 
 (define (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym capacity)
