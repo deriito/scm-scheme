@@ -117,11 +117,24 @@
 ;; LinkedList
 (define-data-type 'linked-list-node '(entry next-node))
 
+(define (new-linked-list-node entry next-node)
+  (let ((new-instance (make-linked-list-node '() '())))
+    (begin
+      (set-linked-list-node-entry! new-instance entry)
+      (set-linked-list-node-next-node! new-instance next-node)
+      new-instance)))
+
 (define-data-type 'linked-list '(size pred-proc-sym first-node last-node))
 
 (define (new-linked-list accepted-type-name-sym)
-  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?"))))
-    (make-linked-list 0 pred-proc-sym '() '())))
+  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?")))
+         (new-instance (make-linked-list '() '() '() '())))
+    (begin
+      (set-linked-list-size! new-instance 0)
+      (set-linked-list-pred-proc-sym! new-instance pred-proc-sym)
+      (set-linked-list-first-node! new-instance '())
+      (set-linked-list-last-node! new-instance '())
+      new-instance)))
 
 (define (linked-list-add linked-list value)
   (if (not ((eval (linked-list-pred-proc-sym linked-list)) value))
@@ -132,7 +145,7 @@
                ">\n"))
       #f)
     (begin
-      (let ((tmp-node (make-linked-list-node value '())))
+      (let ((tmp-node (new-linked-list-node value '())))
         (begin
           (if (null? (linked-list-first-node linked-list))
             (begin
@@ -209,8 +222,13 @@
 (define default-array-list-grow-time 2)
 
 (define (new-array-list accepted-type-name-sym)
-  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?"))))
-    (make-array-list 0 pred-proc-sym (make-vector init-array-list-data-capacity '()))))
+  (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?")))
+         (new-instance (make-array-list '() '() '())))
+    (begin
+      (set-array-list-size! new-instance 0)
+      (set-array-list-pred-proc-sym! new-instance pred-proc-sym)
+      (set-array-list-data! new-instance (make-vector init-array-list-data-capacity '()))
+      new-instance)))
 
 (define (array-list-add array-list value)
   (if (not ((eval (array-list-pred-proc-sym array-list)) value))
@@ -291,7 +309,24 @@
 ;; HashMap
 (define-data-type 'hash-map-entry '(k v))
 
+(define (new-hash-map-entry k v)
+  (let ((new-instance (make-hash-map-entry '() '())))
+    (begin
+      (set-hash-map-entry-k! new-instance k)
+      (set-hash-map-entry-v! new-instance v)
+      new-instance)))
+
 (define-data-type 'hash-map-internal '(size key-pred-proc-sym value-pred-proc-sym used-bucket-size buckets-vector))
+
+(define (new-hash-map-internal size key-pred-proc-sym value-pred-proc-sym used-bucket-size buckets-vector)
+  (let ((new-instance (make-hash-map-internal '() '() '() '() '())))
+    (begin
+      (set-hash-map-internal-size! new-instance size)
+      (set-hash-map-internal-key-pred-proc-sym! new-instance key-pred-proc-sym)
+      (set-hash-map-internal-value-pred-proc-sym! new-instance value-pred-proc-sym)
+      (set-hash-map-internal-used-bucket-size! new-instance used-bucket-size)
+      (set-hash-map-internal-buckets-vector! new-instance buckets-vector)
+      new-instance)))
 
 (define-data-type 'hash-map '(hash-map-internal))
 
@@ -299,11 +334,15 @@
 (define buscket-capacity-expand-time 2)
 
 (define (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym capacity)
-  (make-hash-map-internal 0 key-pred-proc-sym value-pred-proc-sym 0 (make-vector capacity '())))
+  (new-hash-map-internal 0 key-pred-proc-sym value-pred-proc-sym 0 (make-vector capacity '())))
 
 (define (new-hash-map-with-buckets-capacity key-pred-proc-sym value-pred-proc-sym capacity)
-  (make-hash-map
-    (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym capacity)))
+  (let ((new-instance (make-hash-map '())))
+    (begin
+      (set-hash-map-hash-map-internal!
+        new-instance
+        (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym capacity))
+      new-instance)))
 
 (define (new-hash-map accepted-key-type-name-sym accepted-value-type-name-sym)
   (let ((key-pred-proc-sym (string->symbol (string-append (symbol->string accepted-key-type-name-sym) "?")))
@@ -315,7 +354,7 @@
             (key-hash (hash key (vector-length buckets-vector)))
             (entry-list (vector-ref buckets-vector key-hash)))
     (begin
-      (let ((entry-to-add (make-hash-map-entry key value)))
+      (let ((entry-to-add (new-hash-map-entry key value)))
         (if (null? entry-list)
           (begin
             (set! entry-list (new-linked-list 'hash-map-entry))
