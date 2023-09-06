@@ -215,6 +215,36 @@
             (set-linked-list-size! linked-list (- list-size 1)))
           (loop (+ i 1) curr-node post-node (linked-list-node-next-node post-node)))))))
 
+(define (linked-list-index-of linked-list obj)
+  (let ((found-index -1))
+    (begin
+      (let loop ((i 0)
+                  (curr-node (linked-list-first-node linked-list)))
+        (if (not (null? curr-node))
+          (if (eq? obj (linked-list-node-entry curr-node))
+            (set! found-index i)
+            (loop (+ i 1) (linked-list-node-next-node curr-node)))))
+      found-index)))
+
+(define (linked-list-rm-obj linked-list obj)
+  (let ((found-index (linked-list-index-of linked-list obj)))
+    (if (>= found-index 0)
+      (linked-list-rm-ref linked-list found-index))))
+
+(define (linked-list-print linked-list)
+  (begin
+    (display "[")
+    (let loop ((curr-node (linked-list-first-node linked-list))
+                (i 0)
+                (list-size (get-linked-list-size linked-list)))
+      (if (not (null? curr-node))
+        (begin
+          (display (linked-list-node-entry curr-node))
+          (if (< i (- list-size 1))
+            (display ", "))
+          (loop (linked-list-node-next-node curr-node) (+ i 1) list-size))))
+    (display "]\n")))
+
 ;; ArrayList
 (define-data-type 'array-list '(size pred-proc-sym data))
 
@@ -305,6 +335,37 @@
                   (loop (+ i 1))))))
           (set-array-list-data! array-list new-vector)
           (set-array-list-size! array-list (- list-size 1)))))))
+
+(define (array-list-index-of array-list obj)
+  (let ((found-index -1)
+         (list-size (get-array-list-size array-list)))
+    (begin
+      (let loop ((i 0))
+        (cond
+          ((< i list-size)
+            (if (eq? obj (array-list-ref array-list i))
+              (set! found-index i)
+              (loop (+ i 1))))))
+      found-index)))
+
+(define (array-list-rm-obj array-list obj)
+  (let ((found-index (array-list-index-of array-list obj)))
+    (if (>= found-index 0)
+      (array-list-rm-ref array-list found-index))))
+
+(define (array-list-print array-list)
+  (begin
+    (display "[")
+    (let loop ((i 0)
+                (list-size (get-array-list-size array-list)))
+      (cond
+        ((< i list-size)
+          (begin
+            (display (array-list-ref array-list i))
+            (if (< i (- list-size 1))
+              (display ", "))
+            (loop (+ i 1) list-size)))))
+    (display "]\n")))
 
 ;; HashMap
 (define-data-type 'hash-map-entry '(k v))
@@ -492,5 +553,30 @@
                         (begin
                           (vector-set! buckets-vector key-hash '())
                           (set-hash-map-internal-used-bucket-size! hash-map-internal (- (hash-map-internal-used-bucket-size hash-map-internal) 1)))))))))))))))
+
+(define (hash-map-print hash-map)
+  (let ((hash-map-internal (hash-map-hash-map-internal hash-map)))
+    (begin
+      (display "{")
+      (let ((entry-idx 0)
+             (map-size (get-hash-map-size hash-map)))
+        (let external-loop ((i 0))
+          (if (< i (get-hash-map-buckets-vector-capacity hash-map))
+            (let ((entry-list (vector-ref (hash-map-internal-buckets-vector hash-map-internal) i)))
+              (if (not (null? entry-list))
+                (let loop ((curr-node (linked-list-first-node entry-list)))
+                  (if (not (null? curr-node))
+                    (let ((entry (linked-list-node-entry curr-node)))
+                      (begin
+                        (display (hash-map-entry-k entry))
+                        (display "=")
+                        (display (hash-map-entry-v entry))
+                        (if (< entry-idx (- map-size 1))
+                          (display ", "))
+                        (set! entry-idx (+ entry-idx 1))
+                        (loop (linked-list-node-next-node curr-node))))
+                    (external-loop (+ i 1))))
+                (external-loop (+ i 1)))))))
+      (display "}\n"))))
 
 ;; ====================== utils for define-data-type ======================
