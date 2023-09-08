@@ -280,7 +280,9 @@
                    (let loop ((i 0))
                      (cond
                        ((< i curr-size)
-                         (vector-set! new-vector i (vector-ref curr-vector i)))))
+                         (begin
+                           (vector-set! new-vector i (vector-ref curr-vector i))
+                           (loop (+ i 1))))))
                    (set-array-list-data! array-list new-vector)))))))
         array-list)
       (let ((curr-size (array-list-size array-list)))

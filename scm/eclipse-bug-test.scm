@@ -6,7 +6,7 @@
 (define (new-compare-editor-input string-message)
   (let ((new-instance (make-compare-editor-input '())))
     (begin
-      (set-compare-editor-input-string-message! new-instance string-message)
+      (set-compare-editor-input-f-message! new-instance string-message)
       new-instance)))
 
 
@@ -60,7 +60,7 @@
             (editors (navigation-history-editors navi-history))
             (editors-list-size (get-array-list-size editors))
             (info '())
-            (history-entry-idxs-to-rm (new-array-list 'number))
+            (history-entries-to-rm (new-array-list 'navigation-history-entry))
             (history-list (navigation-history-history navi-history))
             (history-list-size (get-array-list-size history-list)))
     (begin
@@ -72,24 +72,24 @@
             (set! info (array-list-ref editors i))
             (loop (+ i 1)))))
       (if (not (null? info))
-        (editor-info-handle-part-closed info))
+        (begin
+          (assert-dead info) ;; assert-dead
+          (editor-info-handle-part-closed info)))
       (let loop ((i 0))
         (cond
-          ((< i history-list-size)
-            (let ((entry (array-list-get history-list i)))
-              (cond
-                ((eqv? info (navigation-history-entry-editor-info entry))
-                  (begin
-                    (array-list-add history-entry-idx-to-rm i)
-                    (history-entry-dispose entry) ;; Should be "(dispose-entry navi-history entry)"
-                    (loop (+ i 1))))
-                (else
-                  (loop (+ i 1))))))))
+          ((and (not (null? info)) (< i history-list-size))
+            (let ((entry (array-list-ref history-list i)))
+              (if (eqv? info (navigation-history-entry-editor-info entry))
+                (begin
+                  (array-list-add history-entries-to-rm entry)
+                  (history-entry-dispose entry) ;; Should be "(dispose-entry navi-history entry)"
+                  (loop (+ i 1)))
+                (loop (+ i 1)))))))
       (let loop ((i 0))
         (cond
-          ((< i (get-array-list-size history-entry-idxs-to-rm))
+          ((< i (get-array-list-size history-entries-to-rm))
             (begin
-              (array-list-rm-ref history-list (array-list-get history-entry-idxs-to-rm i))
+              (array-list-rm-obj history-list (array-list-ref history-entries-to-rm i))
               (loop (+ i 1)))))))))
 
 (define (create-entry navi-history page part)
@@ -113,6 +113,7 @@
         ((null? info)
           (begin
             (set! info (new-navigation-history-editor-info part))
+            ;; (assert-dead info) ;; assert-dead
             (set-navigation-history-editor-info-ref-count! info (+ (navigation-history-editor-info-ref-count info) 1))
             (array-list-add navi-history-edi-infos info))))
       (new-navigation-history-entry page info))))
@@ -235,7 +236,7 @@
   (let ((input (try-find-exist-editor-input work-bench-page input-context)))
     (begin
       (if (null? input)
-        (set! input (new-compare-editor-input string-message input-context)))
+        (set! input (new-compare-editor-input input-context)))
       (open-compare-editor-on-page input work-bench-page)
       (set! input '()) ;; don't reuse this input!
       )))
@@ -243,7 +244,7 @@
 
 ;; close editor part
 (define (stop-compare work-bench-page input-context)
-  (let ((input (try-find-exist-editor-input page input-context)))
+  (let ((input (try-find-exist-editor-input work-bench-page input-context)))
     (if (not (null? input))
       (close-compare-editor-on-page input work-bench-page))))
 
@@ -265,5 +266,11 @@
 
 ;; Simulation Running
 (define work-bench-page (new-work-bench-page))
-(run-compare work-bench-page (array-list-ref input-context-string-list 0))
-(stop-compare work-bench-page (array-list-ref input-context-string-list 0))
+
+(let loop ((i 0))
+  (if (< i 100)
+    (begin
+      (run-compare work-bench-page (array-list-ref input-context-string-list (random-0-n (get-array-list-size input-context-string-list))))
+      (stop-compare work-bench-page (array-list-ref input-context-string-list (random-0-n (get-array-list-size input-context-string-list))))
+      (gc)
+      (loop (+ i 1)))))

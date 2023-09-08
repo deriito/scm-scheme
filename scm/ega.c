@@ -12,6 +12,7 @@ long line_num_quantity_of_a_ref_pattern_at_least = 1L;
 long gc_count_of_a_ref_pattern_at_most = 3L;
 char is_print_result = 1;
 unsigned long current_gc_count = 0;
+char is_dynamic_check_mode = 1;
 
 GcTracedInfo *gc_traced = NULL;
 FocusingRefPathList *focusing_ref_path_list = NULL;
@@ -550,18 +551,6 @@ void ega_process_at_gc_start() {
     plus_current_gc_count();
 }
 
-void ega_process_after_gc() {
-    if (NULL == focusing_ref_path_list->paths) {
-        return; // 如果没有focusing path的话就不用执行后面的了
-    }
-    check_ref_path_list_after_gc();
-    scm_evstr("(begin"
-              "(display \"System will be exit!\\n\")"
-              "(disk-save)"
-              "(display \"Current executing status has been saved successfully!\\n\")"
-              "(exit))");
-}
-
 static void wb_add_or_rm(SCM data_type_def, long field_index, int is_add) {
     char *type_name_str = data_type_name(data_type_def);
     char *field_name_str = data_type_field_name(data_type_def, field_index);
@@ -685,6 +674,32 @@ static SCM update_type_def_and_wb() {
     return UNSPECIFIED;
 }
 
+void ega_process_after_gc() {
+    if (is_dynamic_check_mode > 0) {
+        check_ref_path_list_after_gc();
+        update_type_def_and_wb();
+    } else {
+        if (NULL == focusing_ref_path_list->paths) {
+            return; // 如果没有focusing path的话就不用执行后面的了
+        }
+        check_ref_path_list_after_gc();
+        scm_evstr("(begin"
+                  "(display \"System will be exit!\\n\")"
+                  "(disk-save)"
+                  "(display \"Current executing status has been saved successfully!\\n\")"
+                  "(exit))");
+    }
+}
+
+static char s_random_0_n[] = "random-0-n";
+static SCM random_0_n(SCM n) {
+    int number = INUM(n);
+    if (number <= 0) {
+        wta(n, (char *)ARG1, s_random_0_n);
+    }
+    return MAKINUM(rand() % number);
+}
+
 void init_gc_traced() {
     gc_traced = (GcTracedInfo *) malloc(heap_cells * sizeof(GcTracedInfo));
     focusing_ref_path_list = (FocusingRefPathList *) malloc(sizeof(FocusingRefPathList));
@@ -698,11 +713,12 @@ void init_gc_traced() {
 
 static iproc subr0s[] = {
         {s_update_type_def_and_wb, update_type_def_and_wb},
-        {0,                        0}
+        {0, 0}
 };
 
 static iproc subr1s[] = {
         {s_assert_dead, assert_dead},
+        {s_random_0_n, random_0_n},
         {0, 0}
 };
 
