@@ -13,7 +13,7 @@ long gc_count_of_a_ref_pattern_at_most = 3L;
 char is_print_result = 1;
 unsigned long current_gc_count = 0;
 char is_dynamic_check_mode = 1;
-char is_show_ega_debug_info = 1;
+char is_show_ega_debug_info = 0;
 
 GcTracedInfo *gc_traced = NULL;
 FocusingRefPathList *focusing_ref_path_list = NULL;
@@ -494,6 +494,9 @@ static void print_result(RefPath *ref_path) {
 
         if (i != ref_path->len - 1L) {
             printf("; -> ");
+            if (i != 0 && i % 5 == 0) { // TODO [Dirty] 長すぎるので, 改行しよう（ハードコードで5個ごとに改行決定）
+                printf("\n");
+            }
         } else {
             printf(";");
         }
