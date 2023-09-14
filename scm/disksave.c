@@ -196,6 +196,7 @@ SCM disk_save() {
     fwrite(&focusing_ref_path_list, sizeof(FocusingRefPathList *), 1, fp);
     fwrite(&collect_info_hash_map, sizeof(CollectedInfoHash **), 1, fp);
     fwrite(&is_dynamic_check_mode, sizeof(char), 1, fp);
+    fwrite(&is_show_ega_debug_info, sizeof(char), 1, fp);
 
     // disksave.c
     // nothing

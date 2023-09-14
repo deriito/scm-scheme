@@ -73,7 +73,7 @@
             (loop (+ i 1)))))
       (if (not (null? info))
         (begin
-          (assert-dead info) ;; assert-dead
+          ;; (assert-dead info) ;; assert-dead
           (editor-info-handle-part-closed info)))
       (let loop ((i 0))
         (cond
@@ -113,7 +113,7 @@
         ((null? info)
           (begin
             (set! info (new-navigation-history-editor-info part))
-            ;; (assert-dead info) ;; assert-dead
+            (assert-dead info) ;; assert-dead
             (set-navigation-history-editor-info-ref-count! info (+ (navigation-history-editor-info-ref-count info) 1))
             (array-list-add navi-history-edi-infos info))))
       (new-navigation-history-entry page info))))
@@ -180,7 +180,7 @@
         (if (< i list-size)
           (if (and
                 (equal? editor-id (editor-part-editor-id (array-list-ref editors i)))
-                (eq? input (editor-part-editor-input (array-list-ref editors i))))
+                (eqv? input (editor-part-editor-input (array-list-ref editors i))))
             (set! editor-part (array-list-ref editors i))
             (loop (+ i 1) list-size))))
       (if (null? editor-part)
@@ -267,10 +267,11 @@
 ;; Simulation Running
 (define work-bench-page (new-work-bench-page))
 
-(let loop ((i 0))
-  (if (< i 100)
-    (begin
-      (run-compare work-bench-page (array-list-ref input-context-string-list (random-0-n (get-array-list-size input-context-string-list))))
-      (stop-compare work-bench-page (array-list-ref input-context-string-list (random-0-n (get-array-list-size input-context-string-list))))
-      (gc)
-      (loop (+ i 1)))))
+;; (let loop ((i 0))
+;;  )
+
+(define (test-func run-str stop-str)
+  (begin
+    (run-compare work-bench-page run-str)
+    (stop-compare work-bench-page stop-str)
+    (gc)))

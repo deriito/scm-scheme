@@ -228,6 +228,7 @@ void init_my_zone() {
     fread(&is_print_result, sizeof(char), 1, fp);
     fread(&current_gc_count, sizeof(unsigned long), 1, fp);
     fread(&is_dynamic_check_mode, sizeof(char), 1, fp);
+    fread(&is_show_ega_debug_info, sizeof(char), 1, fp);
     fread(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
     fread(&focusing_ref_path_list, sizeof(FocusingRefPathList *), 1, fp);
     fread(&collect_info_hash_map, sizeof(CollectedInfoHash **), 1, fp);

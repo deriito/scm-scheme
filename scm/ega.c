@@ -13,6 +13,7 @@ long gc_count_of_a_ref_pattern_at_most = 3L;
 char is_print_result = 1;
 unsigned long current_gc_count = 0;
 char is_dynamic_check_mode = 1;
+char is_show_ega_debug_info = 1;
 
 GcTracedInfo *gc_traced = NULL;
 FocusingRefPathList *focusing_ref_path_list = NULL;
@@ -257,8 +258,16 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
     new_ref_path->next = NULL;
 
     for (long i = 0; i <= last_gc_traced_index; ++i) {
-        new_ref_path->entries[i].ptr = gc_traced[i].ptr;
-        long data_type_inst_field_idx = gc_traced[i].ref_field_index - 1L;
+        SCM tmp_ptr = gc_traced[i].ptr;
+        new_ref_path->entries[i].ptr = tmp_ptr;
+
+        long data_type_inst_field_idx;
+        if (is_user_defined_data_type_instance(tmp_ptr)) {
+            data_type_inst_field_idx = gc_traced[i].ref_field_index - 1L;
+        } else {
+            data_type_inst_field_idx = gc_traced[i].ref_field_index;
+        }
+
         new_ref_path->entries[i].ref_field_index = (i == last_gc_traced_index ? -1L : data_type_inst_field_idx);
         new_ref_path->entries[i].line_num_quantity = 0;
         new_ref_path->entries[i].line_nums = NULL;
@@ -270,6 +279,20 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
     } else {
         focusing_ref_path_list->last->next = new_ref_path;
         new_ref_path->prev = focusing_ref_path_list->last;
+    }
+
+    // print debug info
+    if (is_show_ega_debug_info) {
+        printf("[DebugInfo] New focusing path collected:\n[DebugInfo] ");
+        for (long i = 0; i < new_ref_path->len; ++i) {
+            SCM curr_object = new_ref_path->entries[i].ptr;
+            printf("%s#field[%ld];", type_str(curr_object), new_ref_path->entries[i].ref_field_index);
+            if (i < new_ref_path->len - 1) {
+                printf(" -> ");
+            } else {
+                printf("\n");
+            }
+        }
     }
 
     set_ref_path_info_recorded(ptr);

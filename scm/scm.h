@@ -1214,6 +1214,7 @@ SCM_EXPORT long gc_count_of_a_ref_pattern_at_most;
 SCM_EXPORT char is_print_result;
 SCM_EXPORT unsigned long current_gc_count;
 SCM_EXPORT char is_dynamic_check_mode;
+SCM_EXPORT char is_show_ega_debug_info;
 SCM_EXPORT GcTracedInfo *gc_traced;
 SCM_EXPORT FocusingRefPathList *focusing_ref_path_list;
 SCM_EXPORT CollectedInfoHash **collect_info_hash_map;
