@@ -344,7 +344,8 @@ SCM c_data_type_modifier(SCM obj, SCM index, SCM value) {
 }
 
 static char s_c_data_type_modifier_with_wb[] = "c-data-type-modifier-with-wb";
-SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value) {
+SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
+    SCM value = CAR(value_and_callsite);
     c_data_type_modifier(obj, index, value);
 
     // try process write barrier
@@ -380,7 +381,7 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value) {
 
     long used_len = INUM(VELTS(line_num_vector_of_ref_type)[2]);
 
-    SCM ln_num = line_num();
+    SCM ln_num = CDR(value_and_callsite);
     for (long i = 3; i < used_len; ++i) {
         if (VELTS(line_num_vector_of_ref_type)[i] == ln_num) {
             return UNSPECIFIED;
@@ -405,28 +406,76 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value) {
     return UNSPECIFIED;
 }
 
+static char s_make_internal_vector[] = "make-internal-vector";
+static SCM make_internal_vector(SCM k, SCM fill) {
+    SCM new_v = make_vector(MAKINUM(INUM(k) + 1L), fill);
+    VELTS(new_v)[0] = internal_vector_symbol;
+    return new_v;
+}
+
+static char s_internal_vector_set[] = "internal-vector-set!";
+static SCM internal_vector_set(SCM v, SCM k, SCM obj) {
+    if (!is_internal_vector(v)) {
+        wta(v, (char *)ARG1, s_internal_vector_set);
+    }
+    return vector_set(v, MAKINUM(INUM(k) + 1L), obj);
+}
+
+static char s_internal_vector_ref[] = "internal-vector-ref";
+static SCM internal_vector_ref(SCM v, SCM k) {
+    if (!is_internal_vector(v)) {
+        wta(v, (char *)ARG1, s_internal_vector_ref);
+    }
+    return vector_ref(v, MAKINUM(INUM(k) + 1L));
+}
+
+static char s_internal_vector_length[] = "internal-vector-length";
+static SCM internal_vector_length(SCM v) {
+    if (!is_internal_vector(v)) {
+        wta(v, (char *)ARG1, s_internal_vector_length);
+    }
+    return MAKINUM(INUM(vector_length(v)) - 1L);
+}
+
+static iproc subr1s[] = {
+        {s_internal_vector_length, internal_vector_length},
+        {0, 0}
+};
+
 static iproc subr2s[] = {
         {s_c_define_data_type, c_define_data_type},
         {s_c_make_instance, c_make_instance},
         {s_c_data_type_predicate, c_data_type_predicate},
         {s_c_data_type_accessor, c_data_type_accessor},
+        {s_internal_vector_ref, internal_vector_ref},
         {0, 0}
 };
+
+static iproc subr2os[] = {
+        {s_make_internal_vector, make_internal_vector},
+        {0, 0}
+};
+
 static iproc subr3s[] = {
         {s_c_data_type_modifier, c_data_type_modifier},
         {s_c_data_type_modifier_with_wb, c_data_type_modifier_with_wb},
+        {s_internal_vector_set, internal_vector_set},
         {0, 0}
 };
 
 void init_define_data_type() {
     module_flag_symbol = CAR(sysintern(s_user_define_datatype, makfrom0str(s_user_define_datatype)));
     internal_vector_symbol = CAR(sysintern(s_internal_vector, makfrom0str(s_internal_vector)));
+    init_iprocs(subr1s, tc7_subr_1);
     init_iprocs(subr2s, tc7_subr_2);
+    init_iprocs(subr2os, tc7_subr_2o);
     init_iprocs(subr3s, tc7_subr_3);
     add_feature("definedatatype");
 }
 
 void init_define_data_type_disk_saved() {
+    init_iprocs(subr1s, tc7_subr_1);
     init_iprocs(subr2s, tc7_subr_2);
+    init_iprocs(subr2os, tc7_subr_2o);
     init_iprocs(subr3s, tc7_subr_3);
 }

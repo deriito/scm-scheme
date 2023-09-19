@@ -12,6 +12,8 @@ long line_num_quantity_of_a_ref_pattern_at_least = 1L;
 long gc_count_of_a_ref_pattern_at_most = 3L;
 char is_print_result = 1;
 unsigned long current_gc_count = 0;
+char is_dynamic_check_mode = 1;
+char is_show_ega_debug_info = 0;
 
 GcTracedInfo *gc_traced = NULL;
 FocusingRefPathList *focusing_ref_path_list = NULL;
@@ -256,8 +258,16 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
     new_ref_path->next = NULL;
 
     for (long i = 0; i <= last_gc_traced_index; ++i) {
-        new_ref_path->entries[i].ptr = gc_traced[i].ptr;
-        long data_type_inst_field_idx = gc_traced[i].ref_field_index - 1L;
+        SCM tmp_ptr = gc_traced[i].ptr;
+        new_ref_path->entries[i].ptr = tmp_ptr;
+
+        long data_type_inst_field_idx;
+        if (is_user_defined_data_type_instance(tmp_ptr)) {
+            data_type_inst_field_idx = gc_traced[i].ref_field_index - 1L;
+        } else {
+            data_type_inst_field_idx = gc_traced[i].ref_field_index;
+        }
+
         new_ref_path->entries[i].ref_field_index = (i == last_gc_traced_index ? -1L : data_type_inst_field_idx);
         new_ref_path->entries[i].line_num_quantity = 0;
         new_ref_path->entries[i].line_nums = NULL;
@@ -269,6 +279,20 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
     } else {
         focusing_ref_path_list->last->next = new_ref_path;
         new_ref_path->prev = focusing_ref_path_list->last;
+    }
+
+    // print debug info
+    if (is_show_ega_debug_info) {
+        printf("[DebugInfo] New focusing path collected:\n[DebugInfo] ");
+        for (long i = 0; i < new_ref_path->len; ++i) {
+            SCM curr_object = new_ref_path->entries[i].ptr;
+            printf("%s#field[%ld];", type_str(curr_object), new_ref_path->entries[i].ref_field_index);
+            if (i < new_ref_path->len - 1) {
+                printf(" -> ");
+            } else {
+                printf("\n");
+            }
+        }
     }
 
     set_ref_path_info_recorded(ptr);
@@ -470,6 +494,9 @@ static void print_result(RefPath *ref_path) {
 
         if (i != ref_path->len - 1L) {
             printf("; -> ");
+            if (i != 0 && i % 5 == 0) { // TODO [Dirty] 長すぎるので, 改行しよう（ハードコードで5個ごとに改行決定）
+                printf("\n");
+            }
         } else {
             printf(";");
         }
@@ -548,18 +575,6 @@ static void plus_current_gc_count() {
 
 void ega_process_at_gc_start() {
     plus_current_gc_count();
-}
-
-void ega_process_after_gc() {
-    if (NULL == focusing_ref_path_list->paths) {
-        return; // 如果没有focusing path的话就不用执行后面的了
-    }
-    check_ref_path_list_after_gc();
-    scm_evstr("(begin"
-              "(display \"System will be exit!\\n\")"
-              "(disk-save)"
-              "(display \"Current executing status has been saved successfully!\\n\")"
-              "(exit))");
 }
 
 static void wb_add_or_rm(SCM data_type_def, long field_index, int is_add) {
@@ -685,6 +700,32 @@ static SCM update_type_def_and_wb() {
     return UNSPECIFIED;
 }
 
+void ega_process_after_gc() {
+    if (is_dynamic_check_mode > 0) {
+        check_ref_path_list_after_gc();
+        update_type_def_and_wb();
+    } else {
+        if (NULL == focusing_ref_path_list->paths) {
+            return; // 如果没有focusing path的话就不用执行后面的了
+        }
+        check_ref_path_list_after_gc();
+        scm_evstr("(begin"
+                  "(display \"System will be exit!\\n\")"
+                  "(disk-save)"
+                  "(display \"Current executing status has been saved successfully!\\n\")"
+                  "(exit))");
+    }
+}
+
+static char s_random_0_n[] = "random-0-n";
+static SCM random_0_n(SCM n) {
+    int number = INUM(n);
+    if (number <= 0) {
+        wta(n, (char *)ARG1, s_random_0_n);
+    }
+    return MAKINUM(rand() % number);
+}
+
 void init_gc_traced() {
     gc_traced = (GcTracedInfo *) malloc(heap_cells * sizeof(GcTracedInfo));
     focusing_ref_path_list = (FocusingRefPathList *) malloc(sizeof(FocusingRefPathList));
@@ -698,11 +739,12 @@ void init_gc_traced() {
 
 static iproc subr0s[] = {
         {s_update_type_def_and_wb, update_type_def_and_wb},
-        {0,                        0}
+        {0, 0}
 };
 
 static iproc subr1s[] = {
         {s_assert_dead, assert_dead},
+        {s_random_0_n, random_0_n},
         {0, 0}
 };
 
