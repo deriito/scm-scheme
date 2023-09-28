@@ -5,19 +5,19 @@
 
 #include "scm.h"
 
-#define NUM_HASH_BUCKETS 137
-
 char is_process_all_ref_paths = 0;
-long line_num_quantity_of_a_ref_pattern_at_least = 1L;
+long line_num_quantity_of_a_ref_pattern_at_least = 3L;
 long gc_count_of_a_ref_pattern_at_most = 3L;
 char is_print_result = 1;
-unsigned long current_gc_count = 0;
+size_t current_gc_count = 0;
 char is_dynamic_check_mode = 1;
-char is_show_ega_debug_info = 0;
+char is_show_ega_debug_info = 1;
 
 GcTracedInfo *gc_traced = NULL;
-FocusingRefPathList *focusing_ref_path_list = NULL;
-CollectedInfoHash **collect_info_hash_map = NULL;
+RefPath *focusing_ref_path_list = NULL;
+WriteBarrierUpdateMetadata *wb_update_metadata_hash = NULL;
+
+UT_icd *ref_path_entry_icd = NULL;
 
 static char s_assert_dead[] = "assert-dead";
 SCM assert_dead(SCM ptr) {
@@ -92,147 +92,322 @@ char *type_str(SCM ptr) {
     }
 }
 
-static CollectedInfoHash *find_hash_entry_from_collected_info(SCM data_type_def) {
-    char *type_name = data_type_name(data_type_def);
-    unsigned long hash_code = strhash(type_name, strlen(type_name), NUM_HASH_BUCKETS);
-
-    CollectedInfoHash *info_list = collect_info_hash_map[hash_code];
-
-    CollectedInfoHash *result = NULL;
-    for (CollectedInfoHash *tmp = info_list; NULL != tmp; tmp = tmp->next) {
-        if (tmp->data_type_def == data_type_def) {
-            result = tmp;
-            break;
-        }
-    }
-
-    if (NULL == result) {
-        result = (CollectedInfoHash *) malloc(sizeof(CollectedInfoHash));
-        result->data_type_def = data_type_def;
-
-        long field_num = field_number(data_type_def);
-        result->field_ref_info = (FieldRefDataTypeInfo *) malloc(field_num * sizeof(FieldRefDataTypeInfo));
-        for (long i = 0; i < field_num; ++i) {
-            result->field_ref_info[i].ref_data_types = (SCM *) malloc(FIELD_REF_INFO_ALLOCATED_LEN * sizeof(SCM));
-            memset(result->field_ref_info[i].ref_data_types, -1, FIELD_REF_INFO_ALLOCATED_LEN);
-            result->field_ref_info[i].is_to_add = (int *) malloc(FIELD_REF_INFO_ALLOCATED_LEN * sizeof(int));
-            memset(result->field_ref_info[i].is_to_add, -1, FIELD_REF_INFO_ALLOCATED_LEN);
-            result->field_ref_info[i].allocated_len = FIELD_REF_INFO_ALLOCATED_LEN;
-            result->field_ref_info[i].len = 0;
-        }
-        result->next = NULL;
-
-        if (NULL == info_list) {
-            collect_info_hash_map[hash_code] = result;
-        } else {
-            CollectedInfoHash *last_entry = info_list;
-            while (NULL != last_entry->next) {
-                last_entry = last_entry->next;
-            }
-            last_entry->next = result;
-        }
-    }
-
-    return result;
-}
-
-static void try_expand_types_and_adds_info(FieldRefDataTypeInfo *field_ref_info) {
-    long cur_len = field_ref_info->len;
-    if (cur_len < field_ref_info->allocated_len) {
-        return;
-    }
-
-    size_t new_len = (size_t) (FIELD_REF_INFO_ALLOCATED_LEN_EXPAND_TIMES * cur_len);
-
-    SCM *new_ref_data_types = (SCM *) malloc(new_len * sizeof(SCM));
-    memset(new_ref_data_types, -1, new_len);
-    for (long i = 0; i < cur_len; ++i) {
-        new_ref_data_types[i] = field_ref_info->ref_data_types[i];
-    }
-    free(field_ref_info->ref_data_types);
-    field_ref_info->ref_data_types = new_ref_data_types;
-
-    int *new_is_to_add = (int *) malloc(new_len * sizeof(int));
-    memset(new_is_to_add, -1, new_len);
-    for (long i = 0; i < cur_len; ++i) {
-        new_is_to_add[i] = field_ref_info->is_to_add[i];
-    }
-    free(field_ref_info->is_to_add);
-    field_ref_info->is_to_add = new_is_to_add;
-
-    field_ref_info->allocated_len = new_len;
-}
-
-long search_index_from_ref_types(CollectedInfoHash *hash_entry, RefPathEntry *path_entry, SCM ref_type_def) {
-    long found_index = -1L;
-    for (long i = 0; i < hash_entry->field_ref_info[path_entry->ref_field_index].len; ++i) {
-        if (ref_type_def == hash_entry->field_ref_info[path_entry->ref_field_index].ref_data_types[i]) {
-            found_index = i;
-            break;
-        }
-    }
-    return found_index;
-}
-
+/**
+ * 尝试去更新WB相关的情报
+ */
 static char s_try_record_metadata[] = "try_record_metadata";
 static void try_record_metadata(RefPath *ref_path) {
-    if (ref_path->len <= 1L) {
+    long len = utarray_len(ref_path->entries);
+    if (len <= 1L) {
         // 只处理长度为两个以上的link
         return;
     }
 
-    RefPathEntry *prev_entry = NULL;
-    RefPathEntry *curr_entry = NULL;
-    RefPathEntry *post_entry = NULL;
+    for (long i = 0; i < len - 1L; ++i) {
+        RefPathEntry *curr_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i);
+        RefPathEntry *next_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i + 1L);
+        if (!is_user_defined_data_type_instance(curr_entry->ptr)
+            || !is_user_defined_data_type_instance(next_entry->ptr)) {
+            continue;
+        }
 
-    if (ref_path->active_index == 0) { // 先頭
-        curr_entry = &ref_path->entries[ref_path->active_index];
-        post_entry = &ref_path->entries[ref_path->active_index + 1L];
-    } else if (ref_path->active_index == ref_path->len - 1L) { // 末尾
-        prev_entry = &ref_path->entries[ref_path->active_index - 1L];
-    } else if (0 < ref_path->active_index && ref_path->active_index < ref_path->len - 1L) { // 真ん中
-        prev_entry = &ref_path->entries[ref_path->active_index - 1L];
-        curr_entry = &ref_path->entries[ref_path->active_index];
-        post_entry = &ref_path->entries[ref_path->active_index + 1L];
-    } else {
-        wta(UNDEFINED, "WTF???", s_try_record_metadata);
-    }
+        WriteBarrierUpdateMetadata *curr_type_metadata;
+        SCM curr_entry_class_obj = get_data_type_def_identifier(curr_entry->ptr);
+        HASH_FIND(hh, wb_update_metadata_hash, &curr_entry_class_obj, sizeof(SCM), curr_type_metadata);
+        if (NULL == curr_type_metadata) {
+            curr_type_metadata = (WriteBarrierUpdateMetadata *) malloc(sizeof(WriteBarrierUpdateMetadata));
+            if (NULL == curr_type_metadata) {
+                fprintf(stderr, "[curr_type_metadata]内存分配失败!\n");
+                exit(-1);
+            }
+            curr_type_metadata->data_type_def = curr_entry_class_obj;
+            curr_type_metadata->field_ref_info = NULL;
+            HASH_ADD(hh, wb_update_metadata_hash, data_type_def, sizeof(SCM), curr_type_metadata);
+        }
 
-    if (NULL != prev_entry && is_user_defined_data_type_instance(prev_entry->ptr)) {
-        if (NULL != curr_entry && is_user_defined_data_type_instance(curr_entry->ptr)) {
-            SCM prev_type_def = get_data_type_def_identifier(prev_entry->ptr);
-            CollectedInfoHash *prev_hash_entry = find_hash_entry_from_collected_info(prev_type_def);
-            SCM curr_type_def = get_data_type_def_identifier(curr_entry->ptr);
+        MetadataPerField *curr_field_ref_info;
+        HASH_FIND(hh, curr_type_metadata->field_ref_info, &(curr_entry->ref_field_index), sizeof(long), curr_field_ref_info);
+        if (NULL == curr_field_ref_info) {
+            curr_field_ref_info = (MetadataPerField *) malloc(sizeof(MetadataPerField));
+            if (NULL == curr_field_ref_info) {
+                fprintf(stderr, "[curr_field_ref_info]内存分配失败!\n");
+                exit(-1);
+            }
+            curr_field_ref_info->field_index = curr_entry->ref_field_index;
+            curr_field_ref_info->update_state_by_ref_type = NULL;
+            HASH_ADD(hh, curr_type_metadata->field_ref_info, field_index, sizeof(long), curr_field_ref_info);
+        }
 
-            long found_index = search_index_from_ref_types(prev_hash_entry, prev_entry, curr_type_def);
-            if (found_index < 0) {
-                try_expand_types_and_adds_info(&prev_hash_entry->field_ref_info[prev_entry->ref_field_index]);
-                long this_idx_field_info_len = prev_hash_entry->field_ref_info[prev_entry->ref_field_index].len;
-                prev_hash_entry->field_ref_info[prev_entry->ref_field_index].ref_data_types[this_idx_field_info_len] = curr_type_def;
-                prev_hash_entry->field_ref_info[prev_entry->ref_field_index].is_to_add[this_idx_field_info_len] = 0;
-                prev_hash_entry->field_ref_info[prev_entry->ref_field_index].len += 1L;
+        UpdateStateByRefType *curr_ref_type_state;
+        SCM next_entry_class_obj = get_data_type_def_identifier(next_entry->ptr);
+        HASH_FIND(hh, curr_field_ref_info->update_state_by_ref_type, &next_entry_class_obj, sizeof(SCM), curr_ref_type_state);
+        if (NULL == curr_ref_type_state) {
+            curr_ref_type_state = (UpdateStateByRefType *) malloc(sizeof(UpdateStateByRefType));
+            if (NULL == curr_ref_type_state) {
+                fprintf(stderr, "[curr_ref_type_state]内存分配失败!\n");
+                exit(-1);
+            }
+            curr_ref_type_state->ref_data_type = next_entry_class_obj;
+            curr_ref_type_state->is_to_add = curr_entry->is_active;
+            HASH_ADD(hh, curr_field_ref_info->update_state_by_ref_type, ref_data_type, sizeof(SCM), curr_ref_type_state);
+        } else {
+            if (curr_ref_type_state->is_to_add <= 0) {
+                curr_ref_type_state->is_to_add = curr_entry->is_active;
             }
         }
     }
+}
 
-    if (NULL != curr_entry && is_user_defined_data_type_instance(curr_entry->ptr)) {
-        if (is_user_defined_data_type_instance(post_entry->ptr)) {
-            SCM curr_type_def = get_data_type_def_identifier(curr_entry->ptr);
-            CollectedInfoHash *curr_hash_entry = find_hash_entry_from_collected_info(curr_type_def);
-            SCM post_type_def = get_data_type_def_identifier(post_entry->ptr);
+/**
+ * 只检查对象的类型信息是否一致
+ * @param a
+ * @param b
+ * @return
+ */
+static int is_the_same_type(SCM a, SCM b) {
+    if (is_user_defined_data_type_instance(a)) {
+        if (!is_user_defined_data_type_instance(b)) {
+            return 0;
+        }
+        return get_data_type_def_identifier(a) == get_data_type_def_identifier(b);
+    }
 
-            long found_index = search_index_from_ref_types(curr_hash_entry, curr_entry, post_type_def);
-            if (found_index < 0) {
-                try_expand_types_and_adds_info(&curr_hash_entry->field_ref_info[curr_entry->ref_field_index]);
-                long this_index_field_info_len = curr_hash_entry->field_ref_info[curr_entry->ref_field_index].len;
-                curr_hash_entry->field_ref_info[curr_entry->ref_field_index].ref_data_types[this_index_field_info_len] = post_type_def;
-                curr_hash_entry->field_ref_info[curr_entry->ref_field_index].is_to_add[this_index_field_info_len] = 1;
-                curr_hash_entry->field_ref_info[curr_entry->ref_field_index].len += 1L;
+    if (IMP(a)) {
+        if (NIMP(b)) {
+            return 0;
+        }
+        return 1;
+    }
+
+    return TYP7(a) == TYP7(b);
+}
+
+/**
+ * 检查类型和指向下一个对象的field_idx是否一致
+ * @param a
+ * @param b
+ * @return
+ */
+static int is_the_same_ref_path_entries(RefPathEntry *a, RefPathEntry *b) {
+    if (NULL == a || NULL == b) {
+        fprintf(stderr, "[is_the_same_ref_path_entries]空指针异常!\n");
+        exit(-1);
+    }
+
+    if (a->ref_field_index != b->ref_field_index) {
+        return 0;
+    }
+    return is_the_same_type(a->ptr, b->ptr);
+}
+
+static int is_all_entries_the_same(RefPath *path_a, RefPath *path_b, long quantity) {
+    for (long i = 0; i < quantity; ++i) {
+        RefPathEntry *tmp_path_entry = (RefPathEntry *)utarray_eltptr(path_a->entries, i);
+        RefPathEntry *new_path_entry = (RefPathEntry *)utarray_eltptr(path_b->entries, i);
+        if (!is_the_same_ref_path_entries(tmp_path_entry, new_path_entry)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static void try_free_ref_path_entry(RefPathEntry *entry) {
+    if (NULL != entry->line_numbers) {
+        CollectedLineNumber *curr, *tmp;
+        HASH_ITER(hh, entry->line_numbers, curr, tmp) {
+            HASH_DEL(entry->line_numbers, curr);
+            free(curr);
+        }
+        HASH_CLEAR(hh, entry->line_numbers);
+    }
+    free(entry);
+}
+
+static void try_record_line_numbers_into_ref_path_entry(SCM ptr, RefPathEntry *entry) {
+    if (!is_user_defined_data_type_instance_with_rec_slots(ptr)) {
+        return;
+    }
+
+    SCM rec_slot_of_field = get_rec_slot_of_field(ptr, entry->ref_field_index);
+    if (NULLP(rec_slot_of_field)) {
+        return;
+    }
+
+    SCM path_entry_class_obj = get_data_type_def_identifier(entry->ptr);
+
+    SCM ln_vector_of_ref_type = EOL;
+    for (long i = 1L; i < INUM(vector_length(rec_slot_of_field)); ++i) {
+        SCM tmp_ln_vector_of_ref_type = VELTS(rec_slot_of_field)[i];
+        if (VELTS(tmp_ln_vector_of_ref_type)[1] != path_entry_class_obj) {
+            continue;
+        }
+
+        if (INUM(VELTS(tmp_ln_vector_of_ref_type)[2]) <= 3) {
+            // e.g. ln_vector_of_ref_type <= [internal-vector-sym, ref-type-def, used-len, EOL, EOL, ...]
+            // 即还没有任何的记录
+            break;
+        }
+
+        ln_vector_of_ref_type = tmp_ln_vector_of_ref_type;
+        break;
+    }
+
+    if (NULLP(ln_vector_of_ref_type)) {
+        return;
+    }
+
+    long ln_quantity = INUM(VELTS(ln_vector_of_ref_type)[2]) - 3L;
+    for (long i = 0; i < ln_quantity; ++i) {
+        long ln = INUM(VELTS(ln_vector_of_ref_type)[i + 3L]);
+
+        CollectedLineNumber *new_ln;
+        HASH_FIND(hh, entry->line_numbers, &ln, sizeof(long), new_ln);
+        if (NULL != new_ln) {
+            continue;
+        }
+
+        new_ln = (CollectedLineNumber *) malloc(sizeof(CollectedLineNumber));
+        if (NULL == new_ln) {
+            fprintf(stderr, "[new_ln]内存分配失败\n");
+            exit(1);
+        }
+        new_ln->line_num = ln;
+        HASH_ADD(hh, entry->line_numbers, line_num, sizeof(long), new_ln);
+    }
+}
+
+/**
+ * TODO 尝试整理path, 现阶段只针对LinkedList的情况, 即只合并相邻的重复entries
+ * @param ptr
+ * @param last_gc_traced_index
+ * @param is_write_ln
+ * @return
+ */
+static RefPath *gen_a_concise_ref_path(SCM ptr, long last_gc_traced_index, int is_write_ln) {
+    RefPath *out = (RefPath *) malloc(sizeof(RefPath));
+    if (NULL == out) {
+        fprintf(stderr, "[new_ref_path]内存分配失败\n");
+        exit(1);
+    }
+    out->repeat_entry_indexes = NULL;
+    utarray_new(out->entries, ref_path_entry_icd);
+
+    for (long i = 0; i <= last_gc_traced_index; ++i) {
+        long tmp_entry_quantity = utarray_len(out->entries);
+
+        RefPathEntry *new_path_entry = (RefPathEntry *) malloc(sizeof(RefPathEntry));
+        if (NULL == new_path_entry) {
+            fprintf(stderr, "[new_path_entry]内存分配失败\n");
+            exit(1);
+        }
+        new_path_entry->ptr = gc_traced[i].ptr;
+        long data_type_inst_field_idx;
+        if (is_user_defined_data_type_instance(new_path_entry->ptr)) {
+            data_type_inst_field_idx = gc_traced[i].ref_field_index - 1L;
+        } else {
+            data_type_inst_field_idx = gc_traced[i].ref_field_index;
+        }
+        new_path_entry->ref_field_index = i == last_gc_traced_index ? -1L : data_type_inst_field_idx;
+        if (i == last_gc_traced_index) {
+            new_path_entry->is_active = 0;
+        } else {
+            if (!is_user_defined_data_type_instance(new_path_entry->ptr)) {
+                new_path_entry->is_active = 0;
             } else {
-                curr_hash_entry->field_ref_info[curr_entry->ref_field_index].is_to_add[found_index] = 1;
+                if (is_user_defined_data_type_instance(gc_traced[i + 1L].ptr)) {
+                    new_path_entry->is_active = 1;
+                } else {
+                    new_path_entry->is_active = 0;
+                }
             }
         }
+        new_path_entry->line_numbers = NULL;
+        if (is_write_ln) {
+            try_record_line_numbers_into_ref_path_entry(new_path_entry->ptr, new_path_entry);
+        }
+        new_path_entry->gc_count_at_created = current_gc_count;
+        new_path_entry->gc_count_at_last_updated = current_gc_count;
+
+        // 至少要有两个元素, 也就是需要至少一个link, 才能够开始比较link是否相同
+        if (tmp_entry_quantity < 2) {
+            utarray_push_back(out->entries, new_path_entry);
+            continue;
+        }
+
+        RefPathEntry *tmp_entry_n_2 = (RefPathEntry *) utarray_eltptr(out->entries, tmp_entry_quantity - 2);
+        RefPathEntry *tmp_entry_n_1 = (RefPathEntry *) utarray_eltptr(out->entries, tmp_entry_quantity - 1);
+        if (is_the_same_ref_path_entries(tmp_entry_n_2, tmp_entry_n_1)
+            && is_the_same_type(tmp_entry_n_1->ptr, new_path_entry->ptr)) {
+            long tmp_key = tmp_entry_quantity - 2;
+
+            RepeatEntryIndex *tmp_rei;
+            HASH_FIND(hh, out->repeat_entry_indexes, &tmp_key, sizeof(long), tmp_rei);
+            if (NULL == tmp_rei) {
+                tmp_rei = (RepeatEntryIndex *) malloc(sizeof(RepeatEntryIndex));
+                if (NULL == tmp_rei) {
+                    fprintf(stderr, "[tmp_rei]内存分配失败\n");
+                    exit(1);
+                }
+                tmp_rei->index = tmp_key;
+                HASH_ADD(hh, out->repeat_entry_indexes, index, sizeof(long), tmp_rei);
+            }
+
+            if (is_write_ln) {
+                try_record_line_numbers_into_ref_path_entry(new_path_entry->ptr, tmp_entry_n_2);
+            }
+            tmp_entry_n_2->gc_count_at_last_updated = current_gc_count;
+            tmp_entry_n_2->is_active = 1;
+
+            // 为了尽可能的合并相同的节点
+            tmp_entry_n_1->ref_field_index = new_path_entry->ref_field_index;
+
+            try_free_ref_path_entry(new_path_entry);
+            continue;
+        }
+
+        utarray_push_back(out->entries, new_path_entry);
     }
+
+    return out;
+}
+
+static RefPath *try_find_same_path_in_focusing_list(RefPath *in) {
+    RefPath *out = NULL;
+
+    RefPath *tmp_path;
+    long input_path_entry_quantity = utarray_len(in->entries);
+    DL_FOREACH(focusing_ref_path_list, tmp_path) {
+        long tmp_path_entry_quantity = utarray_len(tmp_path->entries);
+        if (tmp_path_entry_quantity != input_path_entry_quantity) {
+            continue;
+        }
+
+        if (!is_all_entries_the_same(tmp_path, in, tmp_path_entry_quantity)) {
+            continue;
+        }
+
+        out = tmp_path;
+        break;
+    }
+
+    return out;
+}
+
+static void try_free_ref_path_obj(RefPath *ref_path) {
+    if (NULL == ref_path) {
+        return;
+    }
+
+    utarray_free(ref_path->entries);
+
+    RepeatEntryIndex *curr, *tmp;
+    HASH_ITER(hh, ref_path->repeat_entry_indexes, curr, tmp) {
+        HASH_DEL(ref_path->repeat_entry_indexes, curr);
+        free(curr);
+    }
+    HASH_CLEAR(hh, ref_path->repeat_entry_indexes);
+
+    free(ref_path);
 }
 
 void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
@@ -244,127 +419,82 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
         return;
     }
 
-    if (is_ref_path_info_recorded(ptr)) {
-        return;
-    }
+//    // 2023.09.28 即使是标记过的对象, 也让它能够再次出发收集新path的处理
+//    if (is_ref_path_info_recorded(ptr)) {
+//        return;
+//    }
 
-    RefPath *new_ref_path = (RefPath *) malloc(sizeof(RefPath));
+    // 不管存不存在相同的Path, 都新建一个
+    RefPath *new_ref_path = gen_a_concise_ref_path(ptr, last_gc_traced_index, 0);
 
-    new_ref_path->active_index = 0;
-    new_ref_path->gc_count_of_active_index = 0;
-    new_ref_path->len = 1L + (last_gc_traced_index < 0 ? 0 : last_gc_traced_index);
-    new_ref_path->entries = (RefPathEntry *) malloc(new_ref_path->len * sizeof(RefPathEntry));
-    new_ref_path->prev = NULL;
-    new_ref_path->next = NULL;
+    // 检查是否已经有重复的路径并且将指针记录下来
+    RefPath *same_path = try_find_same_path_in_focusing_list(new_ref_path);
 
-    for (long i = 0; i <= last_gc_traced_index; ++i) {
-        SCM tmp_ptr = gc_traced[i].ptr;
-        new_ref_path->entries[i].ptr = tmp_ptr;
-
-        long data_type_inst_field_idx;
-        if (is_user_defined_data_type_instance(tmp_ptr)) {
-            data_type_inst_field_idx = gc_traced[i].ref_field_index - 1L;
-        } else {
-            data_type_inst_field_idx = gc_traced[i].ref_field_index;
-        }
-
-        new_ref_path->entries[i].ref_field_index = (i == last_gc_traced_index ? -1L : data_type_inst_field_idx);
-        new_ref_path->entries[i].line_num_quantity = 0;
-        new_ref_path->entries[i].line_nums = NULL;
-    }
-
-    if (NULL == focusing_ref_path_list->paths) {
-        focusing_ref_path_list->paths = new_ref_path;
-        focusing_ref_path_list->last = new_ref_path;
+    if (NULL == same_path) {
+        DL_APPEND(focusing_ref_path_list, new_ref_path);
     } else {
-        focusing_ref_path_list->last->next = new_ref_path;
-        new_ref_path->prev = focusing_ref_path_list->last;
+        RepeatEntryIndex *current, *tmp;
+        HASH_ITER(hh, new_ref_path->repeat_entry_indexes, current, tmp) {
+            RepeatEntryIndex  *tmp_in_same_path;
+            HASH_FIND(hh, same_path->repeat_entry_indexes, &(current->index), sizeof(long), tmp_in_same_path);
+            if (NULL != tmp_in_same_path) {
+                continue;
+            }
+
+            RepeatEntryIndex *new_rei = (RepeatEntryIndex *) malloc(sizeof(RepeatEntryIndex));
+            if (NULL == new_rei) {
+                fprintf(stderr, "[new_rei]内存分配失败\n");
+                exit(1);
+            }
+            new_rei->index = current->index;
+            HASH_ADD(hh, same_path->repeat_entry_indexes, index, sizeof(long), new_rei);
+
+            RefPathEntry *tmp_entry_in_same_path = utarray_eltptr(same_path->entries, new_rei->index);
+            tmp_entry_in_same_path->is_active = 1;
+            tmp_entry_in_same_path->gc_count_at_last_updated = current_gc_count;
+        }
+    }
+
+    // 尝试清理new_ref_path
+    if (NULL != same_path) {
+        try_free_ref_path_obj(new_ref_path);
     }
 
     // print debug info
     if (is_show_ega_debug_info) {
-        printf("[DebugInfo] New focusing path collected:\n[DebugInfo] ");
-        for (long i = 0; i < new_ref_path->len; ++i) {
-            SCM curr_object = new_ref_path->entries[i].ptr;
-            printf("%s#field[%ld];", type_str(curr_object), new_ref_path->entries[i].ref_field_index);
-            if (i < new_ref_path->len - 1) {
-                printf(" -> ");
+        RefPath *path_to_show;
+        if (NULL == same_path) {
+            path_to_show = new_ref_path;
+            printf("[DebugInfo] New focusing path collected:\n[DebugInfo] ");
+        } else {
+            path_to_show = same_path;
+            printf("[DebugInfo] Still use old path in focusing path list:\n[DebugInfo] ");
+        }
+
+        long len = utarray_len(path_to_show->entries);
+        for (long i = 0; i < len; ++i) {
+            RefPathEntry *temp = (RefPathEntry *)utarray_eltptr(path_to_show->entries, i);
+            SCM curr_object = temp->ptr;
+            printf("%s#field[%ld];", type_str(curr_object), temp->ref_field_index);
+            if (i < len - 1) {
+                RepeatEntryIndex *rei;
+                HASH_FIND(hh, path_to_show->repeat_entry_indexes, &i, sizeof(long), rei);
+                if (NULL != rei) {
+                    printf(" ->* ");
+                } else {
+                    printf(" -> ");
+                }
             } else {
                 printf("\n");
             }
         }
     }
 
+    // 这个对象不会再触发这个获取新path的处理
     set_ref_path_info_recorded(ptr);
-    try_record_metadata(new_ref_path);
-}
 
-static long partition(long **arr_p, long low, long high) {
-    long t = (*arr_p)[low];
-    while (low < high) {
-        while (low < high && (*arr_p)[high] >= t) {
-            high -= 1;
-        }
-        (*arr_p)[low] = (*arr_p)[high];
-
-        while (low < high && (*arr_p)[low] <= t) {
-            low += 1;
-        }
-        (*arr_p)[high] = (*arr_p)[low];
-    }
-    (*arr_p)[low] = t;
-    return low;
-}
-
-static void q_sort(long **arr_p, long low, long high) {
-    if (low < high) {
-        long t = partition(arr_p, low, high);
-        q_sort(arr_p, low, t - 1);
-        q_sort(arr_p, t + 1, high);
-    }
-}
-
-static void quick_sort(long **arr_p, long len) {
-    q_sort(arr_p, 0, len - 1);
-}
-
-static long rm_duplicates(long **in_arr_p, long in_arr_len) {
-    long j = 0;
-    for (int i = 0; i < in_arr_len; ++i) {
-        if ((*in_arr_p)[i] != (*in_arr_p)[i + 1]) {
-            (*in_arr_p)[j++] = (*in_arr_p)[i];
-        }
-    }
-    return j;
-}
-
-/**
- * merge two arrays of long
- * @param arr1_p
- * @param arr2_p
- * @param out_arr_p
- * @param arr1_len
- * @param arr2_len
- * @return length of out_arr
- */
-static long merge_arrays(long **arr1_p, long **arr2_p, long **out_arr_p, long arr1_len, long arr2_len) {
-    long *arr1 = *arr1_p;
-    long *arr2 = *arr2_p;
-
-    long *merge_roughly = (long *) malloc((arr1_len + arr2_len) * sizeof(long));
-    memcpy(merge_roughly, arr1, arr1_len * sizeof(long));
-    memcpy(merge_roughly + arr1_len, arr2, arr2_len * sizeof(long));
-
-    quick_sort(&merge_roughly, arr1_len + arr2_len);
-    long new_len = rm_duplicates(&merge_roughly, arr1_len + arr2_len);
-
-    long *result = (long *) malloc(new_len * sizeof(long));
-    memcpy(result, merge_roughly, new_len * sizeof(long));
-
-    out_arr_p = &result;
-    free(merge_roughly);
-
-    return new_len;
+    // 尝试去更新WB相关的情报
+    try_record_metadata(NULL == same_path ? new_ref_path : same_path);
 }
 
 static char s_try_gather_new_line_num[] = "try_gather_new_line_num";
@@ -377,94 +507,46 @@ void try_gather_new_line_num(SCM ptr, long last_gc_traced_index) {
         return;
     }
 
-    SCM prev_ptr = gc_traced[last_gc_traced_index - 1L].ptr;
-    if (!is_user_defined_data_type_instance(prev_ptr)) {
+    if (!is_assert_dead_marked(ptr)) {
         return;
     }
 
-    if (!is_user_defined_data_type_instance_with_rec_slots(prev_ptr)) {
+    RefPath *curr_path = gen_a_concise_ref_path(ptr, last_gc_traced_index, 1);
+
+    RefPath *same_path = try_find_same_path_in_focusing_list(curr_path);
+    if (NULL == same_path) {
+        try_free_ref_path_obj(curr_path);
         return;
     }
 
-    long prev_obj_field_index = gc_traced[last_gc_traced_index - 1L].ref_field_index - 1L;
-    SCM rec_slot_of_field = get_rec_slot_of_field(prev_ptr, prev_obj_field_index);
-    if (NULLP(rec_slot_of_field)) {
-        return;
-    }
+    long entry_quantity = utarray_len(curr_path->entries);
+    for (long i = 0; i < entry_quantity; ++i) {
+        RefPathEntry *curr_path_tmp_entry = (RefPathEntry *) utarray_eltptr(curr_path->entries, i);
+        RefPathEntry *same_path_tmp_entry = (RefPathEntry *) utarray_eltptr(same_path->entries, i);
 
-    SCM prev_ptr_type_def = get_data_type_def_identifier(prev_ptr);
-    SCM curr_ptr_type_def = get_data_type_def_identifier(ptr);
-
-    for (RefPath *tmp_path = focusing_ref_path_list->paths; NULL != tmp_path && !is_process_all_ref_paths; tmp_path = tmp_path->next) {
-        long len = tmp_path->len;
-        if (len <= 1L) {
+        if (!same_path_tmp_entry->is_active) {
             continue;
         }
 
-        long active_index = tmp_path->active_index;
-        if (active_index == len - 1L) {
-            continue;
-        }
-
-        //参照パターン(a.f -> b)の比較
-        SCM a = tmp_path->entries[active_index].ptr;
-        if (!is_user_defined_data_type_instance(a)) {
-            continue;
-        }
-        SCM b = tmp_path->entries[active_index + 1L].ptr;
-        if (!is_user_defined_data_type_instance(b)) {
-            continue;
-        }
-        if (get_data_type_def_identifier(a) != prev_ptr_type_def) {
-            continue;
-        }
-        if (tmp_path->entries[active_index].ref_field_index != gc_traced[last_gc_traced_index - 1L].ref_field_index - 1L) {
-            continue;
-        }
-        if (get_data_type_def_identifier(b) != curr_ptr_type_def) {
-            continue;
-        }
-
-        // 收集分散存储的行号
-        SCM ln_vector_of_ref_type = EOL;
-        for (long i = 1L; i < INUM(VELTS(rec_slot_of_field)[1]) - 1L; ++i) {
-            SCM tmp_ln_vector_of_ref_type = VELTS(rec_slot_of_field)[i];
-            if (VELTS(tmp_ln_vector_of_ref_type)[2] <= MAKINUM(3)) {
-                // e.g. ln_vector_of_ref_type <= [internal-vector-sym, ref-type-def, used-len, EOL, EOL, ...]
-                break;
-            }
-            if (VELTS(tmp_ln_vector_of_ref_type)[1] != curr_ptr_type_def) {
+        CollectedLineNumber *curr, *tmp;
+        HASH_ITER(hh, curr_path_tmp_entry->line_numbers, curr, tmp) {
+            CollectedLineNumber *ln_info = NULL;
+            HASH_FIND(hh, same_path_tmp_entry->line_numbers, &(curr->line_num), sizeof(long), ln_info);
+            if (NULL != ln_info) {
                 continue;
             }
-            ln_vector_of_ref_type = tmp_ln_vector_of_ref_type;
-            break;
-        }
 
-        if (NULLP(ln_vector_of_ref_type)) {
-            return;
-        }
-
-        long tmp_len = INUM(VELTS(ln_vector_of_ref_type)[2]) - 3;
-        long *tmp_lns = (long *) malloc(tmp_len * sizeof(long));
-        for (long i = 0; i < tmp_len; ++i) {
-            tmp_lns[i] = INUM(VELTS(ln_vector_of_ref_type)[i + 3L]);
-        }
-
-        if (tmp_path->entries[active_index].line_num_quantity <= 0) {
-            tmp_path->entries[active_index].line_nums = tmp_lns;
-            tmp_path->entries[active_index].line_num_quantity = tmp_len;
-        } else {
-            long *new_line_nums;
-            long new_len = merge_arrays(&tmp_path->entries[active_index].line_nums,
-                                        &tmp_lns,
-                                        &new_line_nums,
-                                        tmp_path->entries[active_index].line_num_quantity,
-                                        tmp_len);
-            free(tmp_path->entries[active_index].line_nums);
-            tmp_path->entries[active_index].line_nums = new_line_nums;
-            tmp_path->entries[active_index].line_num_quantity = new_len;
+            ln_info = (CollectedLineNumber *) malloc(sizeof(CollectedLineNumber));
+            if (NULL == ln_info) {
+                fprintf(stderr, "[new_ln_info]内存分配失败\n");
+                exit(1);
+            }
+            ln_info->line_num = curr->line_num;
+            HASH_ADD(hh, same_path_tmp_entry->line_numbers, line_num, sizeof(long), ln_info);
         }
     }
+
+    try_free_ref_path_obj(curr_path);
 }
 
 static void print_result(RefPath *ref_path) {
@@ -472,30 +554,40 @@ static void print_result(RefPath *ref_path) {
         return;
     }
 
+    long len = utarray_len(ref_path->entries);
+
     printf("\033[31mWarning: an object that was asserted dead is reachable.\n"
            "Type: %s;\n"
            "Path to object: ",
-           type_str(ref_path->entries[ref_path->len -1L].ptr));
+           type_str(((RefPathEntry *) utarray_eltptr(ref_path->entries, len - 1L))->ptr));
 
-    for (long i = 0; i < ref_path->len; ++i) {
-        SCM p = ref_path->entries[i].ptr;
+    for (long i = 0; i < len; ++i) {
+        RefPathEntry *entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i);
+        SCM p = entry->ptr;
 
-        if (ref_path->entries[i].line_num_quantity <= 0) {
+        long recorded_lns_quantity = HASH_COUNT(entry->line_numbers);
+        if (recorded_lns_quantity <= 0) {
             printf("%s", type_str(p));
         } else {
             printf("%s@ln", type_str(p));
-            for (long index = 0; index < ref_path->entries[i].line_num_quantity; ++index) {
-                printf("%ld", ref_path->entries[i].line_nums[index]);
-                if (index != ref_path->entries[i].line_num_quantity - 1L) {
+            CollectedLineNumber *el, *tmp;
+            long j = 0;
+            HASH_ITER(hh, entry->line_numbers, el, tmp) {
+                printf("%ld", el->line_num);
+                if (j != recorded_lns_quantity - 1L) {
                     printf(",");
                 }
+                j += 1L;
             }
         }
 
-        if (i != ref_path->len - 1L) {
-            printf("; -> ");
-            if (i != 0 && i % 5 == 0) { // TODO [Dirty] 長すぎるので, 改行しよう（ハードコードで5個ごとに改行決定）
-                printf("\n");
+        if (i != len - 1L) {
+            RepeatEntryIndex *rei;
+            HASH_FIND(hh, ref_path->repeat_entry_indexes, &i, sizeof(long), rei);
+            if (NULL != rei) {
+                printf("; ->* ");
+            } else {
+                printf("; -> ");
             }
         } else {
             printf(";");
@@ -505,67 +597,44 @@ static void print_result(RefPath *ref_path) {
     printf("\n\n\033[0m");
 }
 
-static void remove_path_info(RefPath *ref_path) {
-    // try to break the relationship between the node and the whole linked list
-    if (NULL == ref_path->prev && NULL == ref_path->next) {
-        focusing_ref_path_list->paths = NULL;
-        focusing_ref_path_list->last = NULL;
-    } else if (NULL != ref_path->prev && NULL != ref_path->next) {
-        ref_path->prev->next = ref_path->next;
-        ref_path->next->prev = ref_path->prev;
-    } else if (NULL == ref_path->prev) {
-        ref_path->next->prev = NULL;
-        focusing_ref_path_list->paths = ref_path->next;
-    } else if (NULL == ref_path->next) {
-        ref_path->prev->next = NULL;
-        focusing_ref_path_list->last = ref_path->prev;
-    }
+static void remove_path_info_from_focusing_list(RefPath *ref_path) {
+    utarray_free(ref_path->entries);
 
-    // free memory of the node
-    free(ref_path->entries->line_nums);
-    free(ref_path->entries);
+    RepeatEntryIndex *curr, *tmp;
+    HASH_ITER(hh, ref_path->repeat_entry_indexes, curr, tmp) {
+        HASH_DEL(ref_path->repeat_entry_indexes, curr);
+        free(curr);
+    }
+    HASH_CLEAR(hh, ref_path->repeat_entry_indexes);
+
+    DL_DELETE(focusing_ref_path_list, ref_path);
     free(ref_path);
 }
 
 static void check_ref_path_list_after_gc() {
-    typedef struct pointer_info {
-        RefPath *p;
-        struct pointer_info *next;
-    } PointerInfo;
+    RefPath *curr, *tmp;
+    DL_FOREACH_SAFE(focusing_ref_path_list, curr, tmp) {
+        long len = utarray_len(curr->entries);
 
-    PointerInfo *fst = NULL;
-    PointerInfo *lst = NULL;
-
-    for (RefPath *tmp_path = focusing_ref_path_list->paths; NULL != tmp_path && !is_process_all_ref_paths; tmp_path = tmp_path->next) {
-        tmp_path->gc_count_of_active_index += 1L;
-        if (tmp_path->gc_count_of_active_index >= gc_count_of_a_ref_pattern_at_most
-            || tmp_path->entries[tmp_path->active_index].line_num_quantity >= line_num_quantity_of_a_ref_pattern_at_least) {
-            tmp_path->active_index += 1L;
-            try_record_metadata(tmp_path);
+        int line_num_reading_completed = 1;
+        for (long i = 0; i < len - 1L; ++i) {
+            RefPathEntry *tmp_entry = (RefPathEntry *) utarray_eltptr(curr->entries, i);
+            size_t passed_gc_count = current_gc_count - tmp_entry->gc_count_at_last_updated;
+            if (passed_gc_count >= gc_count_of_a_ref_pattern_at_most
+                || HASH_COUNT(tmp_entry->line_numbers) >= line_num_quantity_of_a_ref_pattern_at_least) {
+                tmp_entry->is_active = 0;
+                continue;
+            }
+            line_num_reading_completed = 0;
         }
 
-        if (tmp_path->active_index < tmp_path->len - 1L) {
-            continue;
+        // 尝试记录metadata
+        try_record_metadata(curr);
+
+        if (line_num_reading_completed) {
+            print_result(curr);
+            remove_path_info_from_focusing_list(curr);
         }
-
-        print_result(tmp_path);
-
-        // collect RefPath that to be removed
-        PointerInfo *tmp_pointer_info = (PointerInfo *) malloc(sizeof(PointerInfo));
-        tmp_pointer_info->p = tmp_path;
-        tmp_pointer_info->next = NULL;
-        if (NULL == fst) {
-            fst = tmp_pointer_info;
-        } else {
-            lst->next = tmp_pointer_info;
-        }
-        lst = tmp_pointer_info;
-    }
-
-    for (PointerInfo *tmp = fst, *nxt; NULL != tmp; tmp = nxt) {
-        nxt = tmp->next;
-        remove_path_info(tmp->p);
-        free(tmp);
     }
 }
 
@@ -657,46 +726,64 @@ static void wb_add_or_rm(SCM data_type_def, long field_index, int is_add) {
     free(exec_code);
 }
 
+static void free_wb_update_metadata_hash() {
+    WriteBarrierUpdateMetadata *wbim, *wbim_tmp;
+    HASH_ITER(hh, wb_update_metadata_hash, wbim, wbim_tmp) {
+
+        MetadataPerField *mpf, *mpf_tmp;
+        HASH_ITER(hh, wbim->field_ref_info, mpf, mpf_tmp) {
+            UpdateStateByRefType *usbrt, *usbrt_tmp;
+            HASH_ITER(hh, mpf->update_state_by_ref_type, usbrt, usbrt_tmp) {
+                HASH_DEL(mpf->update_state_by_ref_type, usbrt);
+                free(usbrt);
+            }
+            HASH_CLEAR(hh, mpf->update_state_by_ref_type);
+
+            HASH_DEL(wbim->field_ref_info, mpf);
+            free(mpf);
+        }
+        HASH_CLEAR(hh, wbim->field_ref_info);
+
+        HASH_DEL(wb_update_metadata_hash, wbim);
+        free(wbim);
+    }
+    HASH_CLEAR(hh, wb_update_metadata_hash);
+}
+
 static char s_update_type_def_and_wb[] = "update-type-def-and-wb";
 static SCM update_type_def_and_wb() {
-    for (long i = 0; i < NUM_HASH_BUCKETS; ++i) {
-        CollectedInfoHash *info_list = collect_info_hash_map[i];
-        while (NULL != info_list) {
-            SCM tmp_type_def = info_list->data_type_def;
-            long field_num = field_number(tmp_type_def);
+    WriteBarrierUpdateMetadata *el, *tmp;
+    HASH_ITER(hh, wb_update_metadata_hash, el, tmp) {
+        // type_def_objの更新
+        try_update_data_type_def(el);
 
-            // type_def_objの更新
-            try_update_data_type_def(info_list);
-
-            // ライトバリアの更新
-            for (long fi = 0; fi < field_num; ++fi) {
-                int is_add = 0;
-                for (long m = 0; m < info_list->field_ref_info[fi].len; ++m) {
-                    if (info_list->field_ref_info->is_to_add[m]) {
-                        is_add = 1;
-                        break;
-                    }
-                }
-                wb_add_or_rm(tmp_type_def, fi, is_add);
+        // ライトバリアの更新
+        SCM tmp_type_def = el->data_type_def;
+        long field_num = field_number(tmp_type_def);
+        for (long i = 0; i < field_num; ++i) {
+            MetadataPerField *metadata_per_field;
+            HASH_FIND(hh, el->field_ref_info, &i, sizeof(long), metadata_per_field);
+            if (NULL == metadata_per_field) {
+                continue;
             }
 
-            info_list = info_list->next;
+            int is_add_final = 0;
+
+            UpdateStateByRefType *e, *t;
+            HASH_ITER(hh, metadata_per_field->update_state_by_ref_type, e, t) {
+                if (e->is_to_add) {
+                    is_add_final = 1;
+                    break;
+                }
+            }
+
+            wb_add_or_rm(tmp_type_def, i, is_add_final);
         }
     }
 
-    // CollectInfoHashのメモリの解放
-    for (long i = 0; i < NUM_HASH_BUCKETS; ++i) {
-        CollectedInfoHash *info_list = collect_info_hash_map[i];
-        while (NULL != info_list) {
-            free(info_list->field_ref_info->ref_data_types);
-            free(info_list->field_ref_info->is_to_add);
-            free(info_list->field_ref_info);
-            CollectedInfoHash *tmp = info_list;
-            info_list = info_list->next;
-            free(tmp);
-        }
-        collect_info_hash_map[i] = NULL;
-    }
+    // wb_update_metadata_hashのメモリの解放
+    free_wb_update_metadata_hash();
+
     return UNSPECIFIED;
 }
 
@@ -705,7 +792,10 @@ void ega_process_after_gc() {
         check_ref_path_list_after_gc();
         update_type_def_and_wb();
     } else {
-        if (NULL == focusing_ref_path_list->paths) {
+        RefPath *el;
+        long counter;
+        DL_COUNT(focusing_ref_path_list, el, counter);
+        if (counter <= 0) {
             return; // 如果没有focusing path的话就不用执行后面的了
         }
         check_ref_path_list_after_gc();
@@ -726,15 +816,42 @@ static SCM random_0_n(SCM n) {
     return MAKINUM(rand() % number);
 }
 
-void init_gc_traced() {
-    gc_traced = (GcTracedInfo *) malloc(heap_cells * sizeof(GcTracedInfo));
-    focusing_ref_path_list = (FocusingRefPathList *) malloc(sizeof(FocusingRefPathList));
-    focusing_ref_path_list->paths = NULL;
-    focusing_ref_path_list->last = NULL;
-    collect_info_hash_map = (CollectedInfoHash **) malloc(NUM_HASH_BUCKETS * sizeof(CollectedInfoHash *));
-    for (int i = 0; i < NUM_HASH_BUCKETS; ++i) {
-        collect_info_hash_map[i] = NULL;
+static void ref_path_entry_dtor(void *elt) {
+    RefPathEntry *tmp_elt = (RefPathEntry *) elt;
+
+    CollectedLineNumber *curr, *tmp;
+    HASH_ITER(hh, tmp_elt->line_numbers, curr, tmp) {
+        HASH_DEL(tmp_elt->line_numbers, curr);
+        free(curr);
     }
+
+    HASH_CLEAR(hh, tmp_elt->line_numbers);
+}
+
+static void init_gc_traced() {
+    gc_traced = (GcTracedInfo *) malloc(heap_cells * sizeof(GcTracedInfo));
+    if (NULL == gc_traced) {
+        fprintf(stderr, "[gc_traced]内存分配失败\n");
+        exit(1);
+    }
+}
+
+static void init_focusing_ref_path_list() {
+    ref_path_entry_icd = (UT_icd *) malloc(sizeof(UT_icd));
+    if (NULL == ref_path_entry_icd) {
+        fprintf(stderr, "[ref_path_entry_icd]内存分配失败\n");
+        exit(1);
+    }
+    ref_path_entry_icd->sz = sizeof(RefPathEntry);
+    ref_path_entry_icd->init = NULL;
+    ref_path_entry_icd->copy = NULL;
+    ref_path_entry_icd->dtor = ref_path_entry_dtor;
+
+    focusing_ref_path_list = NULL;
+}
+
+static void init_wb_update_metadata_hash() {
+    wb_update_metadata_hash = NULL;
 }
 
 static iproc subr0s[] = {
@@ -750,12 +867,21 @@ static iproc subr1s[] = {
 
 void init_ega() {
     init_gc_traced();
+    init_focusing_ref_path_list();
+    init_wb_update_metadata_hash();
     init_iprocs(subr0s, tc7_subr_0);
     init_iprocs(subr1s, tc7_subr_1);
     add_feature("ega");
 }
 
 void init_ega_disk_saved() {
+    if (NULL != ref_path_entry_icd) {
+        ref_path_entry_icd->sz = sizeof(RefPathEntry);
+        ref_path_entry_icd->init = NULL;
+        ref_path_entry_icd->copy = NULL;
+        ref_path_entry_icd->dtor = ref_path_entry_dtor;
+    }
+
     init_iprocs(subr0s, tc7_subr_0);
     init_iprocs(subr1s, tc7_subr_1);
 }

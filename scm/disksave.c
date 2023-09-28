@@ -191,20 +191,22 @@ SCM disk_save() {
     fwrite(&line_num_quantity_of_a_ref_pattern_at_least, sizeof(long), 1, fp);
     fwrite(&gc_count_of_a_ref_pattern_at_most, sizeof(long), 1, fp);
     fwrite(&is_print_result, sizeof(char), 1, fp);
-    fwrite(&current_gc_count, sizeof(unsigned long), 1, fp);
-    fwrite(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
-    fwrite(&focusing_ref_path_list, sizeof(FocusingRefPathList *), 1, fp);
-    fwrite(&collect_info_hash_map, sizeof(CollectedInfoHash **), 1, fp);
+    fwrite(&current_gc_count, sizeof(size_t), 1, fp);
     fwrite(&is_dynamic_check_mode, sizeof(char), 1, fp);
     fwrite(&is_show_ega_debug_info, sizeof(char), 1, fp);
+    fwrite(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
+    fwrite(&focusing_ref_path_list, sizeof(RefPath *), 1, fp);
+    fwrite(&wb_update_metadata_hash, sizeof(WriteBarrierUpdateMetadata *), 1, fp);
+    fwrite(&ref_path_entry_icd, sizeof(UT_icd *), 1, fp);
 
     // disksave.c
     // nothing
 
     // socket.c
-#ifdef COMPILED_INITS
-    fwrite(&tc16_sknm, sizeof(long), 1, fp);
-#endif
+    // 2023.09.19 No usages
+//#ifdef COMPILED_INITS
+//    fwrite(&tc16_sknm, sizeof(long), 1, fp);
+//#endif
 
     // scl.c
     fwrite(sys_protects, sizeof(SCM), NUM_PROTECTS, fp);

@@ -16,6 +16,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+#include "utlist.h"
+#include "utarray.h"
+#include "uthash.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -140,51 +144,75 @@ typedef struct {SCM type;float num;} flo;
 typedef struct {SCM type;double *real;} dbl;
 #endif
 
+
 typedef struct bheader {
     struct bheader *ptr;
     unsigned size;
 } HEADER;
+
 
 typedef struct gc_traced_info {
     SCM ptr;
     long ref_field_index;
 } GcTracedInfo;
 
+
+typedef struct collected_line_number {
+    long line_num;
+    UT_hash_handle hh;
+} CollectedLineNumber;
+
+typedef struct repeat_entry_index {
+    long index;
+    UT_hash_handle hh;
+} RepeatEntryIndex;
+
+//typedef struct repeat_part {
+//    long start_index;
+//    long len;
+//    UT_hash_handle hh;
+//} RepeatPart;
+
 typedef struct ref_path_entry {
     SCM ptr;
     long ref_field_index;
-    long line_num_quantity;
-    long *line_nums;
+    int is_active; // needs write-barriers and record-slots?
+    size_t gc_count_at_created;
+    size_t gc_count_at_last_updated;
+    CollectedLineNumber *line_numbers;
 } RefPathEntry;
 
+/**
+ * Entry Definition in focusing_ref_path_list
+ */
 typedef struct ref_path {
-    long active_index;
-    long gc_count_of_active_index;
-    long len;
-    RefPathEntry *entries;
+    RepeatEntryIndex *repeat_entry_indexes; // 全ての重複したリンクのindexes (HashMap)
+    // RepeatPart *repeat_parts; // 重複したpartsのHashMap.g. {{0, [0, 3]}, {3, [3, 1]}, {4, [4, 2]}} (之后用于对应所有的重复情况)
+    UT_array *entries; // RefPathEntry is inside
     struct ref_path *prev;
     struct ref_path *next;
 } RefPath;
 
-typedef struct focusing_ref_path_list {
-    RefPath *paths;
-    RefPath *last;
-} FocusingRefPathList;
-
 #define FIELD_REF_INFO_ALLOCATED_LEN (6)
-#define FIELD_REF_INFO_ALLOCATED_LEN_EXPAND_TIMES (2)
-typedef struct field_ref_data_type_info {
-    SCM *ref_data_types;
-    int *is_to_add; // 各の値に対し, 0: 削除 1: 追加
-    long allocated_len;
-    long len;
-} FieldRefDataTypeInfo;
 
-typedef struct collected_info_hash {
-    SCM data_type_def;
-    FieldRefDataTypeInfo *field_ref_info; // len is num of the data type fields
-    struct collected_info_hash* next;
-} CollectedInfoHash;
+typedef struct update_state_by_ref_type {
+    SCM ref_data_type; // SCM is long
+    int is_to_add; // 各の値に対し, 0: 削除 1: 追加
+    UT_hash_handle hh;
+} UpdateStateByRefType;
+
+typedef struct metadata_per_field {
+    long field_index;
+    UpdateStateByRefType *update_state_by_ref_type;
+    UT_hash_handle hh;
+} MetadataPerField;
+
+typedef struct write_barrier_update_metadata {
+    SCM data_type_def; // class_obj SCM is long
+    MetadataPerField *field_ref_info;
+    UT_hash_handle hh;
+} WriteBarrierUpdateMetadata;
+
 
   /* Conditionals should always expect immediates */
   /* GCC __builtin_expect() is stubbed in scmfig.h */
@@ -1212,12 +1240,13 @@ SCM_EXPORT char is_process_all_ref_paths;
 SCM_EXPORT long line_num_quantity_of_a_ref_pattern_at_least;
 SCM_EXPORT long gc_count_of_a_ref_pattern_at_most;
 SCM_EXPORT char is_print_result;
-SCM_EXPORT unsigned long current_gc_count;
+SCM_EXPORT size_t current_gc_count;
 SCM_EXPORT char is_dynamic_check_mode;
 SCM_EXPORT char is_show_ega_debug_info;
 SCM_EXPORT GcTracedInfo *gc_traced;
-SCM_EXPORT FocusingRefPathList *focusing_ref_path_list;
-SCM_EXPORT CollectedInfoHash **collect_info_hash_map;
+SCM_EXPORT RefPath *focusing_ref_path_list;
+SCM_EXPORT WriteBarrierUpdateMetadata *wb_update_metadata_hash;
+SCM_EXPORT UT_icd *ref_path_entry_icd;
 SCM_EXPORT long field_number P((SCM data_type_def));
 SCM_EXPORT char *data_type_field_name P((SCM data_type_def, long field_index));
 SCM_EXPORT char *data_type_name P((SCM data_type_def));
@@ -1225,7 +1254,7 @@ SCM_EXPORT char *instance_type_name P((SCM ptr));
 SCM_EXPORT char is_internal_vector P((SCM ptr));
 SCM_EXPORT char is_user_defined_data_type_instance_with_rec_slots P((SCM scm_obj));
 SCM_EXPORT SCM get_rec_slot_of_field P((SCM scm_obj, long field_index));
-SCM_EXPORT void try_update_data_type_def P((CollectedInfoHash *collected_info));
+SCM_EXPORT void try_update_data_type_def P((WriteBarrierUpdateMetadata * metadata));
 
 SCM_EXPORT HEADER base; /* empty list to get started */
 SCM_EXPORT HEADER *freep; /* start of free list */

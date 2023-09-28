@@ -287,41 +287,50 @@ SCM get_rec_slot_of_field(SCM scm_obj, long field_index) {
     return VELTS(rec_slots_vector)[field_index + 1L];
 }
 
-void try_update_data_type_def(CollectedInfoHash *collected_info) {
-    SCM type_def = collected_info->data_type_def;
-    long field_num = field_number(type_def);
+void try_update_data_type_def(WriteBarrierUpdateMetadata *metadata) {
+    if (HASH_COUNT(metadata->field_ref_info) <= 0) {
+        return;
+    }
+
+    SCM class_obj = metadata->data_type_def;
+    long field_num = field_number(class_obj);
 
     SCM new_rec_slot_defs = EOL;
     for (long field_idx = 0; field_idx < field_num; ++field_idx) {
-        FieldRefDataTypeInfo *field_ref_data_type_info = &collected_info->field_ref_info[field_idx];
+        MetadataPerField *field_ref_data_type_info;
+        HASH_FIND(hh, metadata->field_ref_info, &field_idx, sizeof(long), field_ref_data_type_info);
 
         long ref_num_to_add = 0;
-        for (long i = 0; i < field_ref_data_type_info->len; ++i) {
-            if (field_ref_data_type_info->is_to_add[i]) {
-                ref_num_to_add += 1;
+        if (NULL != field_ref_data_type_info) {
+            UpdateStateByRefType *e, *t;
+            HASH_ITER(hh, field_ref_data_type_info->update_state_by_ref_type, e, t) {
+                if (e->is_to_add) ref_num_to_add += 1L;
             }
         }
 
-        if (ref_num_to_add > 0) {
+        if (ref_num_to_add <= 0) {
+            continue;
+        }
+
+        if (NULLP(new_rec_slot_defs)) {
             new_rec_slot_defs = make_vector(MAKINUM(field_num + 1L), EOL);
             vector_set(new_rec_slot_defs, MAKINUM(0), internal_vector_symbol);
-
-            SCM new_ref_types_of_field = make_vector(MAKINUM(ref_num_to_add + 1L), internal_vector_symbol);
-            long prev_idx = 0;
-            for (long i = 0; i < field_ref_data_type_info->len; ++i) {
-                if (field_ref_data_type_info->is_to_add[i]) {
-                    vector_set(new_ref_types_of_field, MAKINUM(prev_idx + 1L), field_ref_data_type_info->ref_data_types[i]);
-                    prev_idx += 1L;
-                }
-            }
-
-            vector_set(new_rec_slot_defs, MAKINUM(field_idx + 1L), new_ref_types_of_field);
         }
+
+        SCM new_ref_types_of_field = make_vector(MAKINUM(ref_num_to_add + 1L), internal_vector_symbol);
+        UpdateStateByRefType *element, *temp;
+        long prev_set_index = 0;
+        HASH_ITER(hh, field_ref_data_type_info->update_state_by_ref_type, element, temp) {
+            if (element->is_to_add) {
+                VELTS(new_ref_types_of_field)[prev_set_index + 1L] = element->ref_data_type;
+                prev_set_index += 1L;
+            }
+        }
+        VELTS(new_rec_slot_defs)[field_idx + 1L] = new_ref_types_of_field;
     }
 
-    DTD_RSD(type_def) = new_rec_slot_defs;
-
-    IC(type_def) = NULLP(new_rec_slot_defs) ? DTD_IT_CODE : DTDWRS_IT_CODE;
+    DTD_RSD(class_obj) = new_rec_slot_defs;
+    IC(class_obj) = NULLP(new_rec_slot_defs) ? DTD_IT_CODE : DTDWRS_IT_CODE;
 }
 
 static char s_c_data_type_predicate[] = "c-data-type-predicate";
@@ -390,7 +399,7 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
 
     // 拡張してみる
     if (used_len >= vector_length(line_num_vector_of_ref_type)) {
-        long new_len = used_len * FIELD_REF_INFO_ALLOCATED_LEN_EXPAND_TIMES;
+        long new_len = used_len + FIELD_REF_INFO_ALLOCATED_LEN; // TODO [dirty] 每次多扩张6个就空位
         SCM new_ln_v_of_ref_type = make_vector(MAKINUM(new_len), EOL);
         for (long i = 0; i < used_len; ++i) {
             VELTS(new_ln_v_of_ref_type)[i] = VELTS(line_num_vector_of_ref_type)[i];
