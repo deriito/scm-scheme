@@ -480,7 +480,7 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
                 RepeatEntryIndex *rei;
                 HASH_FIND(hh, path_to_show->repeat_entry_indexes, &i, sizeof(long), rei);
                 if (NULL != rei) {
-                    printf(" ->* ");
+                    printf(" ->+ ");
                 } else {
                     printf(" -> ");
                 }
@@ -585,7 +585,7 @@ static void print_result(RefPath *ref_path) {
             RepeatEntryIndex *rei;
             HASH_FIND(hh, ref_path->repeat_entry_indexes, &i, sizeof(long), rei);
             if (NULL != rei) {
-                printf("; ->* ");
+                printf("; ->+ ");
             } else {
                 printf("; -> ");
             }
