@@ -255,7 +255,7 @@
 (define-data-type 'array-list '(size pred-proc-sym data))
 
 (define init-array-list-data-capacity 10)
-(define default-array-list-grow-time 2)
+(define default-array-list-grow-size 6)
 
 (define (new-array-list accepted-type-name-sym)
   (let ((pred-proc-sym (string->symbol (string-append (symbol->string accepted-type-name-sym) "?")))
@@ -280,7 +280,7 @@
                 (curr-capacity (internal-vector-length (array-list-data array-list))))
            (cond
              ((>= curr-size curr-capacity)
-               (let ((new-vector (make-internal-vector (* curr-capacity default-array-list-grow-time) '()))
+               (let ((new-vector (make-internal-vector (+ curr-capacity default-array-list-grow-size) '()))
                       (curr-vector (array-list-data array-list)))
                  (begin
                    (let loop ((i 0))
@@ -401,7 +401,7 @@
 (define-data-type 'hash-map '(hash-map-internal))
 
 (define init-buckets-capacity 16)
-(define buscket-capacity-expand-time 2)
+(define buscket-capacity-expand-size 6)
 
 (define (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym capacity)
   (new-hash-map-internal 0 key-pred-proc-sym value-pred-proc-sym 0 (make-internal-vector capacity '())))
@@ -472,7 +472,7 @@
                        (used-buckets-size (hash-map-internal-used-bucket-size hash-map-internal)))
                (cond
                  ((>= used-buckets-size buckets-capacity)
-                   (letrec ((new-buckets-capacity (* buckets-capacity buscket-capacity-expand-time))
+                   (letrec ((new-buckets-capacity (+ buckets-capacity buscket-capacity-expand-size))
                              (key-pred-proc-sym (hash-map-internal-key-pred-proc-sym hash-map-internal))
                              (value-pred-proc-sym (hash-map-internal-value-pred-proc-sym hash-map-internal))
                              (new-hash-map-internal (new-hash-map-internal-with-capacity key-pred-proc-sym value-pred-proc-sym new-buckets-capacity))

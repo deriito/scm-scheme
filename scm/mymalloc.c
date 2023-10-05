@@ -222,9 +222,8 @@ void init_my_zone() {
     fread(&internal_vector_symbol, sizeof(SCM), 1, fp);
 
     // ega.c
-    fread(&is_process_all_ref_paths, sizeof(char), 1, fp);
-    fread(&line_num_quantity_of_a_ref_pattern_at_least, sizeof(long), 1, fp);
-    fread(&gc_count_of_a_ref_pattern_at_most, sizeof(long), 1, fp);
+    fread(&line_num_quantity_of_a_ref_pattern_at_least, sizeof(size_t), 1, fp);
+    fread(&gc_count_of_a_ref_pattern_at_most, sizeof(size_t), 1, fp);
     fread(&is_print_result, sizeof(char), 1, fp);
     fread(&current_gc_count, sizeof(size_t), 1, fp);
     fread(&is_dynamic_check_mode, sizeof(char), 1, fp);

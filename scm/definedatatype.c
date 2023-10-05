@@ -392,7 +392,7 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
 
     SCM ln_num = CDR(value_and_callsite);
     for (long i = 3; i < used_len; ++i) {
-        if (VELTS(line_num_vector_of_ref_type)[i] == ln_num) {
+        if (INUM(VELTS(line_num_vector_of_ref_type)[i]) == INUM(ln_num)) {
             return UNSPECIFIED;
         }
     }
@@ -411,6 +411,14 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
     // 本当に行番号を記録
     VELTS(line_num_vector_of_ref_type)[used_len] = ln_num;
     VELTS(line_num_vector_of_ref_type)[2] = MAKINUM(used_len + 1L);
+
+    if (is_show_ega_debug_info) {
+        fprintf(stdout, "\n[DebugInfo] A new site_info@%ld is recorded in \"%s#%s <= %s\"\n\n",
+                INUM(ln_num),
+                data_type_name(get_data_type_def_identifier(obj)),
+                data_type_field_name(get_data_type_def_identifier(obj), INUM(index) - 1L),
+                data_type_name(get_data_type_def_identifier(value)));
+    }
 
     return UNSPECIFIED;
 }

@@ -162,23 +162,13 @@ typedef struct collected_line_number {
     UT_hash_handle hh;
 } CollectedLineNumber;
 
-typedef struct repeat_entry_index {
-    long index;
-    UT_hash_handle hh;
-} RepeatEntryIndex;
-
-//typedef struct repeat_part {
-//    long start_index;
-//    long len;
-//    UT_hash_handle hh;
-//} RepeatPart;
-
 typedef struct ref_path_entry {
     SCM ptr;
     long ref_field_index;
     int is_active; // needs write-barriers and record-slots?
+    int is_repeat;
     size_t gc_count_at_created;
-    size_t gc_count_at_last_updated;
+    size_t gc_count_at_last_reactivated;
     CollectedLineNumber *line_numbers;
 } RefPathEntry;
 
@@ -186,8 +176,6 @@ typedef struct ref_path_entry {
  * Entry Definition in focusing_ref_path_list
  */
 typedef struct ref_path {
-    RepeatEntryIndex *repeat_entry_indexes; // 全ての重複したリンクのindexes (HashMap)
-    // RepeatPart *repeat_parts; // 重複したpartsのHashMap.g. {{0, [0, 3]}, {3, [3, 1]}, {4, [4, 2]}} (之后用于对应所有的重复情况)
     UT_array *entries; // RefPathEntry is inside
     struct ref_path *prev;
     struct ref_path *next;
@@ -1236,9 +1224,8 @@ SCM_EXPORT void try_gather_new_ref_path P((SCM ptr, long last_gc_traced_index));
 SCM_EXPORT void try_gather_new_line_num P((SCM ptr, long last_gc_traced_index));
 SCM_EXPORT void ega_process_at_gc_start P((void));
 SCM_EXPORT void ega_process_after_gc P((void));
-SCM_EXPORT char is_process_all_ref_paths;
-SCM_EXPORT long line_num_quantity_of_a_ref_pattern_at_least;
-SCM_EXPORT long gc_count_of_a_ref_pattern_at_most;
+SCM_EXPORT size_t line_num_quantity_of_a_ref_pattern_at_least;
+SCM_EXPORT size_t gc_count_of_a_ref_pattern_at_most;
 SCM_EXPORT char is_print_result;
 SCM_EXPORT size_t current_gc_count;
 SCM_EXPORT char is_dynamic_check_mode;

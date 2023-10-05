@@ -269,9 +269,9 @@
 (define work-bench-page (new-work-bench-page 269))
 
 (let loop ((i 0))
-  (if (< i 30)
+  (if (< i 50)
     (begin
       (run-compare work-bench-page (linked-list-ref input-context-string-list (random-0-n (get-linked-list-size input-context-string-list))))
       (stop-compare work-bench-page (linked-list-ref input-context-string-list (random-0-n (get-linked-list-size input-context-string-list))))
-      (gc)
+      ;; (gc)
       (loop (+ i 1)))))
