@@ -269,9 +269,10 @@
 (define work-bench-page (new-work-bench-page 269))
 
 (let loop ((i 0))
-  (if (< i 50)
+  (if (< i 35)
     (begin
       (run-compare work-bench-page (linked-list-ref input-context-string-list (random-0-n (get-linked-list-size input-context-string-list))))
       (stop-compare work-bench-page (linked-list-ref input-context-string-list (random-0-n (get-linked-list-size input-context-string-list))))
       ;; (gc)
+      (display (string-append "loop:" (number->string i) "が実行完了!\n"))
       (loop (+ i 1)))))

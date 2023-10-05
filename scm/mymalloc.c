@@ -2,7 +2,7 @@
 // Created by Guang Yang on 2023/05/21.
 //
 
-#define PREPARED_MEMORY_BYTES (5 * 1024 * 1024)
+#define PREPARED_MEMORY_BYTES (1024 * 1024 * 1024)
 #define OFFSET_OF_STARTS (1024 * 1024)
 
 #include <sys/mman.h>
