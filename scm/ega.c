@@ -392,9 +392,9 @@ static void print_ref_path_links(RefPath *ref_path, int is_std_err) {
 
         long recorded_lns_quantity = HASH_COUNT(entry->line_numbers);
         if (recorded_lns_quantity <= 0) {
-            fprintf(io_stream_f, "%s#fields[%ld]", type_str(p), entry->ref_field_index);
+            fprintf(io_stream_f, "%s#f[%ld]", type_str(p), entry->ref_field_index);
         } else {
-            fprintf(io_stream_f, "%s#fields[%ld]@", type_str(p), entry->ref_field_index);
+            fprintf(io_stream_f, "%s#f[%ld]@", type_str(p), entry->ref_field_index);
             CollectedLineNumber *el, *tmp;
             long j = 0;
             HASH_ITER(hh, entry->line_numbers, el, tmp) {
@@ -408,9 +408,9 @@ static void print_ref_path_links(RefPath *ref_path, int is_std_err) {
 
         if (i != len - 1L) {
             if (entry->is_repeat) {
-                fprintf(io_stream_f, "; ->+ ");
+                fprintf(io_stream_f, " ->+ ");
             } else {
-                fprintf(io_stream_f, "; -> ");
+                fprintf(io_stream_f, " -> ");
             }
         } else {
             fprintf(io_stream_f, ";\n");
@@ -473,7 +473,6 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
             fprintf(stdout, "\n[DebugInfo] Still use old path in focusing path list:\n[DebugInfo] ");
         }
         print_ref_path_links(path_to_show, 0);
-        fprintf(stdout, "\n");
     }
 
     // 这个对象不会再触发这个获取新path的处理 (2023.10.04这个记录暂时没什么用)
@@ -548,8 +547,6 @@ static void print_result(RefPath *ref_path) {
            type_str(((RefPathEntry *) utarray_eltptr(ref_path->entries, len - 1L))->ptr));
 
     print_ref_path_links(ref_path, 1);
-
-    fprintf(stderr, "\n");
 }
 
 static void remove_path_info_from_focusing_list(RefPath *ref_path) {
