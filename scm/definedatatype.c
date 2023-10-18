@@ -398,7 +398,7 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
     }
 
     // 拡張してみる
-    if (used_len >= vector_length(line_num_vector_of_ref_type)) {
+    if (used_len >= INUM(vector_length(line_num_vector_of_ref_type))) {
         long new_len = used_len + FIELD_REF_INFO_ALLOCATED_LEN; // TODO [dirty] 每次多扩张6个就空位
         SCM new_ln_v_of_ref_type = make_vector(MAKINUM(new_len), EOL);
         for (long i = 0; i < used_len; ++i) {
@@ -413,7 +413,7 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
     VELTS(line_num_vector_of_ref_type)[2] = MAKINUM(used_len + 1L);
 
     if (is_show_ega_debug_info) {
-        fprintf(stdout, "\n[DebugInfo] A new site_info@%ld is recorded in \"%s#%s <= %s\"\n\n",
+        fprintf(stdout, "\n[DebugInfo] A new site_info@%ld is recorded in \"%s#%s <= %s\"\n",
                 INUM(ln_num),
                 data_type_name(get_data_type_def_identifier(obj)),
                 data_type_field_name(get_data_type_def_identifier(obj), INUM(index) - 1L),

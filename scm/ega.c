@@ -317,7 +317,11 @@ static RefPath *gen_a_concise_ref_path(SCM ptr, long last_gc_traced_index, int i
         if (i == last_gc_traced_index) {
             new_path_entry->is_active = 0;
         } else {
-            new_path_entry->is_active = 1;
+            if (is_user_defined_data_type_instance(new_path_entry->ptr)) {
+                new_path_entry->is_active = 1;
+            } else {
+                new_path_entry->is_active = 0;
+            }
         }
         new_path_entry->is_repeat = 0;
         new_path_entry->line_numbers = NULL;
@@ -444,10 +448,14 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
         // 尝试更新原有的path中的子link的信息 (如: 是否重复等)
         long len = utarray_len(new_ref_path->entries);
         for (long i = 0; i < len; ++i) {
-            if (!((RefPathEntry *) utarray_eltptr(new_ref_path->entries, i))->is_repeat) {
+            RefPathEntry *tmp_entry_same_path = (RefPathEntry *) utarray_eltptr(same_path->entries, i);
+            RefPathEntry  *tmp_entry_new_path = (RefPathEntry *) utarray_eltptr(new_ref_path->entries, i);
+
+            tmp_entry_same_path->ptr = tmp_entry_new_path->ptr; // 2023.10.18 总是更新一下ptr, 防止出现显示freeCell的情况
+
+            if (!(tmp_entry_new_path->is_repeat)) {
                 continue;
             }
-            RefPathEntry *tmp_entry_same_path = (RefPathEntry *) utarray_eltptr(same_path->entries, i);
             if (tmp_entry_same_path->is_repeat) {
                 continue;
             }
@@ -674,7 +682,7 @@ static void wb_add_or_rm(SCM data_type_def, long field_index, int is_add) {
     }
 
     if (is_show_ega_debug_info) {
-        fprintf(stdout, "\n[DebugInfo] WriteBarrierChanged: %s\n\n", exec_code);
+        fprintf(stdout, "\n[DebugInfo] WriteBarrierChanged: %s\n", exec_code);
     }
 
     free(exec_code);
