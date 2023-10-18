@@ -1,4 +1,5 @@
 ;; Test program based on "eclipse bug #115789"
+;; 2023.10.19 Using array-list as the orignal program did
 
 ;; CompareEditorInput.java
 (define-data-type 'compare-editor-input '(f-message))
@@ -49,8 +50,8 @@
 (define (new-navigation-history page . call-site-info)
   (let ((new-instance (make-navigation-history '() '() '())))
     (begin
-      (set-navigation-history-history! new-instance (new-linked-list 'navigation-history-entry) call-site-info)
-      (set-navigation-history-editors! new-instance (new-linked-list 'navigation-history-editor-info) call-site-info)
+      (set-navigation-history-history! new-instance (new-array-list 'navigation-history-entry) call-site-info)
+      (set-navigation-history-editors! new-instance (new-array-list 'navigation-history-editor-info) call-site-info)
       (set-navigation-history-page! new-instance page 54)
       new-instance)))
 
@@ -58,18 +59,18 @@
   (letrec ((editor-id (editor-part-editor-id editor-part))
             (editor-input (editor-part-editor-input editor-part))
             (editors (navigation-history-editors navi-history))
-            (editors-list-size (get-linked-list-size editors))
+            (editors-list-size (get-array-list-size editors))
             (info '())
-            (history-entries-to-rm (new-linked-list 'navigation-history-entry 63))
+            (history-entries-to-rm (new-array-list 'navigation-history-entry 63))
             (history-list (navigation-history-history navi-history))
-            (history-list-size (get-linked-list-size history-list)))
+            (history-list-size (get-array-list-size history-list)))
     (begin
       (let loop ((i 0))
         (if (< i editors-list-size)
           (if (and
-                (equal? editor-id (navigation-history-editor-info-editor-id (linked-list-ref editors i)))
-                (eqv? editor-input (navigation-history-editor-info-editor-input (linked-list-ref editors i))))
-            (set! info (linked-list-ref editors i))
+                (equal? editor-id (navigation-history-editor-info-editor-id (array-list-ref editors i)))
+                (eqv? editor-input (navigation-history-editor-info-editor-input (array-list-ref editors i))))
+            (set! info (array-list-ref editors i))
             (loop (+ i 1)))))
       (if (not (null? info))
         (begin
@@ -78,18 +79,18 @@
       (let loop ((i 0))
         (cond
           ((and (not (null? info)) (< i history-list-size))
-            (let ((entry (linked-list-ref history-list i)))
+            (let ((entry (array-list-ref history-list i)))
               (if (eqv? info (navigation-history-entry-editor-info entry))
                 (begin
-                  (linked-list-add history-entries-to-rm entry 84)
+                  (array-list-add history-entries-to-rm entry 84)
                   (history-entry-dispose entry) ;; Should be "(dispose-entry navi-history entry)"
                   (loop (+ i 1)))
                 (loop (+ i 1)))))))
       (let loop ((i 0))
         (cond
-          ((< i (get-linked-list-size history-entries-to-rm))
+          ((< i (get-array-list-size history-entries-to-rm))
             (begin
-              (linked-list-rm-obj history-list (linked-list-ref history-entries-to-rm i))
+              (array-list-rm-obj history-list (array-list-ref history-entries-to-rm i))
               (loop (+ i 1)))))))))
 
 (define (create-entry navi-history page part)
@@ -100,9 +101,9 @@
     (begin
       (let loop ((i 0))
         (cond
-          ((< i (get-linked-list-size navi-history-edi-infos))
+          ((< i (get-array-list-size navi-history-edi-infos))
             (begin
-              (set! info (linked-list-ref navi-history-edi-infos i))
+              (set! info (array-list-ref navi-history-edi-infos i))
               ;; (assert-dead info) ;; assert-dead
               (if (and (equal? editor-id (navigation-history-editor-info-editor-id info))
                     (eqv? editor-input (navigation-history-editor-info-editor-input info)))
@@ -116,7 +117,7 @@
             (set! info (new-navigation-history-editor-info part 116))
             (assert-dead info) ;; assert-dead
             (set-navigation-history-editor-info-ref-count! info (+ (navigation-history-editor-info-ref-count info) 1) 118)
-            (linked-list-add navi-history-edi-infos info 119))))
+            (array-list-add navi-history-edi-infos info 119))))
       (new-navigation-history-entry page info 120))))
 
 (define (dispose-entry navi-history navi-history-entry)
@@ -127,19 +128,19 @@
           (set-navigation-history-editor-info-ref-count! editor-info (- (navigation-history-editor-info-ref-count editor-info) 1) 127)
           (cond
             ((<= (navigation-history-editor-info-ref-count editor-info) 0)
-              (linked-list-rm-obj (navigation-history-editors navi-history) editor-info)))
+              (array-list-rm-obj (navigation-history-editors navi-history) editor-info)))
           (history-entry-dispose navi-history-entry))))))
 
 (define (do-add navi-history entry)
   (letrec ((entry-list (navigation-history-history navi-history))
-            (entry-list-size (get-linked-list-size entry-list)))
+            (entry-list-size (get-array-list-size entry-list)))
     (begin
       (if (>= entry-list-size history-entry-capacity)
-        (let ((oldest-entry (linked-list-ref entry-list 0)))
+        (let ((oldest-entry (array-list-ref entry-list 0)))
           (begin
             (dispose-entry navi-history oldest-entry)
-            (linked-list-rm-ref entry-list 0))))
-      (linked-list-add entry-list entry 142))))
+            (array-list-rm-ref entry-list 0))))
+      (array-list-add entry-list entry 142))))
 
 (define (add-entry navi-history editor-part)
   (letrec ((page (navigation-history-page navi-history))
@@ -167,7 +168,7 @@
 (define (new-work-bench-page . call-site-info)
   (let ((new-instance (make-work-bench-page '() '())))
     (begin
-      (set-work-bench-page-editors! new-instance (new-linked-list 'editor-part) call-site-info)
+      (set-work-bench-page-editors! new-instance (new-array-list 'editor-part) call-site-info)
       (set-work-bench-page-navigation-history! new-instance (new-navigation-history new-instance) call-site-info)
       new-instance)))
 
@@ -177,18 +178,18 @@
          (editor-part '()))
     (begin
       (let loop ((i 0)
-                  (list-size (get-linked-list-size editors)))
+                  (list-size (get-array-list-size editors)))
         (if (< i list-size)
           (if (and
-                (equal? editor-id (editor-part-editor-id (linked-list-ref editors i)))
-                (eqv? input (editor-part-editor-input (linked-list-ref editors i))))
-            (set! editor-part (linked-list-ref editors i))
+                (equal? editor-id (editor-part-editor-id (array-list-ref editors i)))
+                (eqv? input (editor-part-editor-input (array-list-ref editors i))))
+            (set! editor-part (array-list-ref editors i))
             (loop (+ i 1) list-size))))
       (if (null? editor-part)
         (begin
           (set! editor-part (new-editor-part editor-id))
           (set-editor-part-editor-input! editor-part input 190)
-          (linked-list-add editors editor-part 191)))
+          (array-list-add editors editor-part 191)))
       (mark-editor navi-history editor-part))))
 
 (define (try-find-exist-editor-input page input-context)
@@ -196,10 +197,10 @@
          (found-input '()))
     (begin
       (let loop ((i 0)
-                  (list-size (get-linked-list-size editors)))
+                  (list-size (get-array-list-size editors)))
         (if (< i list-size)
-          (if (equal? input-context (compare-editor-input-f-message (editor-part-editor-input (linked-list-ref editors i))))
-            (set! found-input (editor-part-editor-input (linked-list-ref editors i)))
+          (if (equal? input-context (compare-editor-input-f-message (editor-part-editor-input (array-list-ref editors i))))
+            (set! found-input (editor-part-editor-input (array-list-ref editors i)))
             (loop (+ i 1) list-size))))
       found-input)))
 
@@ -209,18 +210,18 @@
          (found-editor-part-idx -1))
     (begin
       (let loop ((i 0)
-                  (list-size (get-linked-list-size editors)))
+                  (list-size (get-array-list-size editors)))
         (if (< i list-size)
           (if (and
-                (equal? editor-id (editor-part-editor-id (linked-list-ref editors i)))
-                (eq? input (editor-part-editor-input (linked-list-ref editors i))))
+                (equal? editor-id (editor-part-editor-id (array-list-ref editors i)))
+                (eq? input (editor-part-editor-input (array-list-ref editors i))))
             (set! found-editor-part-idx i)
             (loop (+ i 1) list-size))))
       (if (>= found-editor-part-idx 0)
-        (let ((found-editor-part (linked-list-ref editors found-editor-part-idx)))
+        (let ((found-editor-part (array-list-ref editors found-editor-part-idx)))
           (begin
             (update-navigation-history navi-history found-editor-part)
-            (linked-list-rm-ref editors found-editor-part-idx)))))))
+            (array-list-rm-ref editors found-editor-part-idx)))))))
 
 
 ;; CompareUI.java
@@ -251,28 +252,28 @@
 
 
 ;; test data
-(define input-context-string-list (new-linked-list 'string))
-(linked-list-add input-context-string-list "a2b")
-(linked-list-add input-context-string-list "a2c")
-(linked-list-add input-context-string-list "a2d")
-(linked-list-add input-context-string-list "a2e")
-(linked-list-add input-context-string-list "a2f")
-(linked-list-add input-context-string-list "a2g")
-(linked-list-add input-context-string-list "a2h")
-(linked-list-add input-context-string-list "a2i")
-(linked-list-add input-context-string-list "a2j")
-(linked-list-add input-context-string-list "a2k")
-(linked-list-add input-context-string-list "a2l")
+(define input-context-string-list (new-array-list 'string))
+(array-list-add input-context-string-list "a2b")
+(array-list-add input-context-string-list "a2c")
+(array-list-add input-context-string-list "a2d")
+(array-list-add input-context-string-list "a2e")
+(array-list-add input-context-string-list "a2f")
+(array-list-add input-context-string-list "a2g")
+(array-list-add input-context-string-list "a2h")
+(array-list-add input-context-string-list "a2i")
+(array-list-add input-context-string-list "a2j")
+(array-list-add input-context-string-list "a2k")
+(array-list-add input-context-string-list "a2l")
 
 
 ;; Simulation Running
 (define work-bench-page (new-work-bench-page 269))
 
 (let loop ((i 0))
-  (if (< i 35)
+  (if (< i 50)
     (begin
-      (run-compare work-bench-page (linked-list-ref input-context-string-list (random-0-n (get-linked-list-size input-context-string-list))))
-      (stop-compare work-bench-page (linked-list-ref input-context-string-list (random-0-n (get-linked-list-size input-context-string-list))))
+      (run-compare work-bench-page (array-list-ref input-context-string-list (random-0-n (get-array-list-size input-context-string-list))))
+      (stop-compare work-bench-page (array-list-ref input-context-string-list (random-0-n (get-array-list-size input-context-string-list))))
       ;; (gc)
       (display (string-append "loop:" (number->string i) "が実行完了!\n"))
       (loop (+ i 1)))))
