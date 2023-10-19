@@ -184,7 +184,7 @@ typedef struct ref_path {
 #define FIELD_REF_INFO_ALLOCATED_LEN (6)
 
 typedef struct update_state_by_ref_type {
-    SCM ref_data_type; // SCM is long
+    SCM ref_data_type; // SCM is long, user_defined_class_obj or fixed_type_code
     int is_to_add; // 各の値に対し, 0: 削除 1: 追加
     UT_hash_handle hh;
 } UpdateStateByRefType;

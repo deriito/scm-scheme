@@ -362,10 +362,6 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
         return UNSPECIFIED;
     }
 
-    if (!is_user_defined_data_type_instance(value)) {
-        return UNSPECIFIED;
-    }
-
     SCM rec_slot_of_field = get_rec_slot_of_field(obj, INUM(index) - 1L);
     if (NULLP(rec_slot_of_field)) {
         return UNSPECIFIED;
@@ -377,7 +373,13 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
     long idx = -1;
     for (long i = 1; i < len; ++i) {
         SCM tmp_ln_v_of_ref_type = VELTS(rec_slot_of_field)[i];
-        if (VELTS(tmp_ln_v_of_ref_type)[1] == DTI_DTD(value)) {
+        SCM classobj_or_fixed_type_code_of_value;
+        if (is_user_defined_data_type_instance(value)) {
+            classobj_or_fixed_type_code_of_value = DTI_DTD(value);
+        } else {
+            classobj_or_fixed_type_code_of_value = IMP(value) ? -1L : TYP7(value);
+        }
+        if (VELTS(tmp_ln_v_of_ref_type)[1] == classobj_or_fixed_type_code_of_value) {
             line_num_vector_of_ref_type = tmp_ln_v_of_ref_type;
             idx = i;
             break;

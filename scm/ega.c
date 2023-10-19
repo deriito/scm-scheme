@@ -105,8 +105,7 @@ static void try_record_metadata(RefPath *ref_path) {
     for (long i = 0; i < len - 1L; ++i) {
         RefPathEntry *curr_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i);
         RefPathEntry *next_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i + 1L);
-        if (!is_user_defined_data_type_instance(curr_entry->ptr)
-            || !is_user_defined_data_type_instance(next_entry->ptr)) {
+        if (!is_user_defined_data_type_instance(curr_entry->ptr)) {
             continue;
         }
 
@@ -138,15 +137,20 @@ static void try_record_metadata(RefPath *ref_path) {
         }
 
         UpdateStateByRefType *curr_ref_type_state;
-        SCM next_entry_class_obj = get_data_type_def_identifier(next_entry->ptr);
-        HASH_FIND(hh, curr_field_ref_info->update_state_by_ref_type, &next_entry_class_obj, sizeof(SCM), curr_ref_type_state);
+        SCM next_entry_class_obj_or_fixed_type_code;
+        if (is_user_defined_data_type_instance(next_entry->ptr)) {
+            next_entry_class_obj_or_fixed_type_code = get_data_type_def_identifier(next_entry->ptr);
+        } else {
+            next_entry_class_obj_or_fixed_type_code = IMP(next_entry->ptr) ? -1L : TYP7(next_entry->ptr);
+        }
+        HASH_FIND(hh, curr_field_ref_info->update_state_by_ref_type, &next_entry_class_obj_or_fixed_type_code, sizeof(SCM), curr_ref_type_state);
         if (NULL == curr_ref_type_state) {
             curr_ref_type_state = (UpdateStateByRefType *) malloc(sizeof(UpdateStateByRefType));
             if (NULL == curr_ref_type_state) {
                 fprintf(stderr, "[curr_ref_type_state]内存分配失败!\n");
                 exit(-1);
             }
-            curr_ref_type_state->ref_data_type = next_entry_class_obj;
+            curr_ref_type_state->ref_data_type = next_entry_class_obj_or_fixed_type_code;
             curr_ref_type_state->is_to_add = curr_entry->is_active;
             HASH_ADD(hh, curr_field_ref_info->update_state_by_ref_type, ref_data_type, sizeof(SCM), curr_ref_type_state);
         } else {
@@ -193,10 +197,18 @@ static int is_the_same_ref_path_entries(RefPathEntry *a, RefPathEntry *b) {
         exit(-1);
     }
 
-    if (a->ref_field_index != b->ref_field_index) {
+    if (!is_the_same_type(a->ptr, b->ptr)) {
         return 0;
     }
-    return is_the_same_type(a->ptr, b->ptr);
+
+    if (a->ref_field_index != b->ref_field_index) {
+        if (VECTORP(a->ptr) && VECTORP(b->ptr)) {
+            return 1; // 2023.10.19 vectorなら，fieldの一致するかに関心しない
+        }
+        return 0;
+    }
+
+    return 1;
 }
 
 static int is_all_entries_the_same(RefPath *path_a, RefPath *path_b, long quantity) {
@@ -452,6 +464,13 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
             RefPathEntry  *tmp_entry_new_path = (RefPathEntry *) utarray_eltptr(new_ref_path->entries, i);
 
             tmp_entry_same_path->ptr = tmp_entry_new_path->ptr; // 2023.10.18 总是更新一下ptr, 防止出现显示freeCell的情况
+            if (!is_user_defined_data_type(tmp_entry_same_path->ptr) &&
+                !is_user_defined_data_type_instance(tmp_entry_new_path->ptr) &&
+                VECTORP(tmp_entry_same_path->ptr) &&
+                VECTORP(tmp_entry_new_path->ptr)) {
+                // 2023.10.19 vector的话，也更新一下field（只是为了显示，毕竟是不支持记录行号的数据结构）
+                tmp_entry_same_path->ref_field_index = -1L;
+            }
 
             if (!(tmp_entry_new_path->is_repeat)) {
                 continue;
