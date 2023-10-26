@@ -22,12 +22,19 @@
           (string->symbol (string-append
                             "make-"
                             (symbol->string type-name))))
+         (procname2
+           (string->symbol (string-append
+                             (symbol->string procname)
+                             "-not-init")))
          (field-num (vector-length field-names-v))
          (field-names (vector->list field-names-v))
          (arg2 (append (list 'vector) field-names)))
-    (eval `(define ,procname
-              (lambda ,field-names
-                (c-make-instance ,data-type-def ,arg2))))))
+    (begin
+      (eval `(define ,procname
+                     (lambda ,field-names
+                       (c-make-instance ,data-type-def ,arg2))))
+      (eval `(define (,procname2)
+               (c-make-instance ,data-type-def '()))))))
 
 (define (gen-predicate-name type-name)
   (string->symbol (string-append
@@ -54,7 +61,9 @@
                     (lambda (obj)
                       (if (,(gen-predicate-name type-name) obj)
                         (c-data-type-accessor obj ,(+ i 1))
-                        (error "accessor: wrong type of obj")))))
+                        (error (string-append
+                                 ,(symbol->string type-name)
+                                 "'s accessor: wrong type of obj"))))))
           (loop (+ i 1))))
       #t)))
 
@@ -102,7 +111,9 @@
                          (lambda (obj value . call-site-info) ;; call-site-infoは使わない, 単にエラー出ないように設置する
                            (if (,(gen-predicate-name type-name) obj)
                              (c-data-type-modifier obj ,(+ i 1) value)
-                             (error "modifier: wrong type of obj")))))
+                             (error (string-append
+                                      ,(symbol->string type-name)
+                                      "'s modifier: wrong type of obj"))))))
           (eval `(define ,procname-bakup ,procname))
           (eval `(define ,procname-with-wb
                          (lambda (obj value . call-site-info)
@@ -113,7 +124,9 @@
                                  (if (number? maybe-call-site)
                                    (c-data-type-modifier-with-wb obj ,(+ i 1) (cons value maybe-call-site))
                                    (c-data-type-modifier-with-wb obj ,(+ i 1) (cons value -1)))))
-                             (error "modifier-with-wb: wrong type of obj")))))
+                             (error (string-append
+                                      ,(symbol->string type-name)
+                                      "'s modifier-with-wb: wrong type of obj"))))))
           (loop (+ i 1))))
       #t)))
 
