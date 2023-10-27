@@ -31,19 +31,27 @@
       ni)))
 
 (define (segment-term-enum-clone ste . call-site)
-  (let ((clone '()))
+  (let ((clone '())
+         (nti (new-term-info-by-old-term-info (segment-term-enum-term-info ste) 35)))
     (begin
-      (set! clone (new-segment-term-enum call-site))
-      (set-segment-term-enum-term-info! clone (new-term-info-by-old-term-info (segment-term-enum-term-info ste) call-site))
+      (set! clone (new-segment-term-enum 37))
+      (set-segment-term-enum-term-info! clone nti 38)
+      (assert-dead nti)
       clone)))
+
+(define thread-local-hash (new-hash-map 'number 'thread-local 60))
 
 ;; ThreadLocal.java  ;; 这里当作一个普通的类来看待不考虑多线程
 (define-data-type 'thread-local '(cache))
 
-(define (new-thread-local . call-site)
-  (let ((ni (make-thread-local-not-init)))
-    (begin
-      (set-thread-local-cache! ni '() call-site)
+(define (new-thread-local thread-id . call-site)
+  (let ((ni (hash-map-get thread-local-hash thread-id)))
+    (if (null? ni)
+      (begin
+        (set! ni (make-thread-local-not-init))
+        (hash-map-put thread-local-hash thread-id ni 53)
+        (set-thread-local-cache! ni '() call-site)
+        ni)
       ni)))
 
 (define (thread-local-get tl)
@@ -55,11 +63,11 @@
 ;; TermInfosReader.java
 (define-data-type 'term-infos-reader '(enumerators orig-enum))
 
-(define (new-term-infos-reader . call-site)
+(define (new-term-infos-reader thread-id . call-site)
   (let ((ni (make-term-infos-reader-not-init)))
     (begin
-      (set-term-infos-reader-enumerators! ni  (new-thread-local 61) 61)
-      (set-term-infos-reader-orig-enum! ni (new-segment-term-enum 62) 62)
+      (set-term-infos-reader-enumerators! ni (new-thread-local thread-id 68) 68)
+      (set-term-infos-reader-orig-enum! ni (new-segment-term-enum 67) 67)
       ni)))
 
 (define (terms term-infos-reader)
@@ -72,7 +80,7 @@
       (cond ((null? term-enum)
               (begin
                 (set! term-enum (terms term-infos-reader))
-                (thread-local-set enumerators term-enum))))
+                (thread-local-set enumerators term-enum 83))))
       term-enum)))
 
 (define (scan-enum term-infos-reader term)
@@ -185,10 +193,10 @@
 ;; SegmentReader.java
 (define-data-type 'segment-reader '(term-infos-reader))
 
-(define (new-segment-reader . call-site)
+(define (new-segment-reader thread-id . call-site)
   (let ((ni (make-segment-reader-not-init)))
     (begin
-      (set-segment-reader-term-infos-reader! ni (new-term-infos-reader 187) 187)
+      (set-segment-reader-term-infos-reader! ni (new-term-infos-reader thread-id 187) 187)
       ni)))
 
 (define (reader-doc-freq reader term)
@@ -202,9 +210,9 @@
 
 
 ;; LusearchHarness.java in dacapobench
-(define (run-query)
+(define (run-query thread-id)
   (let* ((searcher
-           (new-index-searcher (new-segment-reader 194) 194))
+           (new-index-searcher (new-segment-reader thread-id 194) 194))
           (query
            (new-term-query
              (new-term
@@ -228,4 +236,11 @@
 (linked-list-add test-data "a2k")
 (linked-list-add test-data "a2l")
 
-
+(define (run)
+  (let loop ((i 0))
+    (cond
+      ((< i 100)
+        (begin
+          (run-query i)
+          (gc)
+          (loop (+ i 1)))))))
