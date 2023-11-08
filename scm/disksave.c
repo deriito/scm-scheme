@@ -7,6 +7,10 @@
 
 static char s_disk_save[] = "disk-save";
 SCM disk_save() {
+    if (!is_disk_save_on) {
+        return UNSPECIFIED;
+    }
+
     FILE *fp;
     if ((fp = fopen("saved_image", "wb")) == NULL) {
         wta(UNDEFINED, "Can not open freeze file(save_image)", s_disk_save);
@@ -193,6 +197,8 @@ SCM disk_save() {
     fwrite(&current_gc_count, sizeof(size_t), 1, fp);
     fwrite(&is_dynamic_check_mode, sizeof(char), 1, fp);
     fwrite(&is_show_ega_debug_info, sizeof(char), 1, fp);
+    fwrite(&is_disk_save_on, sizeof(char), 1, fp);
+    fwrite(&is_show_gc_related_info, sizeof(char), 1, fp);
     fwrite(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
     fwrite(&focusing_ref_path_list, sizeof(RefPath *), 1, fp);
     fwrite(&wb_update_metadata_hash, sizeof(WriteBarrierUpdateMetadata *), 1, fp);

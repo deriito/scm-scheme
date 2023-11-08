@@ -18,6 +18,10 @@ char *managed_memory_start;
 char *managed_memory_end;
 
 void init_my_zone() {
+    if (!is_disk_save_on) {
+        return;
+    }
+
     char *cp = (char *) mmap(NULL, PREPARED_MEMORY_BYTES, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0);
     if (MAP_FAILED == cp) {
         exit(253);
@@ -228,6 +232,8 @@ void init_my_zone() {
     fread(&current_gc_count, sizeof(size_t), 1, fp);
     fread(&is_dynamic_check_mode, sizeof(char), 1, fp);
     fread(&is_show_ega_debug_info, sizeof(char), 1, fp);
+    fread(&is_disk_save_on, sizeof(char), 1, fp);
+    fread(&is_show_gc_related_info, sizeof(char), 1, fp);
     fread(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
     fread(&focusing_ref_path_list, sizeof(RefPath *), 1, fp);
     fread(&wb_update_metadata_hash, sizeof(WriteBarrierUpdateMetadata *), 1, fp);
@@ -249,128 +255,129 @@ void init_my_zone() {
     fclose(fp);
 }
 
-void free(void *ap_arg) {
-    HEADER *bp, *p;
-    char *ap = ap_arg;
-
-    if (NULL == ap) {
-        return;
-    }
-
-    bp = (HEADER *) ap - 1;
-    for (p = freep; !(bp > p && bp < p->ptr); p = p->ptr) {
-        if (p >= p->ptr && (bp > p || bp < p->ptr)) {
-            break;
-        }
-    }
-
-    if (bp + bp->size == p->ptr) {
-        bp->size += (p->ptr)->size;
-        bp->ptr = (p->ptr)->ptr;
-    } else {
-        bp->ptr = p->ptr;
-    }
-    if (p + p->size == bp) {
-        p->size += bp->size;
-        p->ptr = bp->ptr;
-    } else {
-        p->ptr = bp;
-    }
-    freep = p;
-}
-
-static HEADER *morecore(unsigned nu) {
-    char *cp;
-    HEADER *up;
-
-    if (nu < 1024) {
-        nu = 1024;
-    }
-
-    size_t want_bytes = nu * sizeof(HEADER);
-    if (prepared_memory_start + PREPARED_MEMORY_BYTES - managed_memory_end < want_bytes) {
-        return (NULL);
-    }
-
-    cp = managed_memory_end;
-    managed_memory_end += want_bytes;
-
-    up = (HEADER *) cp;
-    up->size = nu;
-    free((void *) (up + 1));
-    return (freep);
-}
-
-void *malloc(size_t nbytes) {
-    HEADER *p, *prevp;
-    unsigned nunits;
-
-    if (0 == nbytes) {
-        return (NULL);
-    }
-
-    nunits = (nbytes + sizeof(HEADER) - 1) / sizeof(HEADER) + 1;
-    if ((prevp = freep) == NULL) {
-        base.ptr = freep = prevp = &base;
-        base.size = 0;
-        prevp = freep;
-    }
-
-    for (p = prevp->ptr; ; prevp = p, p = p->ptr) {
-        if (p->size >= nunits) {
-            if (p->size == nunits)
-                prevp->ptr = p->ptr;
-            else {
-                p->size -= nunits;
-                p += p->size;
-                p->size = nunits;
-            }
-            freep = prevp;
-            return ((char *)(p + 1));
-        }
-        if (p == freep) {
-            if ((p = morecore(nunits)) == NULL) {
-                return (NULL);
-            }
-        }
-    }
-}
-
-void *realloc(void *oldptr_arg, size_t size) {
-    HEADER *bp;
-    unsigned nunits;
-    char *p;
-    int i;
-    char *old_ptr = oldptr_arg;
-
-    if (NULL == old_ptr) {
-        return (malloc(size));
-    }
-
-    bp = (HEADER *) old_ptr - 1;
-    nunits = (size + sizeof(HEADER) - 1) / sizeof(HEADER) + 1;
-    if (bp->size == nunits) {
-        return (old_ptr);
-    } else if (bp->size > nunits) {
-        (bp + nunits)->size = bp->size - nunits;
-        bp->size = nunits;
-        free((char *) (bp + nunits + 1));
-        return ((char *) (bp + 1));
-    } else {
-        p = malloc(size);
-        for (i = 0; i < (bp->size - 1) * sizeof(HEADER); i++) {
-            p[i] = old_ptr[i];
-        }
-        return (p);
-    }
-}
-
-void *calloc(size_t nelem, size_t elsize) {
-    char *ptr;
-    int i;
-    ptr = malloc(i = nelem * elsize);
-    while (--i >= 0) {
-        ptr[i] = 0;
-    }
-    return (ptr);
-}
+// 2023.11.08 用回original malloc
+//void free(void *ap_arg) {
+//    HEADER *bp, *p;
+//    char *ap = ap_arg;
+//
+//    if (NULL == ap) {
+//        return;
+//    }
+//
+//    bp = (HEADER *) ap - 1;
+//    for (p = freep; !(bp > p && bp < p->ptr); p = p->ptr) {
+//        if (p >= p->ptr && (bp > p || bp < p->ptr)) {
+//            break;
+//        }
+//    }
+//
+//    if (bp + bp->size == p->ptr) {
+//        bp->size += (p->ptr)->size;
+//        bp->ptr = (p->ptr)->ptr;
+//    } else {
+//        bp->ptr = p->ptr;
+//    }
+//    if (p + p->size == bp) {
+//        p->size += bp->size;
+//        p->ptr = bp->ptr;
+//    } else {
+//        p->ptr = bp;
+//    }
+//    freep = p;
+//}
+//
+//static HEADER *morecore(unsigned nu) {
+//    char *cp;
+//    HEADER *up;
+//
+//    if (nu < 1024) {
+//        nu = 1024;
+//    }
+//
+//    size_t want_bytes = nu * sizeof(HEADER);
+//    if (prepared_memory_start + PREPARED_MEMORY_BYTES - managed_memory_end < want_bytes) {
+//        return (NULL);
+//    }
+//
+//    cp = managed_memory_end;
+//    managed_memory_end += want_bytes;
+//
+//    up = (HEADER *) cp;
+//    up->size = nu;
+//    free((void *) (up + 1));
+//    return (freep);
+//}
+//
+//void *malloc(size_t nbytes) {
+//    HEADER *p, *prevp;
+//    unsigned nunits;
+//
+//    if (0 == nbytes) {
+//        return (NULL);
+//    }
+//
+//    nunits = (nbytes + sizeof(HEADER) - 1) / sizeof(HEADER) + 1;
+//    if ((prevp = freep) == NULL) {
+//        base.ptr = freep = prevp = &base;
+//        base.size = 0;
+//        prevp = freep;
+//    }
+//
+//    for (p = prevp->ptr; ; prevp = p, p = p->ptr) {
+//        if (p->size >= nunits) {
+//            if (p->size == nunits)
+//                prevp->ptr = p->ptr;
+//            else {
+//                p->size -= nunits;
+//                p += p->size;
+//                p->size = nunits;
+//            }
+//            freep = prevp;
+//            return ((char *)(p + 1));
+//        }
+//        if (p == freep) {
+//            if ((p = morecore(nunits)) == NULL) {
+//                return (NULL);
+//            }
+//        }
+//    }
+//}
+//
+//void *realloc(void *oldptr_arg, size_t size) {
+//    HEADER *bp;
+//    unsigned nunits;
+//    char *p;
+//    int i;
+//    char *old_ptr = oldptr_arg;
+//
+//    if (NULL == old_ptr) {
+//        return (malloc(size));
+//    }
+//
+//    bp = (HEADER *) old_ptr - 1;
+//    nunits = (size + sizeof(HEADER) - 1) / sizeof(HEADER) + 1;
+//    if (bp->size == nunits) {
+//        return (old_ptr);
+//    } else if (bp->size > nunits) {
+//        (bp + nunits)->size = bp->size - nunits;
+//        bp->size = nunits;
+//        free((char *) (bp + nunits + 1));
+//        return ((char *) (bp + 1));
+//    } else {
+//        p = malloc(size);
+//        for (i = 0; i < (bp->size - 1) * sizeof(HEADER); i++) {
+//            p[i] = old_ptr[i];
+//        }
+//        return (p);
+//    }
+//}
+//
+//void *calloc(size_t nelem, size_t elsize) {
+//    char *ptr;
+//    int i;
+//    ptr = malloc(i = nelem * elsize);
+//    while (--i >= 0) {
+//        ptr[i] = 0;
+//    }
+//    return (ptr);
+//}

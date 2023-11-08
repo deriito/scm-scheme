@@ -11,6 +11,9 @@ char is_print_result = 1;
 size_t current_gc_count = 0;
 char is_dynamic_check_mode = 1;
 char is_show_ega_debug_info = 0;
+char is_disk_save_on = 0;
+char is_show_gc_related_info = 0;
+
 
 GcTracedInfo *gc_traced = NULL;
 RefPath *focusing_ref_path_list = NULL;
@@ -619,6 +622,10 @@ static void plus_current_gc_count() {
 
 void ega_process_at_gc_start() {
     plus_current_gc_count();
+
+    if (is_show_gc_related_info) {
+        fprintf(stdout, "\n[GCRelatedInfo] No.%ld GC Start.\n", current_gc_count);
+    }
 }
 
 static void wb_add_or_rm(SCM data_type_def, long field_index, int is_add) {
@@ -785,6 +792,10 @@ void ega_process_after_gc() {
                   "(disk-save)"
                   "(display \"Current executing status has been saved successfully!\\n\")"
                   "(exit))");
+    }
+
+    if (is_show_gc_related_info) {
+        fprintf(stdout, "\n[GCRelatedInfo] No.%ld GC End.\n", current_gc_count);
     }
 }
 
