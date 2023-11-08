@@ -19,6 +19,7 @@
 #include "utlist.h"
 #include "utarray.h"
 #include "uthash.h"
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -184,7 +185,7 @@ typedef struct ref_path {
 #define FIELD_REF_INFO_ALLOCATED_LEN (6)
 
 typedef struct update_state_by_ref_type {
-    SCM ref_data_type; // SCM is long
+    SCM ref_data_type; // SCM is long, user_defined_class_obj or fixed_type_code
     int is_to_add; // 各の値に対し, 0: 削除 1: 追加
     UT_hash_handle hh;
 } UpdateStateByRefType;
@@ -1230,6 +1231,16 @@ SCM_EXPORT char is_print_result;
 SCM_EXPORT size_t current_gc_count;
 SCM_EXPORT char is_dynamic_check_mode;
 SCM_EXPORT char is_show_ega_debug_info;
+SCM_EXPORT char is_disk_save_on;
+SCM_EXPORT char is_show_gc_related_info;
+SCM_EXPORT char is_gc_cost_time_recording;
+SCM_EXPORT size_t gc_idx_gc_cost_recording_start_at;
+SCM_EXPORT clock_t current_gc_start_time;
+SCM_EXPORT clock_t gc_cost_time_sum;
+SCM_EXPORT char is_exec_cost_time_recoding;
+SCM_EXPORT clock_t exec_recoding_start_time;
+SCM_EXPORT clock_t exec_recoding_tmp_gc_start_time;
+SCM_EXPORT clock_t exec_recoding_gc_cost_time_sum;
 SCM_EXPORT GcTracedInfo *gc_traced;
 SCM_EXPORT RefPath *focusing_ref_path_list;
 SCM_EXPORT WriteBarrierUpdateMetadata *wb_update_metadata_hash;

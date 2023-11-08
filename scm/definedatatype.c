@@ -103,10 +103,13 @@ SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
     DTI_DTD(data_type_instance) = data_type_def;
 
     // field-value vectorの初期化
-    long len = INUM(vector_length(field_values_vector));
-    SCM fvv = make_vector(MAKINUM(1L + len), internal_vector_symbol);
-    for (long i = 1L; i < len + 1; ++i) {
-        vector_set(fvv, MAKINUM(i), vector_ref(field_values_vector, MAKINUM(i - 1)));
+    long len = INUM(vector_length(DTD_FNV(data_type_def))) - 1L;
+    SCM fvv = make_vector(MAKINUM(1L + len), EOL);
+    VELTS(fvv)[0] = internal_vector_symbol;
+    if (BOOL_T == vectorp(field_values_vector) && INUM(vector_length(field_values_vector)) == len) {
+        for (long i = 1L; i < len + 1; ++i) {
+            vector_set(fvv, MAKINUM(i), vector_ref(field_values_vector, MAKINUM(i - 1)));
+        }
     }
     DTI_FVV(data_type_instance) = fvv;
 
@@ -362,10 +365,6 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
         return UNSPECIFIED;
     }
 
-    if (!is_user_defined_data_type_instance(value)) {
-        return UNSPECIFIED;
-    }
-
     SCM rec_slot_of_field = get_rec_slot_of_field(obj, INUM(index) - 1L);
     if (NULLP(rec_slot_of_field)) {
         return UNSPECIFIED;
@@ -377,7 +376,13 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
     long idx = -1;
     for (long i = 1; i < len; ++i) {
         SCM tmp_ln_v_of_ref_type = VELTS(rec_slot_of_field)[i];
-        if (VELTS(tmp_ln_v_of_ref_type)[1] == DTI_DTD(value)) {
+        SCM classobj_or_fixed_type_code_of_value;
+        if (is_user_defined_data_type_instance(value)) {
+            classobj_or_fixed_type_code_of_value = DTI_DTD(value);
+        } else {
+            classobj_or_fixed_type_code_of_value = IMP(value) ? -1L : TYP7(value);
+        }
+        if (VELTS(tmp_ln_v_of_ref_type)[1] == classobj_or_fixed_type_code_of_value) {
             line_num_vector_of_ref_type = tmp_ln_v_of_ref_type;
             idx = i;
             break;
