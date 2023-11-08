@@ -5,6 +5,9 @@
 
 #include "scm.h"
 
+static char s_gc_log_filename[] = "gc_cost_time.log";
+static char s_exec_log_filename[] = "exec_cost_time.log";
+
 size_t line_num_quantity_of_a_ref_pattern_at_least = 3L;
 size_t gc_count_of_a_ref_pattern_at_most = 3L;
 char is_print_result = 1;
@@ -13,7 +16,14 @@ char is_dynamic_check_mode = 1;
 char is_show_ega_debug_info = 0;
 char is_disk_save_on = 0;
 char is_show_gc_related_info = 0;
-
+char is_gc_cost_time_recording = 0;
+size_t gc_idx_gc_cost_recording_start_at = 0;
+clock_t current_gc_start_time = 0;
+clock_t gc_cost_time_sum = 0;
+char is_exec_cost_time_recoding = 0;
+clock_t exec_recoding_start_time = 0;
+clock_t exec_recoding_tmp_gc_start_time = 0;
+clock_t exec_recoding_gc_cost_time_sum = 0;
 
 GcTracedInfo *gc_traced = NULL;
 RefPath *focusing_ref_path_list = NULL;
@@ -626,6 +636,17 @@ void ega_process_at_gc_start() {
     if (is_show_gc_related_info) {
         fprintf(stdout, "\n[GCRelatedInfo] No.%ld GC Start.\n", current_gc_count);
     }
+
+    if (is_gc_cost_time_recording) {
+        if (gc_idx_gc_cost_recording_start_at <= 0) {
+            gc_idx_gc_cost_recording_start_at = current_gc_count;
+        }
+        current_gc_start_time = clock();
+    }
+
+    if (is_exec_cost_time_recoding) {
+        exec_recoding_tmp_gc_start_time = clock();
+    }
 }
 
 static void wb_add_or_rm(SCM data_type_def, long field_index, int is_add) {
@@ -775,6 +796,7 @@ static SCM update_type_def_and_wb() {
     return UNSPECIFIED;
 }
 
+static char s_ega_process_after_gc[] = "ega_process_after_gc";
 void ega_process_after_gc() {
     if (is_dynamic_check_mode > 0) {
         check_ref_path_list_after_gc();
@@ -792,6 +814,29 @@ void ega_process_after_gc() {
                   "(disk-save)"
                   "(display \"Current executing status has been saved successfully!\\n\")"
                   "(exit))");
+    }
+
+    if (is_exec_cost_time_recoding) {
+        clock_t curr_clock = clock();
+        exec_recoding_gc_cost_time_sum += curr_clock - exec_recoding_tmp_gc_start_time;
+    }
+
+    if (is_gc_cost_time_recording) {
+        clock_t curr_clock = clock();
+        clock_t past_clock = curr_clock - current_gc_start_time; // ms
+        gc_cost_time_sum += past_clock;
+
+        // record info in file
+        FILE *fp;
+        if ((fp = fopen(s_gc_log_filename, "a+")) == NULL) {
+            wta(UNDEFINED, "Can not open or create gc.log", s_ega_process_after_gc);
+        }
+        fprintf(fp,
+                "[GCCostTimeInfo] No.%ld GC end, cost time: %ld ms. Accumulated GC cost %ld ms.\n",
+                current_gc_count,
+                past_clock,
+                gc_cost_time_sum);
+        fclose(fp);
     }
 
     if (is_show_gc_related_info) {
@@ -846,14 +891,107 @@ static void init_wb_update_metadata_hash() {
     wb_update_metadata_hash = NULL;
 }
 
+static char s_thread_sleep[] = "thread-sleep";
+static SCM thread_sleep(SCM secs) {
+    int s = INUM(secs);
+    if (s < 0) {
+        wta(secs, (char *) ARG1, s_thread_sleep);
+    }
+    sleep(s);
+    return UNSPECIFIED;
+}
+
+static char s_show_gc_related_info_on[] = "show-gc-related-info-on";
+static SCM show_gc_related_info_on() {
+    is_show_gc_related_info = 1;
+    return UNSPECIFIED;
+}
+
+static char s_show_gc_related_info_off[] = "show-gc-related-info-off";
+static SCM show_gc_related_info_off() {
+    is_show_gc_related_info = 0;
+    return UNSPECIFIED;
+}
+
+static char s_int_div[] = "int-div";
+static SCM int_div(SCM a, SCM b) {
+    return MAKINUM(INUM(a) / INUM(b));
+}
+
+static char s_start_record_gc_cost_time[] = "start-record-gc-cost-time";
+static SCM start_record_gc_cost_time() {
+    is_gc_cost_time_recording = 1;
+    gc_idx_gc_cost_recording_start_at = 0;
+    current_gc_start_time = 0;
+    gc_cost_time_sum = 0;
+    remove(s_gc_log_filename);
+    return UNSPECIFIED;
+}
+
+static char s_end_record_gc_cost_time[] = "end-record-gc-cost-time";
+static SCM end_record_gc_cost_time() {
+    is_gc_cost_time_recording = 0;
+    gc_idx_gc_cost_recording_start_at = 0;
+    current_gc_start_time = 0;
+    gc_cost_time_sum = 0;
+    return UNSPECIFIED;
+}
+
+static char s_start_record_exec_cost_time[] = "start-record-exec-cost-time";
+static SCM start_record_exec_cost_time() {
+    is_exec_cost_time_recoding = 1;
+    exec_recoding_start_time = clock();
+    exec_recoding_tmp_gc_start_time = 0;
+    exec_recoding_gc_cost_time_sum = 0;
+    remove(s_exec_log_filename);
+    return UNSPECIFIED;
+}
+
+static char s_end_record_exec_cost_time[] = "end-record-exec-cost-time";
+static SCM end_record_exec_cost_time() {
+    clock_t curr_time = clock();
+
+    clock_t total_time = curr_time - exec_recoding_start_time;
+
+    // record info in file
+    FILE *fp;
+    if ((fp = fopen(s_exec_log_filename, "a+")) == NULL) {
+        wta(UNDEFINED, "Can not open or create exec.log", s_end_record_exec_cost_time);
+    }
+    fprintf(fp,
+            "[ExecCostTimeInfo] Total cost time: %ld ms. Total exec cost %ld ms. Total GC cost %ld ms.\n",
+            total_time,
+            total_time - exec_recoding_gc_cost_time_sum,
+            exec_recoding_gc_cost_time_sum);
+    fclose(fp);
+
+    is_exec_cost_time_recoding = 0;
+    exec_recoding_start_time = 0;
+    exec_recoding_tmp_gc_start_time = 0;
+    exec_recoding_gc_cost_time_sum = 0;
+    return UNSPECIFIED;
+}
+
 static iproc subr0s[] = {
         {s_update_type_def_and_wb, update_type_def_and_wb},
+        {s_show_gc_related_info_on, show_gc_related_info_on},
+        {s_show_gc_related_info_off, show_gc_related_info_off},
+        {s_start_record_gc_cost_time, start_record_gc_cost_time},
+        {s_end_record_gc_cost_time, end_record_gc_cost_time},
+        {s_start_record_exec_cost_time, start_record_exec_cost_time},
+        {s_end_record_exec_cost_time, end_record_exec_cost_time},
         {0, 0}
 };
 
 static iproc subr1s[] = {
         {s_assert_dead, assert_dead},
         {s_random_0_n, random_0_n},
+        {s_thread_sleep, thread_sleep},
+        {0, 0}
+};
+
+static iproc subr2s[] = {
+        {s_int_div, int_div},
         {0, 0}
 };
 
@@ -863,6 +1001,7 @@ void init_ega() {
     init_wb_update_metadata_hash();
     init_iprocs(subr0s, tc7_subr_0);
     init_iprocs(subr1s, tc7_subr_1);
+    init_iprocs(subr2s, tc7_subr_2);
     add_feature("ega");
 }
 
@@ -876,4 +1015,5 @@ void init_ega_disk_saved() {
 
     init_iprocs(subr0s, tc7_subr_0);
     init_iprocs(subr1s, tc7_subr_1);
+    init_iprocs(subr2s, tc7_subr_2);
 }

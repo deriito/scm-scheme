@@ -19,6 +19,7 @@
 #include "utlist.h"
 #include "utarray.h"
 #include "uthash.h"
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -1232,6 +1233,14 @@ SCM_EXPORT char is_dynamic_check_mode;
 SCM_EXPORT char is_show_ega_debug_info;
 SCM_EXPORT char is_disk_save_on;
 SCM_EXPORT char is_show_gc_related_info;
+SCM_EXPORT char is_gc_cost_time_recording;
+SCM_EXPORT size_t gc_idx_gc_cost_recording_start_at;
+SCM_EXPORT clock_t current_gc_start_time;
+SCM_EXPORT clock_t gc_cost_time_sum;
+SCM_EXPORT char is_exec_cost_time_recoding;
+SCM_EXPORT clock_t exec_recoding_start_time;
+SCM_EXPORT clock_t exec_recoding_tmp_gc_start_time;
+SCM_EXPORT clock_t exec_recoding_gc_cost_time_sum;
 SCM_EXPORT GcTracedInfo *gc_traced;
 SCM_EXPORT RefPath *focusing_ref_path_list;
 SCM_EXPORT WriteBarrierUpdateMetadata *wb_update_metadata_hash;

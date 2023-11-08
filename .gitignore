@@ -34,3 +34,7 @@ scm/scm~
 
 # runtime generated files
 **/saved_image
+
+# gc/exec cost time log files
+**/gc_cost_time.log
+**/exec_cost_time.log
