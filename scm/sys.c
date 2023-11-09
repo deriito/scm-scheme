@@ -934,25 +934,6 @@ void init_types()
     scm_init_gra(&finals_gra, sizeof(void (*)()), 4, 0, s_final);
 }
 
-void init_types_disk_saved() {
-    scm_init_gra(&ptobs_gra, sizeof(ptobfuns), 8, 255, "ptobs");
-    /* These newptob calls must be done in this order */
-    /* tc16_fport = */ newptob(&fptob);
-    /* tc16_pipe = */ newptob(&pipob);
-    /* tc16_strport = */ newptob(&stptob);
-    /* tc16_sfport = */ newptob(&sfptob);
-    tc16_clport = newptob(&clptob);
-    tc16_sysport = newptob(&sysptob);
-    tc16_safeport = newptob(&safeptob);
-    scm_init_gra(&smobs_gra, sizeof(smobfuns), 16, 255, "smobs");
-    /* These newsmob calls must be done in this order */
-    newsmob(&freecell);
-    newsmob(&flob);
-    newsmob(&bigob);
-    newsmob(&bigob);
-    scm_init_gra(&finals_gra, sizeof(void (*)()), 4, 0, s_final);
-}
-
 #ifdef TEST_FINAL
 void test_final()
 {
@@ -1248,18 +1229,6 @@ void init_io()
 #ifdef TEST_FINAL
     add_final(test_final);
 #endif
-}
-
-void init_io_disk_saved() {
-    make_subr("dynamic-wind", tc7_subr_3, dynwind);
-    make_subr(s_gc, tc7_subr_1o, gc);
-    init_iprocs(subr0s, tc7_subr_0);
-    init_iprocs(subr1s, tc7_subr_1);
-    init_iprocs(subr2s, tc7_subr_2);
-    loc_open_file =
-            &CDR(sysintern(s_open_file,
-                           CDR(sysintern(s_try_open_file, UNDEFINED))));
-    loc_try_create_file = &CDR(sysintern(s_try_create_file, UNDEFINED));
 }
 
 void grew_lim(nm)
@@ -1572,7 +1541,7 @@ SCM scm_maksubr(name, type, fcn)
     for (isubr = subrs_gra.len; 0 < isubr--;) {
         if (0==strcmp((((subr_info *)subrs_gra.elts)[isubr]).name, name)) {
             free(tmp_name);
-            if (!disk_saved) scm_warn(s_redefining, (char *)name, UNDEFINED);
+            scm_warn(s_redefining, (char *)name, UNDEFINED);
             goto foundit;
         }
     }
@@ -2656,7 +2625,6 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
                 UPDATE_GC_TRACED_INFO;
             }
             try_gather_new_ref_path(ptr, last_gc_traced_index);
-            try_gather_new_line_num(ptr, last_gc_traced_index);
             i = LENGTH(ptr);
             if (i == 0) {
                 break;
