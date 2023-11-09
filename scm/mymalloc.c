@@ -242,6 +242,7 @@ void init_my_zone() {
     fread(&exec_recoding_start_time, sizeof(clock_t), 1, fp);
     fread(&exec_recoding_tmp_gc_start_time, sizeof(clock_t), 1, fp);
     fread(&exec_recoding_gc_cost_time_sum, sizeof(clock_t), 1, fp);
+    fread(&gc_idx_exec_recoding_start_at, sizeof(size_t), 1, fp);
     fread(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
     fread(&focusing_ref_path_list, sizeof(RefPath *), 1, fp);
     fread(&wb_update_metadata_hash, sizeof(WriteBarrierUpdateMetadata *), 1, fp);

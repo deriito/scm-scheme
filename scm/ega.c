@@ -24,6 +24,7 @@ char is_exec_cost_time_recoding = 0;
 clock_t exec_recoding_start_time = 0;
 clock_t exec_recoding_tmp_gc_start_time = 0;
 clock_t exec_recoding_gc_cost_time_sum = 0;
+size_t gc_idx_exec_recoding_start_at = 0;
 
 GcTracedInfo *gc_traced = NULL;
 RefPath *focusing_ref_path_list = NULL;
@@ -924,7 +925,16 @@ static SCM start_record_gc_cost_time() {
     gc_idx_gc_cost_recording_start_at = 0;
     current_gc_start_time = 0;
     gc_cost_time_sum = 0;
-    remove(s_gc_log_filename);
+
+    time_t now;
+    time(&now);
+    FILE *fp;
+    if ((fp = fopen(s_gc_log_filename, "a+")) == NULL) {
+        wta(UNDEFINED, "Can not open or create exec.log", s_start_record_gc_cost_time);
+    }
+    fprintf(fp, "\nNEW RECORD AT %ld (TIMESTAMP): \n", now);
+    fclose(fp);
+
     return UNSPECIFIED;
 }
 
@@ -943,13 +953,15 @@ static SCM start_record_exec_cost_time() {
     exec_recoding_start_time = clock();
     exec_recoding_tmp_gc_start_time = 0;
     exec_recoding_gc_cost_time_sum = 0;
-    remove(s_exec_log_filename);
+    gc_idx_exec_recoding_start_at = current_gc_count;
     return UNSPECIFIED;
 }
 
 static char s_end_record_exec_cost_time[] = "end-record-exec-cost-time";
 static SCM end_record_exec_cost_time() {
     clock_t curr_time = clock();
+    time_t now;
+    time(&now);
 
     clock_t total_time = curr_time - exec_recoding_start_time;
 
@@ -959,16 +971,23 @@ static SCM end_record_exec_cost_time() {
         wta(UNDEFINED, "Can not open or create exec.log", s_end_record_exec_cost_time);
     }
     fprintf(fp,
-            "[ExecCostTimeInfo] Total cost time: %ld ms. Total exec cost %ld ms. Total GC cost %ld ms.\n",
+            "\nNEW RECORD AT %ld (TIMESTAMP): \n"
+            "[ExecCostTimeInfo] Total cost time: %ld ms. "
+            "Total exec cost %ld ms. "
+            "Total GC cost %ld ms. "
+            "Number of GC times is %ld.\n",
+            now,
             total_time,
             total_time - exec_recoding_gc_cost_time_sum,
-            exec_recoding_gc_cost_time_sum);
+            exec_recoding_gc_cost_time_sum,
+            current_gc_count - gc_idx_exec_recoding_start_at);
     fclose(fp);
 
     is_exec_cost_time_recoding = 0;
     exec_recoding_start_time = 0;
     exec_recoding_tmp_gc_start_time = 0;
     exec_recoding_gc_cost_time_sum = 0;
+    gc_idx_exec_recoding_start_at = 0;
     return UNSPECIFIED;
 }
 
