@@ -1365,7 +1365,7 @@ SCM scm_top_level(initpath, toplvl_fun)
     deferred_proc = 0;
     ints_disabled = 0;
     scm_init_INITS();
-    if (dumped) {
+    if (dumped || disk_saved) {
       lcells_allocated = cells_allocated;
       lmallocated = mallocated;
       rt = INUM(my_time());
@@ -1380,7 +1380,7 @@ SCM scm_top_level(initpath, toplvl_fun)
       SCM boot_tail = scm_evstr("boot-tail");
       /* initialization tail-call */
       if (NIMP(boot_tail))
-        apply(boot_tail, ((dumped) ? makfrom0str(initpath) : BOOL_F), listofnull);
+        apply(boot_tail, ((dumped || disk_saved) ? makfrom0str(initpath) : BOOL_F), listofnull);
     }
   case -2:			/* abrt */
   reset_toplvl:
@@ -1648,7 +1648,7 @@ void repl_report()
 unsigned long scm_init_brk = 0, scm_dumped_brk = 0;
 void init_sbrk()
 {
-  if (dumped)
+  if (dumped || disk_saved)
     scm_dumped_brk = (unsigned long)sbrk(0);
   else
     scm_init_brk = (unsigned long)sbrk(0);
@@ -1656,12 +1656,12 @@ void init_sbrk()
 void scm_brk_report()
 {
   unsigned long scm_curbrk = (unsigned long)sbrk(0),
-    dif1 = (((dumped) ? scm_dumped_brk : scm_curbrk) - scm_init_brk)/1024,
+    dif1 = (((dumped || disk_saved) ? scm_dumped_brk : scm_curbrk) - scm_init_brk)/1024,
     dif2 = (scm_curbrk - scm_dumped_brk)/1024;
 
   lputs("initial brk = 0x", cur_errp);
   scm_intprint(scm_init_brk, -16, cur_errp);
-  if (dumped) {
+  if (dumped || disk_saved) {
     lputs(", dumped = 0x", cur_errp);
     scm_intprint(scm_dumped_brk, -16, cur_errp);
   }
@@ -1669,7 +1669,7 @@ void scm_brk_report()
   scm_intprint(scm_curbrk, -16, cur_errp);
   lputs("; ", cur_errp);
   scm_intprint(dif1, 10, cur_errp);
-  if (dumped) {
+  if (dumped || disk_saved) {
     lputs(dif2 < 0 ? " - " : " + ", cur_errp);
     scm_intprint(dif2 < 0 ? -dif2 : dif2, 10, cur_errp);
   }
@@ -2326,6 +2326,23 @@ void init_repl( iverbose )
 	set_erase();
 #endif
 	tc16_arbiter = newsmob(&arbsmob);
+}
+
+void init_repl_disk_saved() {
+    init_iprocs(subr0s, tc7_subr_0);
+    init_iprocs(subr1os, tc7_subr_1o);
+    init_iprocs(subr1s, tc7_subr_1);
+    init_iprocs(subr2os, tc7_subr_2o);
+    make_subr(s_swapcar, tc7_subr_2, swapcar);
+    make_subr(s_wfi, tc7_lsubr, wait_for_input);
+#ifndef MEMOIZE_LOCALS
+    p_read_numbered =
+	  make_subr(s_read_numbered, tc7_subr_1, scm_read_numbered);
+#endif
+    p_read_for_load =
+            make_subr(s_read_for_load, tc7_subr_1, scm_read_for_load);
+    p_read =
+            make_subr(s_read, tc7_subr_1o, scm_read);
 }
 
 void final_repl()

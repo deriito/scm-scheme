@@ -110,6 +110,8 @@ int main(int argc, const char **argv) {
         argc = 1; argv = generic_name; /* for macintosh */
     }
 
+    init_my_zone();       /* Do this before malloc()s. */
+
 #ifndef LACK_SBRK
     init_sbrk();			/* Do this before malloc()s. */
 #endif
@@ -148,6 +150,7 @@ int main(int argc, const char **argv) {
             break;
         }
         dumped = 0;
+        disk_saved = 0;
         if (2 <= iverbose) {
             fputs(";RESTART\n", stderr);
         }
