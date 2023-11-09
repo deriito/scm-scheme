@@ -934,25 +934,6 @@ void init_types()
     scm_init_gra(&finals_gra, sizeof(void (*)()), 4, 0, s_final);
 }
 
-void init_types_disk_saved() {
-    scm_init_gra(&ptobs_gra, sizeof(ptobfuns), 8, 255, "ptobs");
-    /* These newptob calls must be done in this order */
-    /* tc16_fport = */ newptob(&fptob);
-    /* tc16_pipe = */ newptob(&pipob);
-    /* tc16_strport = */ newptob(&stptob);
-    /* tc16_sfport = */ newptob(&sfptob);
-    tc16_clport = newptob(&clptob);
-    tc16_sysport = newptob(&sysptob);
-    tc16_safeport = newptob(&safeptob);
-    scm_init_gra(&smobs_gra, sizeof(smobfuns), 16, 255, "smobs");
-    /* These newsmob calls must be done in this order */
-    newsmob(&freecell);
-    newsmob(&flob);
-    newsmob(&bigob);
-    newsmob(&bigob);
-    scm_init_gra(&finals_gra, sizeof(void (*)()), 4, 0, s_final);
-}
-
 #ifdef TEST_FINAL
 void test_final()
 {
@@ -1248,18 +1229,6 @@ void init_io()
 #ifdef TEST_FINAL
     add_final(test_final);
 #endif
-}
-
-void init_io_disk_saved() {
-    make_subr("dynamic-wind", tc7_subr_3, dynwind);
-    make_subr(s_gc, tc7_subr_1o, gc);
-    init_iprocs(subr0s, tc7_subr_0);
-    init_iprocs(subr1s, tc7_subr_1);
-    init_iprocs(subr2s, tc7_subr_2);
-    loc_open_file =
-            &CDR(sysintern(s_open_file,
-                           CDR(sysintern(s_try_open_file, UNDEFINED))));
-    loc_try_create_file = &CDR(sysintern(s_try_create_file, UNDEFINED));
 }
 
 void grew_lim(nm)
@@ -1572,7 +1541,7 @@ SCM scm_maksubr(name, type, fcn)
     for (isubr = subrs_gra.len; 0 < isubr--;) {
         if (0==strcmp((((subr_info *)subrs_gra.elts)[isubr]).name, name)) {
             free(tmp_name);
-            if (!disk_saved) scm_warn(s_redefining, (char *)name, UNDEFINED);
+            scm_warn(s_redefining, (char *)name, UNDEFINED);
             goto foundit;
         }
     }
@@ -2344,13 +2313,13 @@ void scm_fill_freelist()
 }
 
 static char	s_bad_type[] = "unknown type in ";
-void mark_locations P((STACKITEM x[], sizet n, long last_gc_traced_index, long previous_ref_field_index));
+void mark_locations P((STACKITEM x[], sizet n, long last_gc_traced_index));
 static void mark_syms P((SCM v));
 static void mark_sym_values P((SCM v));
 static void mark_subrs P((void));
 static void sweep_symhash P((SCM v));
 static void mark_finalizers P((SCM *live, SCM *dead));
-static void mark_port_table P((SCM port, long last_gc_traced_index, long previous_ref_field_index));
+static void mark_port_table P((SCM port, long last_gc_traced_index));
 static void sweep_port_table P((void));
 static void egc_mark P((void));
 static void egc_sweep P((void));
@@ -2428,7 +2397,7 @@ void igc(what, basecont)
     if (errjmp_bad) wta(UNDEFINED, s_recursive, s_gc);
     errjmp_bad = s_gc;
     if (no_symhash_gc)		/* Hobbit-compiled code needs this. */
-        gc_mark(symhash, -1L, -1L);
+        gc_mark(symhash, -1L);
     else {
         /* By marking symhash first, we provide the best immunity from
            accidental references.  In order to accidentally protect a
@@ -2450,7 +2419,7 @@ void igc(what, basecont)
         setjump(save_regs_gc_mark);
         mark_locations((STACKITEM *) save_regs_gc_mark,
                        (sizet) (sizeof(STACKITEM) - 1 + sizeof save_regs_gc_mark) /
-                       sizeof(STACKITEM), -1L, -1L);
+                       sizeof(STACKITEM), -1L);
         {
             /* stack_len is long rather than sizet in order to guarantee that
            &stack_len is long aligned */
@@ -2467,13 +2436,13 @@ void igc(what, basecont)
 #  else
             long stack_len = stack_size(stackbase);
 #  endif
-            mark_locations((stackbase - stack_len), (sizet)stack_len, -1L, -1L);
+            mark_locations((stackbase - stack_len), (sizet)stack_len, -1L);
 # endif
         }
 #endif
     }
     while(j--)
-        gc_mark(sys_protects[j], -1L, -1L);
+        gc_mark(sys_protects[j], -1L);
     mark_finalizers(&gc_finalizers, &gc_finalizers_pending);
     if (!no_symhash_gc)		/* if not Hobbit-compiled code. */
         sweep_symhash(symhash);
@@ -2501,9 +2470,9 @@ void free_storage()
     errjmp_bad = "free_storage";
     cur_inp = BOOL_F; cur_outp = BOOL_F;
     cur_errp = tmp_errp; sys_errp = tmp_errp;
-    gc_mark(def_inp, -1L, -1L);		/* don't want to close stdin */
-    gc_mark(def_outp, -1L, -1L);		/* don't want to close stdout */
-    gc_mark(def_errp, -1L, -1L);		/* don't want to close stderr */
+    gc_mark(def_inp, -1L);		/* don't want to close stdin */
+    gc_mark(def_outp, -1L);		/* don't want to close stdout */
+    gc_mark(def_errp, -1L);		/* don't want to close stderr */
     gc_sweep(0);
     rootcont = BOOL_F;
     while (hplim_ind) {		/* free heap segments */
@@ -2552,15 +2521,12 @@ void scm_protect_temp(ptr)
 
 #define UPDATE_GC_TRACED_INFO \
         { gc_traced[++last_gc_traced_index].ptr = ptr; \
-            if (previous_ref_field_index >= 0) { \
-                long previous_gc_traced_index = last_gc_traced_index - 1L; \
-                 gc_traced[previous_gc_traced_index].ref_field_index = previous_ref_field_index;}}
+        }
 
 static char s_gc_sym[] = "mark_syms", s_wrong_length[] = "wrong length";
-void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
+void gc_mark(p, last_gc_traced_index)
         SCM p;
         long last_gc_traced_index;
-        long previous_ref_field_index;
 {
     register long i;
     register SCM ptr = p;
@@ -2588,12 +2554,10 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
             if (IMP(CDR(ptr))	/* IMP works even with a GC mark */
                 || (CONSP(GCCDR(ptr)) && GCMARKP(GCCDR(ptr)))
                     ) {
-                previous_ref_field_index = CONS_CAR_IDX;
                 ptr = CAR(ptr);
                 goto gc_mark_nimp;
             }
-            gc_mark(CAR(ptr), last_gc_traced_index, CONS_CAR_IDX);
-            previous_ref_field_index = CONS_CDR_IDX;
+            gc_mark(CAR(ptr), last_gc_traced_index);
             ptr = GCCDR(ptr);
             goto gc_mark_nimp;
         case tcs_cons_imcar:
@@ -2604,7 +2568,6 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
             SETGCMARK(ptr);
             gc_traced[++last_gc_traced_index].ptr = ptr;
             UPDATE_GC_TRACED_INFO;
-            previous_ref_field_index = CONS_CDR_IDX;
             ptr = GCCDR(ptr);
             goto gc_mark_loop;
         case tcs_closures:
@@ -2614,12 +2577,10 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
             SETGCMARK(ptr);
             UPDATE_GC_TRACED_INFO;
             if (IMP(GCENV(ptr))) {
-                previous_ref_field_index = CLOSURE_CODE_IDX;
                 ptr = CODE(ptr);
                 goto gc_mark_nimp;
             }
-            gc_mark(CODE(ptr), last_gc_traced_index, CLOSURE_CODE_IDX);
-            previous_ref_field_index = CLOSURE_ENV_IDX;
+            gc_mark(CODE(ptr), last_gc_traced_index);
             ptr = GCENV(ptr);
             goto gc_mark_nimp;
         case tc7_specfun:
@@ -2644,7 +2605,6 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
             }
             else
 #endif
-            previous_ref_field_index = SPECFUN_CDR_IDX;
             ptr = CDR(ptr);
             goto gc_mark_loop;
         case tc7_vector:
@@ -2656,17 +2616,15 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
                 UPDATE_GC_TRACED_INFO;
             }
             try_gather_new_ref_path(ptr, last_gc_traced_index);
-            try_gather_new_line_num(ptr, last_gc_traced_index);
             i = LENGTH(ptr);
             if (i == 0) {
                 break;
             }
             while(--i > 0) {
                 if (NIMP(VELTS(ptr)[i])) {
-                    gc_mark(VELTS(ptr)[i], last_gc_traced_index, i);
+                    gc_mark(VELTS(ptr)[i], last_gc_traced_index);
                 }
             }
-            previous_ref_field_index = 0;
             ptr = VELTS(ptr)[0];
             goto gc_mark_loop;
         case tc7_contin:
@@ -2678,7 +2636,7 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
             mark_locations((STACKITEM *)VELTS(ptr),
                            (sizet)(LENGTH(ptr) +
                                    (sizeof(STACKITEM) - 1 + sizeof(CONTINUATION)) /
-                                   sizeof(STACKITEM)), last_gc_traced_index, previous_ref_field_index);
+                                   sizeof(STACKITEM)), last_gc_traced_index);
             break;
         case tc7_string:
         case tc7_msymbol:
@@ -2706,11 +2664,10 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
             if (!(i < numptob)) {
                 goto def;
             }
-            mark_port_table(ptr, last_gc_traced_index, previous_ref_field_index);
+            mark_port_table(ptr, last_gc_traced_index);
             if (!ptobs[i].mark) {
                 break;
             }
-            previous_ref_field_index = PROBFUN_MARK_IDX;
             ptr = (ptobs[i].mark)(ptr);
             goto gc_mark_loop;
         case tc7_smob:
@@ -2740,7 +2697,6 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
                     }
                     SETGC8MARK(ptr);
                     if (!smobs[i].mark)  break;
-                    previous_ref_field_index = SMOBS_MARK_IDX;
                     ptr = (smobs[i].mark)(ptr);
                     goto gc_mark_loop;
             }
@@ -2755,11 +2711,10 @@ void gc_mark(p, last_gc_traced_index, previous_ref_field_index)
    "rope.c", which means that changes to these routines must be
    coordinated. */
 
-void mark_locations(x, n, last_gc_traced_index, previous_ref_field_index)
+void mark_locations(x, n, last_gc_traced_index)
         STACKITEM x[];
         sizet n;
         long last_gc_traced_index;
-        long previous_ref_field_index;
 {
     register long m = n;
     register int i, j;
@@ -2774,7 +2729,7 @@ void mark_locations(x, n, last_gc_traced_index, previous_ref_field_index)
                 if ((i != j)
                     && PTR_LE(hplims[i++], ptr)
                     && PTR_GT(hplims[--j], ptr)) continue;
-                /* if (NFREEP(*(SCM **)&x[m])) */ gc_mark(*(SCM *)&x[m], last_gc_traced_index, previous_ref_field_index);
+                /* if (NFREEP(*(SCM **)&x[m])) */ gc_mark(*(SCM *)&x[m], last_gc_traced_index);
                 break;
             } while(i<j);
         }
@@ -3102,17 +3057,16 @@ static void mark_subrs()
     /* int k = subrs_gra.len; */
     /* while (k--) { } */
 }
-static void mark_port_table(port, last_gc_traced_index, previous_ref_field_index)
+static void mark_port_table(port, last_gc_traced_index)
         SCM port;
         long last_gc_traced_index;
-        long previous_ref_field_index;
 {
     int i = SCM_PORTNUM(port);
     ASRTER(i>=0 && i<scm_port_table_len, MAKINUM(i), "bad port", s_gc);
     if (i) {
         scm_port_table[i].flags |= 1;
         if (NIMP(scm_port_table[i].data))
-            gc_mark(scm_port_table[i].data, last_gc_traced_index, previous_ref_field_index);
+            gc_mark(scm_port_table[i].data, last_gc_traced_index);
     }
 }
 static void sweep_port_table()

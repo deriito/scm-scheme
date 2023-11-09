@@ -99,7 +99,7 @@ SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
     SCM data_type_instance = make_vector(DTI_VECTOR_LEN, UNDEFINED);
 
     MFS(data_type_instance) = module_flag_symbol;
-    IC(data_type_instance) = (IC(data_type_def) == DTDWRS_IT_CODE) ? DTIWRS_IT_CODE : DTI_IT_CODE; // for initialization
+    IC(data_type_instance) = DTI_IT_CODE; // for initialization
     DTI_DTD(data_type_instance) = data_type_def;
 
     // field-value vectorの初期化
@@ -112,34 +112,6 @@ SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
         }
     }
     DTI_FVV(data_type_instance) = fvv;
-
-    // 行番号記録スロットの初期化
-    DTI_RSV(data_type_instance) = EOL; // SCMのNULLである
-    if (IC(data_type_def) == DTDWRS_IT_CODE) {
-        SCM rsv = make_vector(MAKINUM(1L + len), EOL); // rec_slots_vector
-        vector_set(rsv, MAKINUM(0), internal_vector_symbol);
-
-        SCM rec_slot_defs = DTD_RSD(data_type_def);
-        for (long idx = 0; idx < len; ++idx) {
-            SCM ref_types_of_field = VELTS(rec_slot_defs)[idx + 1L];
-            SCM len_of_ref_types_of_field = NULLP(ref_types_of_field) ? 0 : vector_length(ref_types_of_field);
-
-            if (INUM(len_of_ref_types_of_field) > 1) {
-                SCM rec_slot_of_field = make_vector(len_of_ref_types_of_field, internal_vector_symbol);
-                for (long j = 1; j < INUM(len_of_ref_types_of_field); ++j) {
-                    SCM line_num_vector_of_ref_type = make_vector(MAKINUM(FIELD_REF_INFO_ALLOCATED_LEN), EOL);
-                    vector_set(line_num_vector_of_ref_type, MAKINUM(0), internal_vector_symbol);
-                    vector_set(line_num_vector_of_ref_type, MAKINUM(1), VELTS(ref_types_of_field)[j]);
-                    vector_set(line_num_vector_of_ref_type, MAKINUM(2), MAKINUM(3)); // used-len
-                    vector_set(rec_slot_of_field, MAKINUM(j), line_num_vector_of_ref_type);
-                }
-                vector_set(rsv, MAKINUM(idx + 1L), rec_slot_of_field);
-            }
-        }
-
-        DTI_RSV(data_type_instance) = rsv;
-    }
-
     return data_type_instance;
 }
 
@@ -183,72 +155,6 @@ char is_assert_dead_marked(SCM scm_obj) {
     return READ_ASSERT_DEAD_MARK(scm_obj);
 }
 
-void set_ref_path_info_recorded(SCM scm_obj) {
-    if (!is_user_defined_data_type_instance(scm_obj)) {
-        return;
-    }
-    SET_IC_BIT(scm_obj, 4);
-}
-
-static char s_is_ref_path_info_recorded[] = "is_ref_path_info_recorded";
-char is_ref_path_info_recorded(SCM scm_obj) {
-    if (!is_user_defined_data_type_instance(scm_obj)) {
-        wta(scm_obj, (char *)ARG1, s_is_ref_path_info_recorded);
-    }
-    return READ_REF_PATH_INFO_RECORDED_MARK(scm_obj);
-}
-
-static char s_get_data_type_def_identifier[] = "get_data_type_def_identifier";
-SCM get_data_type_def_identifier(SCM scm_obj) {
-    if (!is_user_defined_data_type_instance(scm_obj)) {
-        wta(scm_obj, (char *)ARG1, s_get_data_type_def_identifier);
-    }
-
-    return DTI_DTD(scm_obj);
-}
-
-static char s_field_number[] = "field_number";
-long field_number(SCM data_type_def) {
-    if (!is_user_defined_data_type(data_type_def)) {
-        wta(data_type_def, (char *)ARG1, s_field_number);
-    }
-
-    if (IC(data_type_def) != DTD_IT_CODE && IC(data_type_def) != DTDWRS_IT_CODE) {
-        wta(data_type_def, (char *)ARG1, s_field_number);
-    }
-
-    return (INUM(vector_length(DTD_FNV(data_type_def))) - 1L);
-}
-
-static char s_data_type_field_name[] = "data_type_field_name";
-char *data_type_field_name(SCM data_type_def, long field_index) {
-    if (!is_user_defined_data_type(data_type_def)) {
-        wta(data_type_def, (char *)ARG1, s_data_type_field_name);
-    }
-
-    SCM field_names_vector = DTD_FNV(data_type_def);
-    long field_num = INUM(vector_length(field_names_vector)) - 1L;
-    if (field_index < 0 || field_num <= field_index) {
-        wta(field_index, (char *)ARG2, s_data_type_field_name);
-    }
-
-    SCM field_name = VELTS(field_names_vector)[field_index + 1L];
-    return CHARS(field_name);
-}
-
-static char s_data_type_name[] = "data_type_name";
-char *data_type_name(SCM data_type_def) {
-    if (!is_user_defined_data_type(data_type_def)) {
-        wta(data_type_def, (char *)ARG1, s_data_type_name);
-    }
-
-    if (IC(data_type_def) != DTD_IT_CODE && IC(data_type_def) != DTDWRS_IT_CODE) {
-        wta(data_type_def, (char *)ARG1, s_data_type_name);
-    }
-
-    return CHARS(DTD_TN(data_type_def));
-}
-
 static char s_instance_type_name[] = "instance_type_name";
 char *instance_type_name(SCM ptr) {
     if (!is_user_defined_data_type_instance(ptr)) {
@@ -267,75 +173,6 @@ char is_internal_vector(SCM ptr) {
     return BOOL_T == eq(IVS(ptr), internal_vector_symbol);
 }
 
-char is_user_defined_data_type_instance_with_rec_slots(SCM scm_obj) {
-    if (!is_user_defined_data_type_instance(scm_obj)) {
-        return 0;
-    }
-    return READ_IT(scm_obj) == DTIWRS_IT_CODE;
-}
-
-/**
- *
- * @param scm_obj
- * @param field_index
- * @return maybe return EOL
- */
-SCM get_rec_slot_of_field(SCM scm_obj, long field_index) {
-    if (!is_user_defined_data_type_instance_with_rec_slots(scm_obj)) {
-        return EOL;
-    }
-
-    SCM rec_slots_vector = DTI_RSV(scm_obj);
-
-    return VELTS(rec_slots_vector)[field_index + 1L];
-}
-
-void try_update_data_type_def(WriteBarrierUpdateMetadata *metadata) {
-    if (HASH_COUNT(metadata->field_ref_info) <= 0) {
-        return;
-    }
-
-    SCM class_obj = metadata->data_type_def;
-    long field_num = field_number(class_obj);
-
-    SCM new_rec_slot_defs = EOL;
-    for (long field_idx = 0; field_idx < field_num; ++field_idx) {
-        MetadataPerField *field_ref_data_type_info;
-        HASH_FIND(hh, metadata->field_ref_info, &field_idx, sizeof(long), field_ref_data_type_info);
-
-        long ref_num_to_add = 0;
-        if (NULL != field_ref_data_type_info) {
-            UpdateStateByRefType *e, *t;
-            HASH_ITER(hh, field_ref_data_type_info->update_state_by_ref_type, e, t) {
-                if (e->is_to_add) ref_num_to_add += 1L;
-            }
-        }
-
-        if (ref_num_to_add <= 0) {
-            continue;
-        }
-
-        if (NULLP(new_rec_slot_defs)) {
-            new_rec_slot_defs = make_vector(MAKINUM(field_num + 1L), EOL);
-            vector_set(new_rec_slot_defs, MAKINUM(0), internal_vector_symbol);
-        }
-
-        SCM new_ref_types_of_field = make_vector(MAKINUM(ref_num_to_add + 1L), internal_vector_symbol);
-        UpdateStateByRefType *element, *temp;
-        long prev_set_index = 0;
-        HASH_ITER(hh, field_ref_data_type_info->update_state_by_ref_type, element, temp) {
-            if (element->is_to_add) {
-                VELTS(new_ref_types_of_field)[prev_set_index + 1L] = element->ref_data_type;
-                prev_set_index += 1L;
-            }
-        }
-        VELTS(new_rec_slot_defs)[field_idx + 1L] = new_ref_types_of_field;
-    }
-
-    DTD_RSD(class_obj) = new_rec_slot_defs;
-    IC(class_obj) = NULLP(new_rec_slot_defs) ? DTD_IT_CODE : DTDWRS_IT_CODE;
-}
-
 static char s_c_data_type_predicate[] = "c-data-type-predicate";
 SCM c_data_type_predicate(SCM data_type_def, SCM obj) {
     if (!is_user_defined_data_type(obj)) {
@@ -352,79 +189,6 @@ SCM c_data_type_accessor(SCM obj, SCM index) {
 static char s_c_data_type_modifier[] = "c-data-type-modifier";
 SCM c_data_type_modifier(SCM obj, SCM index, SCM value) {
     vector_set(DTI_FVV(obj), index, value);
-    return UNSPECIFIED;
-}
-
-static char s_c_data_type_modifier_with_wb[] = "c-data-type-modifier-with-wb";
-SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
-    SCM value = CAR(value_and_callsite);
-    c_data_type_modifier(obj, index, value);
-
-    // try process write barrier
-    if (!is_user_defined_data_type_instance_with_rec_slots(obj)) {
-        return UNSPECIFIED;
-    }
-
-    SCM rec_slot_of_field = get_rec_slot_of_field(obj, INUM(index) - 1L);
-    if (NULLP(rec_slot_of_field)) {
-        return UNSPECIFIED;
-    }
-
-    long len = INUM(vector_length(rec_slot_of_field));
-
-    SCM line_num_vector_of_ref_type = EOL;
-    long idx = -1;
-    for (long i = 1; i < len; ++i) {
-        SCM tmp_ln_v_of_ref_type = VELTS(rec_slot_of_field)[i];
-        SCM classobj_or_fixed_type_code_of_value;
-        if (is_user_defined_data_type_instance(value)) {
-            classobj_or_fixed_type_code_of_value = DTI_DTD(value);
-        } else {
-            classobj_or_fixed_type_code_of_value = IMP(value) ? -1L : TYP7(value);
-        }
-        if (VELTS(tmp_ln_v_of_ref_type)[1] == classobj_or_fixed_type_code_of_value) {
-            line_num_vector_of_ref_type = tmp_ln_v_of_ref_type;
-            idx = i;
-            break;
-        }
-    }
-
-    if (NULLP(line_num_vector_of_ref_type)) {
-        return UNSPECIFIED;
-    }
-
-    long used_len = INUM(VELTS(line_num_vector_of_ref_type)[2]);
-
-    SCM ln_num = CDR(value_and_callsite);
-    for (long i = 3; i < used_len; ++i) {
-        if (INUM(VELTS(line_num_vector_of_ref_type)[i]) == INUM(ln_num)) {
-            return UNSPECIFIED;
-        }
-    }
-
-    // 拡張してみる
-    if (used_len >= INUM(vector_length(line_num_vector_of_ref_type))) {
-        long new_len = used_len + FIELD_REF_INFO_ALLOCATED_LEN; // TODO [dirty] 每次多扩张6个就空位
-        SCM new_ln_v_of_ref_type = make_vector(MAKINUM(new_len), EOL);
-        for (long i = 0; i < used_len; ++i) {
-            VELTS(new_ln_v_of_ref_type)[i] = VELTS(line_num_vector_of_ref_type)[i];
-        }
-        VELTS(rec_slot_of_field)[idx] = new_ln_v_of_ref_type;
-        line_num_vector_of_ref_type = new_ln_v_of_ref_type;
-    }
-
-    // 本当に行番号を記録
-    VELTS(line_num_vector_of_ref_type)[used_len] = ln_num;
-    VELTS(line_num_vector_of_ref_type)[2] = MAKINUM(used_len + 1L);
-
-    if (is_show_ega_debug_info) {
-        fprintf(stdout, "\n[DebugInfo] A new site_info@%ld is recorded in \"%s#%s <= %s\"\n",
-                INUM(ln_num),
-                data_type_name(get_data_type_def_identifier(obj)),
-                data_type_field_name(get_data_type_def_identifier(obj), INUM(index) - 1L),
-                data_type_name(get_data_type_def_identifier(value)));
-    }
-
     return UNSPECIFIED;
 }
 
@@ -480,7 +244,6 @@ static iproc subr2os[] = {
 
 static iproc subr3s[] = {
         {s_c_data_type_modifier, c_data_type_modifier},
-        {s_c_data_type_modifier_with_wb, c_data_type_modifier_with_wb},
         {s_internal_vector_set, internal_vector_set},
         {0, 0}
 };
@@ -493,11 +256,4 @@ void init_define_data_type() {
     init_iprocs(subr2os, tc7_subr_2o);
     init_iprocs(subr3s, tc7_subr_3);
     add_feature("definedatatype");
-}
-
-void init_define_data_type_disk_saved() {
-    init_iprocs(subr1s, tc7_subr_1);
-    init_iprocs(subr2s, tc7_subr_2);
-    init_iprocs(subr2os, tc7_subr_2o);
-    init_iprocs(subr3s, tc7_subr_3);
 }
