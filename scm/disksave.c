@@ -207,6 +207,7 @@ SCM disk_save() {
     fwrite(&exec_recoding_start_time, sizeof(clock_t), 1, fp);
     fwrite(&exec_recoding_tmp_gc_start_time, sizeof(clock_t), 1, fp);
     fwrite(&exec_recoding_gc_cost_time_sum, sizeof(clock_t), 1, fp);
+    fwrite(&gc_idx_exec_recoding_start_at, sizeof(size_t), 1, fp);
     fwrite(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
     fwrite(&focusing_ref_path_list, sizeof(RefPath *), 1, fp);
     fwrite(&wb_update_metadata_hash, sizeof(WriteBarrierUpdateMetadata *), 1, fp);

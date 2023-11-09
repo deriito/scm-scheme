@@ -1241,6 +1241,7 @@ SCM_EXPORT char is_exec_cost_time_recoding;
 SCM_EXPORT clock_t exec_recoding_start_time;
 SCM_EXPORT clock_t exec_recoding_tmp_gc_start_time;
 SCM_EXPORT clock_t exec_recoding_gc_cost_time_sum;
+SCM_EXPORT size_t gc_idx_exec_recoding_start_at;
 SCM_EXPORT GcTracedInfo *gc_traced;
 SCM_EXPORT RefPath *focusing_ref_path_list;
 SCM_EXPORT WriteBarrierUpdateMetadata *wb_update_metadata_hash;

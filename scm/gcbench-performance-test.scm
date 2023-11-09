@@ -63,7 +63,7 @@
 ;; (define k-array-size 500000) ;; about 4Mb
 (define k-array-size 50000) ;; about 0.4Mb
 (define k-min-tree-depth 4)
-(define k-max-tree-depth 8)
+(define k-max-tree-depth 16)
 
 ;; Nodes used by a tree of a given size
 (define (tree-size i)
@@ -111,6 +111,7 @@
           (make-tree depth))))))
 
 (define (main)
+  (start-record-exec-cost-time)
   (display "Garbage Collector Test")
   (newline)
   (display (string-append
@@ -159,4 +160,5 @@
           ;  and array
           ;  to keep them from being optimized away
           ))))
-  (print-diagnostics))
+  (print-diagnostics)
+  (end-record-exec-cost-time))
