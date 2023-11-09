@@ -81,31 +81,7 @@
                                       "-"
                                       (string-append
                                         (symbol->string (vector-ref field-names-v i))
-                                        "!")))))))
-             (procname-bakup
-               (string->symbol (string-append
-                                 "set"
-                                 (string-append
-                                   "-"
-                                   (string-append
-                                     (symbol->string type-name)
-                                     (string-append
-                                       "-"
-                                       (string-append
-                                         (symbol->string (vector-ref field-names-v i))
-                                         "!-bakup")))))))
-             (procname-with-wb
-               (string->symbol (string-append
-                                 "set"
-                                 (string-append
-                                   "-"
-                                   (string-append
-                                     (symbol->string type-name)
-                                     (string-append
-                                       "-"
-                                       (string-append
-                                         (symbol->string (vector-ref field-names-v i))
-                                         "!-with-wb"))))))))
+                                        "!"))))))))
         (begin
           (eval `(define ,procname
                          (lambda (obj value . call-site-info) ;; call-site-infoは使わない, 単にエラー出ないように設置する
@@ -114,19 +90,6 @@
                              (error (string-append
                                       ,(symbol->string type-name)
                                       "'s modifier: wrong type of obj"))))))
-          (eval `(define ,procname-bakup ,procname))
-          (eval `(define ,procname-with-wb
-                         (lambda (obj value . call-site-info)
-                           (if (,(gen-predicate-name type-name) obj)
-                             (let modifier-wb-loop ((maybe-call-site call-site-info))
-                               (if (pair? maybe-call-site)
-                                 (modifier-wb-loop (car maybe-call-site))
-                                 (if (number? maybe-call-site)
-                                   (c-data-type-modifier-with-wb obj ,(+ i 1) (cons value maybe-call-site))
-                                   (c-data-type-modifier-with-wb obj ,(+ i 1) (cons value -1)))))
-                             (error (string-append
-                                      ,(symbol->string type-name)
-                                      "'s modifier-with-wb: wrong type of obj"))))))
           (loop (+ i 1))))
       #t)))
 
