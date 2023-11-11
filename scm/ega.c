@@ -824,7 +824,7 @@ void ega_process_after_gc() {
 
     if (is_gc_cost_time_recording) {
         clock_t curr_clock = clock();
-        clock_t past_clock = curr_clock - current_gc_start_time; // ms
+        clock_t past_clock = curr_clock - current_gc_start_time; // cpu ticks
         gc_cost_time_sum += past_clock;
 
         // record info in file
@@ -833,7 +833,7 @@ void ega_process_after_gc() {
             wta(UNDEFINED, "Can not open or create gc.log", s_ega_process_after_gc);
         }
         fprintf(fp,
-                "[GCCostTimeInfo] No.%ld GC end, cost time: %ld ms. Accumulated GC cost %ld ms.\n",
+                "[GCCostTimeInfo] No.%ld GC end, cost time: %ld ticks. Accumulated GC cost %ld ticks.\n",
                 current_gc_count,
                 past_clock,
                 gc_cost_time_sum);
@@ -972,9 +972,9 @@ static SCM end_record_exec_cost_time() {
     }
     fprintf(fp,
             "\nNEW RECORD AT %ld (TIMESTAMP): \n"
-            "[ExecCostTimeInfo] Total cost time: %ld ms. "
-            "Total exec cost %ld ms. "
-            "Total GC cost %ld ms. "
+            "[ExecCostTimeInfo] Total cost time: %ld ticks. "
+            "Total exec cost %ld ticks. "
+            "Total GC cost %ld ticks. "
             "Number of GC times is %ld.\n",
             now,
             total_time,
