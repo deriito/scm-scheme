@@ -58,7 +58,7 @@
    INIT_MALLOC_LIMIT is the initial amount of malloc usage which will
    trigger a GC. */
 
-#define INIT_HEAP_SIZE (8000000L*sizeof(cell))
+#define INIT_HEAP_SIZE (32000000L*sizeof(cell))
 #define MIN_HEAP_SEG_SIZE (2000L*sizeof(cell))
 #ifdef _QC
 # define HEAP_SEG_SIZE 32400L
