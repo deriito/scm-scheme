@@ -495,7 +495,7 @@ SCM lticks(i)
 static SIGRETTYPE (*oldpipe) (); // 不需要被写入dump file，在init_signals()中被初始化
 #endif
 
-int case_sensitize_symbols = 0;	/* set to 8 to read case-sensitive symbols */
+int case_sensitize_symbols = 8;	/* set to 8 to read case-sensitive symbols */
 int dumped = 0;			/* Is this an invocation of unexec exe? */
 int disk_saved = 0; /* for heap memory dump feature (disk-save) */
 
@@ -713,6 +713,10 @@ void scm_init_from_argv(argc, argv, script_arg, iverbose, buf0stdin)
   for (j = 0; argv[j]; j++) {
     if (0==strcmp(argv[j], "--no-symbol-case-fold")) {
       case_sensitize_symbols = 8;
+      break;
+    }
+    if (0==strcmp(argv[j], "--with-symbol-case-fold")) {
+      case_sensitize_symbols = 0;
       break;
     }
   }
