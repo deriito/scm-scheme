@@ -146,7 +146,7 @@
             (newline)
             (let ((array (make-vector kArraySize 0.0)))
               (do ((i 0 (+ i 1)))
-                ((>= i (inexact->exact (floor (/ kArraySize 2)))))
+                ((>= i (quotient kArraySize 2)))
                 (vector-set! array i (/ 1.0 (exact->inexact i))))
               (PrintDiagnostics)
 
@@ -156,9 +156,9 @@
 
               (if (or (eq? longLivedTree '())
                     (let ((n (min 1000
-                               (- (inexact->exact (floor (/ (vector-length array)
-                                                           2)))
-                                 1))))
+                               (- (quotient (vector-length array)
+                                    2)
+                                  1))))
                       (not (= (vector-ref array n)
                              (/ 1.0 (exact->inexact
                                       n))))))
