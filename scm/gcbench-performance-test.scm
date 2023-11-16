@@ -158,7 +158,7 @@
                     (let ((n (min 1000
                                (- (quotient (vector-length array)
                                     2)
-                                 1))))
+                                  1))))
                       (not (= (vector-ref array n)
                              (/ 1.0 (exact->inexact
                                       n))))))
