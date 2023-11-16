@@ -1398,7 +1398,7 @@
 
     (let* ((simple-opts "muvqibs")
 	   (arg-opts '("a kbytes" "-version" "-help"
-		       "-no-symbol-case-fold"
+		       "-no-symbol-case-fold" "-with-symbol-case-fold"
 		       "no-init-file" "-no-init-file" "p number"
 		       "h feature" "r feature" "d filename"
 		       "f filename" "l filename"
@@ -1480,6 +1480,7 @@
       ;; -b     => (set! *interactive* #f)
       ;; -s     => set argv, don't execute first one
       ;; --no-symbol-case-fold => symbols preserve character case
+			;; --with-symbol-case-fold => symbols ignore character case
       ;; -no-init-file => don't load init file
       ;; --no-init-file => don't load init file
       ;; --help => print and exit
@@ -1540,6 +1541,7 @@
 	   (or (cond ((not (string? option)) #f)
 		     ((string-ci=? "no-init-file" option))
 		     ((string-ci=? "no-symbol-case-fold" option))
+				 ((string-ci=? "with-symbol-case-fold" option))
 		     ((string-ci=? "version" option)
 		      (display
 		       (string-append exe-name " "

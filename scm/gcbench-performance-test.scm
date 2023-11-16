@@ -1,10 +1,9 @@
-;; Perfoemance test program on https://www.larcenists.org/benchmarksAboutR6.html
-
 ;  This is adapted from a benchmark written by John Ellis and Pete Kovac
 ;  of Post Communications.
 ;  It was modified by Hans Boehm of Silicon Graphics.
-;  It was translated into Scheme by William D Clinger of Northeastern Univ.
-;  Last modified 24 November 2007 (translated into R6RS Scheme).
+;  It was translated into Scheme by William D Clinger of Northeastern Univ;
+;    the Scheme version uses (RUN-BENCHMARK <string> <thunk>)
+;  Last modified 30 May 1997.
 ;
 ;       This is no substitute for real applications.  No actual application
 ;       is likely to behave in exactly this way.  However, this benchmark was
@@ -34,131 +33,158 @@
 ; of free memory.  There is no portable way to do this in Scheme; each
 ; implementation needs its own version.
 
-(define (run-benchmark2 name thunk)
-  (display name)
-  (newline)
-  (thunk))
-
-(define (print-diagnostics)
+(define (PrintDiagnostics)
   (display " Total memory available= ???????? bytes")
   (display "  Free memory= ???????? bytes")
   (newline))
 
-(define-data-type 'class-node '(left right i j))
+(define (run-benchmark str thu)
+  (display str)
+  (thu))
 
-(define (new-class-node l r . call-site)
-  (let ((ni (make-class-node-not-init)))
+(define-data-type 'Node '(left right i j))
+
+(define (newNode l r . callSite)
+  (let ((ni (make-Node-not-init)))
     (begin
-      (set-class-node-left! ni l call-site)
-      (set-class-node-right! ni r call-site)
-      (set-class-node-i! ni 0 call-site)
-      (set-class-node-j! ni 0 call-site)
+      (set-Node-left! ni l callSite)
+      (set-Node-right! ni r callSite)
+      (set-Node-i! ni 0 callSite)
+      (set-Node-j! ni 0 callSite)
       ni)))
 
-(define (new-class-node0 . call-site)
-  (new-class-node '() '() call-site))
+(define (newEmptyNode . callSite)
+  (newNode '() '() callSite))
 
-(define k-stretch-tree-depth 18) ;; about 16Mb
-(define k-long-lived-tree-depth 16) ;; about 4Mb
-;; (define k-array-size 500000) ;; about 4Mb
-(define k-array-size 50000) ;; about 0.4Mb
-(define k-min-tree-depth 4)
-(define k-max-tree-depth 16)
+(define (gcbench kStretchTreeDepth)
 
-;; Nodes used by a tree of a given size
-(define (tree-size i)
-  (- (expt 2 (+ i 1)) 1))
+  ;  Nodes used by a tree of a given size
+  (define (TreeSize i)
+    (- (expt 2 (+ i 1)) 1))
 
-;; Number of iterations to use for a given tree depth
-(define (numiters i)
-  (inexact->exact (floor (/ (* 2 (tree-size k-stretch-tree-depth)) (tree-size i)))))
+  ;  Number of iterations to use for a given tree depth
+  (define (NumIters i)
+    (quotient (* 2 (TreeSize kStretchTreeDepth))
+      (TreeSize i)))
 
-;; Build tree top down, assigning to older objects.
-(define (populate i-depth this-node)
-  (if (<= i-depth 0)
-    #f
-    (let ((i-depth (- i-depth 1)))
-      (begin
-        (set-class-node-left! this-node (new-class-node0 71) 71)
-        (set-class-node-right! this-node (new-class-node0 72) 72)
-        (populate i-depth (class-node-left this-node))
-        (populate i-depth (class-node-right this-node))))))
+  ;  Parameters are determined by kStretchTreeDepth.
+  ;  In Boehm's version the parameters were fixed as follows:
+  ;    public static final int kStretchTreeDepth    = 18;  // about 16Mb
+  ;    public static final int kLongLivedTreeDepth  = 16;  // about 4Mb
+  ;    public static final int kArraySize  = 500000;       // about 4Mb
+  ;    public static final int kMinTreeDepth = 4;
+  ;    public static final int kMaxTreeDepth = 16;
+  ;  In Larceny the storage numbers above would be 12 Mby, 3 Mby, 6 Mby.
 
-;; Build tree bottom-up
-(define (make-tree i-depth)
-  (if (<= i-depth 0)
-    (new-class-node0 79)
-    (new-class-node (make-tree (- i-depth 1)) (make-tree (- i-depth 1)) 80)))
+  (let* ((kLongLivedTreeDepth (- kStretchTreeDepth 2))
+          (kArraySize         (* 4 (TreeSize kLongLivedTreeDepth)))
+          (kMinTreeDepth      4)
+          (kMaxTreeDepth      kLongLivedTreeDepth))
 
-(define (time-construction depth)
-  (let ((i-numiters (numiters depth)))
-    (display (string-append "Creating "
-               (number->string i-numiters)
-               " trees of depth "
-               (number->string depth)))
-    (newline)
-    (run-benchmark2
-      "GCBench: Top down construction"
-      (lambda ()
-        (do ((i 0 (+ i 1)))
-          ((>= i i-numiters))
-          (populate depth (new-class-node0 99)))))
-    (run-benchmark2
-      "GCBench: Bottom up construction"
-      (lambda ()
-        (do ((i 0 (+ i 1)))
-          ((>= i i-numiters))
-          (make-tree depth))))))
+    ; Elements 3 and 4 of the allocated vectors are useless.
 
-(define (main)
-  (start-record-exec-cost-time)
-  (display "Garbage Collector Test")
-  (newline)
-  (display (string-append
-             " Stretching memory with a binary tree of depth "
-             (number->string k-stretch-tree-depth)))
-  (newline)
-  (print-diagnostics)
-  (run-benchmark2
-    "GCBench: Main"
-    (lambda ()
-      ; Stretch the memory space quickly
-      (make-tree k-stretch-tree-depth)
+    ;  Build tree top down, assigning to older objects.
+    (define (Populate iDepth thisNode)
+      (if (<= iDepth 0)
+        #f
+        (let ((iDepth (- iDepth 1)))
+          (set-Node-left! thisNode (newEmptyNode 91) 91)
+          (set-Node-right! thisNode (newEmptyNode 92) 92)
+          (Populate iDepth (Node-left thisNode))
+          (Populate iDepth (Node-right thisNode)))))
 
-      ; Create a long lived object
-      (display (string-append
-                 " Creating a long-lived binary tree of depth "
-                 (number->string k-long-lived-tree-depth)))
-      (newline)
-      (let ((long-lived-tree (new-class-node0 131)))
-        (populate k-long-lived-tree-depth long-lived-tree)
+    ;  Build tree bottom-up
+    (define (MakeTree iDepth)
+      (if (<= iDepth 0)
+        (newEmptyNode 99)
+        (newNode (MakeTree (- iDepth 1))
+          (MakeTree (- iDepth 1)) 101)))
 
-        ; Create long-lived list, filling half of it
-        (display (string-append
-                   " Creating a long-lived array of "
-                   (number->string k-array-size)
-                   " inexact reals"))
+    (define (TimeConstruction depth)
+      (let ((iNumIters (NumIters depth)))
+        (display (string-append "Creating "
+                   (number->string iNumIters)
+                   " trees of depth "
+                   (number->string depth)))
         (newline)
-        (let ((lst (new-linked-list 'number 140)))
-          (do ((i 0 (+ i 1)))
-            ((>= i  (inexact->exact (floor (/ k-array-size 2)))))
-            (linked-list-add lst (+ i 1) 143))
-          (print-diagnostics)
+        (run-benchmark "GCBench: Top down construction"
+          (lambda ()
+            (do ((i 0 (+ i 1)))
+              ((>= i iNumIters))
+              (Populate depth (newEmptyNode 114)))))
+        (run-benchmark "GCBench: Bottom up construction"
+          (lambda ()
+            (do ((i 0 (+ i 1)))
+              ((>= i iNumIters))
+              (MakeTree depth))))))
 
-          (do ((d k-min-tree-depth (+ d 2)))
-            ((> d k-max-tree-depth))
-            (time-construction d))
+    (define (main)
+      (display "Garbage Collector Test")
+      (newline)
+      (display (string-append
+                 " Stretching memory with a binary tree of depth "
+                 (number->string kStretchTreeDepth)))
+      (newline)
+      (run-benchmark "GCBench: Main"
+        (lambda ()
+          ;  Stretch the memory space quickly
+          (MakeTree kStretchTreeDepth)
 
-          (if (or (eq? long-lived-tree '())
-                (let ((n (min 1000
-                           (- (get-linked-list-size lst)
-                             1))))
-                  (not (= (linked-list-ref lst n)
-                         (+ n 1)))))
-            (begin (display "Failed") (newline)))
-          ;  fake reference to LongLivedTree
-          ;  and array
-          ;  to keep them from being optimized away
-          ))))
-  (print-diagnostics)
-  (end-record-exec-cost-time))
+          ;  Create a long lived object
+          (display (string-append
+                     " Creating a long-lived binary tree of depth "
+                     (number->string kLongLivedTreeDepth)))
+          (newline)
+          (let ((longLivedTree (newEmptyNode 138)))
+            (Populate kLongLivedTreeDepth longLivedTree)
+
+            ;  Create long-lived array, filling half of it
+            (display (string-append
+                       " Creating a long-lived array of "
+                       (number->string kArraySize)
+                       " inexact reals"))
+            (newline)
+            (let ((array (make-vector kArraySize 0.0)))
+              (do ((i 0 (+ i 1)))
+                ((>= i (inexact->exact (floor (/ kArraySize 2)))))
+                (vector-set! array i (/ 1.0 (exact->inexact i))))
+              (PrintDiagnostics)
+
+              (do ((d kMinTreeDepth (+ d 2)))
+                ((> d kMaxTreeDepth))
+                (TimeConstruction d))
+
+              (if (or (eq? longLivedTree '())
+                    (let ((n (min 1000
+                               (- (inexact->exact (floor (/ (vector-length array)
+                                                           2)))
+                                 1))))
+                      (not (= (vector-ref array n)
+                             (/ 1.0 (exact->inexact
+                                      n))))))
+                (begin (display "Failed") (newline)))
+              ;  fake reference to LongLivedTree
+              ;  and array
+              ;  to keep them from being optimized away
+              ))))
+      (PrintDiagnostics))
+
+    (main)))
+
+(define (gc-benchmark . rest)
+  (let ((k (if (null? rest) 18 (car rest))))
+    (display "The garbage collector should touch about ")
+    (display (expt 2 (- k 13)))
+    (display " megabytes of heap storage.")
+    (newline)
+    (display "The use of more or less memory will skew the results.")
+    (newline)
+    (start-record-exec-cost-time)
+    (run-benchmark (string-append "GCBench" (number->string k))
+      (lambda () (gcbench k)))
+    (end-record-exec-cost-time)))
+
+(gc-benchmark )
+
+;; GC test program on https://www.larcenists.org/benchmarksAboutR6.html
+;; and on https://ftp.gnu.org/gnu/guile/guile-3.0.9.tar.gz

@@ -58,7 +58,7 @@
    INIT_MALLOC_LIMIT is the initial amount of malloc usage which will
    trigger a GC. */
 
-#define INIT_HEAP_SIZE (25000L*sizeof(cell))
+#define INIT_HEAP_SIZE (32000000L*sizeof(cell))
 #define MIN_HEAP_SEG_SIZE (2000L*sizeof(cell))
 #ifdef _QC
 # define HEAP_SEG_SIZE 32400L
@@ -70,7 +70,7 @@
 # endif
 #endif
 #define EXPHEAP(heap_cells) (heap_cells*2)
-#define INIT_MALLOC_LIMIT 100000
+#define INIT_MALLOC_LIMIT (INIT_HEAP_SIZE)
 
 /* ECACHE_SIZE is the number of cells in the copy-collected environment
    cache used for environment frames */
