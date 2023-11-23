@@ -3285,14 +3285,3 @@ void init_scl()
 	    pows5 = make_vector(MAKINUM(326), MAKINUM(1)));
 #endif
 }
-
-void init_scl_disk_saved() {
-    init_iprocs(subr1s, tc7_subr_1);
-    init_iprocs(subr2os, tc7_subr_2o);
-    init_iprocs(subr2s, tc7_subr_2);
-    init_iprocs(asubrs, tc7_asubr);
-    init_iprocs(rpsubrs, tc7_rpsubr);
-#ifdef FLOATS
-    init_iprocs((iproc *)cxrs, tc7_cxr);
-#endif
-}
