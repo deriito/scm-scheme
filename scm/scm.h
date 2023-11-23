@@ -16,9 +16,6 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "utlist.h"
-#include "utarray.h"
-#include "uthash.h"
 #include <time.h>
 
 #ifdef __cplusplus
@@ -146,62 +143,12 @@ typedef struct {SCM type;double *real;} dbl;
 #endif
 
 
-typedef struct bheader {
-    struct bheader *ptr;
-    unsigned size;
-} HEADER;
-
-
 typedef struct gc_traced_info {
     SCM ptr;
     long ref_field_index;
 } GcTracedInfo;
 
-
-typedef struct collected_line_number {
-    long line_num;
-    UT_hash_handle hh;
-} CollectedLineNumber;
-
-typedef struct ref_path_entry {
-    SCM ptr;
-    long ref_field_index;
-    int is_active; // needs write-barriers and record-slots?
-    int is_repeat;
-    size_t gc_count_at_created;
-    size_t gc_count_at_last_reactivated;
-    CollectedLineNumber *line_numbers;
-} RefPathEntry;
-
-/**
- * Entry Definition in focusing_ref_path_list
- */
-typedef struct ref_path {
-    UT_array *entries; // RefPathEntry is inside
-    struct ref_path *prev;
-    struct ref_path *next;
-} RefPath;
-
 #define FIELD_REF_INFO_ALLOCATED_LEN (6)
-
-typedef struct update_state_by_ref_type {
-    SCM ref_data_type; // SCM is long, user_defined_class_obj or fixed_type_code
-    int is_to_add; // 各の値に対し, 0: 削除 1: 追加
-    UT_hash_handle hh;
-} UpdateStateByRefType;
-
-typedef struct metadata_per_field {
-    long field_index;
-    UpdateStateByRefType *update_state_by_ref_type;
-    UT_hash_handle hh;
-} MetadataPerField;
-
-typedef struct write_barrier_update_metadata {
-    SCM data_type_def; // class_obj SCM is long
-    MetadataPerField *field_ref_info;
-    UT_hash_handle hh;
-} WriteBarrierUpdateMetadata;
-
 
   /* Conditionals should always expect immediates */
   /* GCC __builtin_expect() is stubbed in scmfig.h */
@@ -1218,20 +1165,11 @@ SCM_EXPORT char is_user_defined_data_type P((SCM scm_obj));
 SCM_EXPORT char is_user_defined_data_type_instance P((SCM scm_obj));
 SCM_EXPORT void set_assert_mark P((SCM scm_obj));
 SCM_EXPORT char is_assert_dead_marked P((SCM scm_obj));
-SCM_EXPORT void set_ref_path_info_recorded P((SCM scm_obj));
-SCM_EXPORT char is_ref_path_info_recorded P((SCM scm_obj));
-SCM_EXPORT SCM get_data_type_def_identifier P((SCM scm_obj));
 SCM_EXPORT void try_gather_new_ref_path P((SCM ptr, long last_gc_traced_index));
-SCM_EXPORT void try_gather_new_line_num P((SCM ptr, long last_gc_traced_index));
 SCM_EXPORT void ega_process_at_gc_start P((void));
 SCM_EXPORT void ega_process_after_gc P((void));
-SCM_EXPORT size_t line_num_quantity_of_a_ref_pattern_at_least;
-SCM_EXPORT size_t gc_count_of_a_ref_pattern_at_most;
 SCM_EXPORT char is_print_result;
 SCM_EXPORT size_t current_gc_count;
-SCM_EXPORT char is_dynamic_check_mode;
-SCM_EXPORT char is_show_ega_debug_info;
-SCM_EXPORT char is_disk_save_on;
 SCM_EXPORT char is_show_gc_related_info;
 SCM_EXPORT char is_gc_cost_time_recording;
 SCM_EXPORT size_t gc_idx_gc_cost_recording_start_at;
@@ -1243,31 +1181,13 @@ SCM_EXPORT clock_t exec_recoding_tmp_gc_start_time;
 SCM_EXPORT clock_t exec_recoding_gc_cost_time_sum;
 SCM_EXPORT size_t gc_idx_exec_recoding_start_at;
 SCM_EXPORT GcTracedInfo *gc_traced;
-SCM_EXPORT RefPath *focusing_ref_path_list;
-SCM_EXPORT WriteBarrierUpdateMetadata *wb_update_metadata_hash;
-SCM_EXPORT UT_icd *ref_path_entry_icd;
-SCM_EXPORT long field_number P((SCM data_type_def));
-SCM_EXPORT char *data_type_field_name P((SCM data_type_def, long field_index));
-SCM_EXPORT char *data_type_name P((SCM data_type_def));
 SCM_EXPORT char *instance_type_name P((SCM ptr));
 SCM_EXPORT char is_internal_vector P((SCM ptr));
-SCM_EXPORT char is_user_defined_data_type_instance_with_rec_slots P((SCM scm_obj));
-SCM_EXPORT SCM get_rec_slot_of_field P((SCM scm_obj, long field_index));
-SCM_EXPORT void try_update_data_type_def P((WriteBarrierUpdateMetadata * metadata));
-
-SCM_EXPORT HEADER base; /* empty list to get started */
-SCM_EXPORT HEADER *freep; /* start of free list */
-
-SCM_EXPORT char *prepared_memory_start;
-SCM_EXPORT char *managed_memory_start;
-SCM_EXPORT char *managed_memory_end;
-
-SCM_EXPORT void init_my_zone(void);
+SCM_EXPORT SCM get_ln_vector_of_field P((SCM scm_obj, long field_index));
 
 /* 之前没有声明在全局的变量 */
 // scm.c
 SCM_EXPORT int case_sensitize_symbols;
-SCM_EXPORT int disk_saved;
 SCM_EXPORT SCM *loc_features;
 typedef struct {SCM sym; int which;} setitimer_tab_info;
 SCM_EXPORT setitimer_tab_info setitimer_tab[3];
@@ -1342,6 +1262,3 @@ SCM_EXPORT sizet num_protects;
 #define SPECFUN_CDR_IDX 1
 #define PROBFUN_MARK_IDX 1
 #define SMOBS_MARK_IDX 1
-
-// max quantity of recorded line num of per field
-#define PER_FIELD_REC_LINE_NUM_QUANTITY 3
