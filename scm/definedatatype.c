@@ -199,17 +199,25 @@ SCM c_data_type_accessor(SCM obj, SCM index) {
     return vector_ref(DTI_FVV(obj), index);
 }
 
-static SCM c_data_type_modifier(SCM obj, SCM index, SCM value) {
-    vector_set(DTI_FVV(obj), index, value);
-    return UNSPECIFIED;
+static SCM process_nested_call_site(SCM nested_call_site) {
+    SCM result = nested_call_site;
+    while (BOOL_T == consp(result)) {
+        result = CAR(result);
+    }
+
+    if (BOOL_F == numberp(result)) {
+        return MAKINUM(-1L);
+    }
+
+    return result;
 }
 
 static char s_c_data_type_modifier_with_wb[] = "c-data-type-modifier-with-wb";
 SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
     SCM value = CAR(value_and_callsite);
-    c_data_type_modifier(obj, index, value);
+    vector_set(DTI_FVV(obj), index, value);
 
-    SCM ln_num = CDR(value_and_callsite);
+    SCM ln_num = process_nested_call_site(CDR(value_and_callsite));
     if (INUM(ln_num) <= 0) {
         return UNSPECIFIED;
     }
