@@ -84,9 +84,9 @@
                                         "!"))))))))
         (begin
           (eval `(define ,procname
-                         (lambda (obj value . call-site-info) ;; call-site-infoは使わない, 単にエラー出ないように設置する
+                         (lambda (obj value . call-site-info)
                            (if (,(gen-predicate-name type-name) obj)
-                             (c-data-type-modifier obj ,(+ i 1) value)
+                             (c-data-type-modifier obj ,(+ i 1) (cons value call-site-info))
                              (error (string-append
                                       ,(symbol->string type-name)
                                       "'s modifier: wrong type of obj"))))))
