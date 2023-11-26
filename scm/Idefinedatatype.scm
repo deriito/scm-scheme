@@ -105,23 +105,19 @@
                                        "-"
                                        (string-append
                                          (symbol->string (vector-ref field-names-v i))
-                                         "!-with-wb"))))))))
+                                         "!-with-wb")))))))
+             (c-modifier-with-wb-procname
+               (string->symbol (string-append
+                                 "c-data-type-modifier-with-wb-of-field-"
+                                 (number->string i)))))
         (begin
           (eval `(define ,procname
-                         (lambda (obj value . call-site-info)
-                           (if (,(gen-predicate-name type-name) obj)
-                             (c-data-type-modifier obj ,(+ i 1) (cons value call-site-info))
-                             (error (string-append
-                                      ,(symbol->string type-name)
-                                      "'s modifier: wrong type of obj"))))))
+                         (lambda (obj value call-site-info) ;; 引数call-site-infoは使わない，WB付きのmodifierの引数個数と同じために
+                           (c-data-type-modifier obj ,i value)))) ;; 型検査は省略, 人工チェックの代わりに
           (eval `(define ,procname-bakup ,procname))
           (eval `(define ,procname-with-wb
-                         (lambda (obj value . call-site-info)
-                           (if (,(gen-predicate-name type-name) obj)
-                             (c-data-type-modifier-with-wb obj ,(+ i 1) (cons value call-site-info))
-                             (error (string-append
-                                      ,(symbol->string type-name)
-                                      "'s modifier-with-wb: wrong type of obj"))))))
+                         (lambda (obj value call-site-info)
+                           (,c-modifier-with-wb-procname obj value call-site-info)))) ;; 型検査は省略, 人工チェックの代わりに
           (loop (+ i 1))))
       #t)))
 
