@@ -44,7 +44,7 @@
 
 (define-data-type 'Node '(left right i j))
 
-(define (newNode l r . callSite)
+(define (newNode l r callSite)
   (let ((ni (make-Node-not-init)))
     (begin
       (set-Node-left! ni l callSite)
@@ -53,7 +53,7 @@
       (set-Node-j! ni 0 callSite)
       ni)))
 
-(define (newEmptyNode . callSite)
+(define (newEmptyNode callSite)
   (newNode '() '() callSite))
 
 (define (gcbench kStretchTreeDepth)
