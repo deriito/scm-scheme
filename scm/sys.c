@@ -2521,7 +2521,7 @@ void scm_protect_temp(ptr)
 
 #define UPDATE_GC_TRACED_INFO \
         { gc_traced[++last_gc_traced_index].ptr = ptr; \
-            if (previous_ref_field_index >= 0) { \
+            if (last_gc_traced_index > 0 && previous_ref_field_index >= 0) { \
                 long previous_gc_traced_index = last_gc_traced_index - 1L; \
                  gc_traced[previous_gc_traced_index].ref_field_index = previous_ref_field_index;}}
 
