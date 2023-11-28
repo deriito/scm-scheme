@@ -222,25 +222,9 @@ SCM c_data_type_accessor(SCM obj, SCM index) {
     return vector_ref(DTI_FVV(obj), index);
 }
 
-static SCM process_nested_call_site(SCM nested_call_site) {
-    SCM result = nested_call_site;
-    while (BOOL_T == consp(result)) {
-        result = CAR(result);
-    }
-
-    if (BOOL_F == numberp(result)) {
-        return MAKINUM(-1L);
-    }
-
-    return result;
-}
-
 static char s_c_data_type_modifier[] = "c-data-type-modifier";
-SCM c_data_type_modifier(SCM obj, SCM index, SCM value_and_callsite) {
-    vector_set(DTI_FVV(obj), index, CAR(value_and_callsite));
-
-    // 让所有的bench下modifier的代码的overhead都相同加上的
-    process_nested_call_site(CDR(value_and_callsite));
+SCM c_data_type_modifier(SCM obj, SCM index, SCM value) {
+    vector_set(DTI_FVV(obj), MAKINUM(INUM(index) + 1L), value);
     return UNSPECIFIED;
 }
 
