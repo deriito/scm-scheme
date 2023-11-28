@@ -349,31 +349,13 @@ SCM c_data_type_accessor(SCM obj, SCM index) {
     return vector_ref(DTI_FVV(obj), index);
 }
 
-static SCM process_nested_call_site(SCM nested_call_site) {
-    SCM result = nested_call_site;
-    while (BOOL_T == consp(result)) {
-        result = CAR(result);
-    }
-
-    if (BOOL_F == numberp(result)) {
-        return MAKINUM(-1L);
-    }
-
-    return result;
-}
-
 static char s_c_data_type_modifier[] = "c-data-type-modifier";
-SCM c_data_type_modifier(SCM obj, SCM index, SCM value_and_callsite) {
-    vector_set(DTI_FVV(obj), index, CAR(value_and_callsite));
-
-    // 让所有的bench下modifier的代码的overhead都相同加上的
-    process_nested_call_site(CDR(value_and_callsite));
+SCM c_data_type_modifier(SCM obj, SCM index, SCM value) {
+    vector_set(DTI_FVV(obj), MAKINUM(INUM(index) + 1L), value);
     return UNSPECIFIED;
 }
 
-static char s_c_data_type_modifier_with_wb[] = "c-data-type-modifier-with-wb";
-SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
-    SCM value = CAR(value_and_callsite);
+SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value, SCM ln_num) {
     c_data_type_modifier(obj, index, value);
 
     // try process write barrier
@@ -381,7 +363,7 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
         return UNSPECIFIED;
     }
 
-    SCM rec_slot_of_field = get_rec_slot_of_field(obj, INUM(index) - 1L);
+    SCM rec_slot_of_field = get_rec_slot_of_field(obj, INUM(index));
     if (NULLP(rec_slot_of_field)) {
         return UNSPECIFIED;
     }
@@ -411,7 +393,6 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
 
     long used_len = INUM(VELTS(line_num_vector_of_ref_type)[2]);
 
-    SCM ln_num = process_nested_call_site(CDR(value_and_callsite));
     for (long i = 3; i < used_len; ++i) {
         if (INUM(VELTS(line_num_vector_of_ref_type)[i]) == INUM(ln_num)) {
             return UNSPECIFIED;
@@ -437,11 +418,91 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value_and_callsite) {
         fprintf(stdout, "\n[DebugInfo] A new site_info@%ld is recorded in \"%s#%s <= %s\"\n",
                 INUM(ln_num),
                 data_type_name(get_data_type_def_identifier(obj)),
-                data_type_field_name(get_data_type_def_identifier(obj), INUM(index) - 1L),
+                data_type_field_name(get_data_type_def_identifier(obj), INUM(index)),
                 data_type_name(get_data_type_def_identifier(value)));
     }
 
     return UNSPECIFIED;
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_0[] = "c-data-type-modifier-with-wb-of-field-0";
+static SCM c_data_type_modifier_with_wb_of_field_0(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(0L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_1[] = "c-data-type-modifier-with-wb-of-field-1";
+static SCM c_data_type_modifier_with_wb_of_field_1(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(1L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_2[] = "c-data-type-modifier-with-wb-of-field-2";
+static SCM c_data_type_modifier_with_wb_of_field_2(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(2L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_3[] = "c-data-type-modifier-with-wb-of-field-3";
+static SCM c_data_type_modifier_with_wb_of_field_3(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(3L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_4[] = "c-data-type-modifier-with-wb-of-field-4";
+static SCM c_data_type_modifier_with_wb_of_field_4(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(4L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_5[] = "c-data-type-modifier-with-wb-of-field-5";
+static SCM c_data_type_modifier_with_wb_of_field_5(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(0L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_6[] = "c-data-type-modifier-with-wb-of-field-6";
+static SCM c_data_type_modifier_with_wb_of_field_6(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(6L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_7[] = "c-data-type-modifier-with-wb-of-field-7";
+static SCM c_data_type_modifier_with_wb_of_field_7(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(7L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_8[] = "c-data-type-modifier-with-wb-of-field-8";
+static SCM c_data_type_modifier_with_wb_of_field_8(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(8L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_9[] = "c-data-type-modifier-with-wb-of-field-9";
+static SCM c_data_type_modifier_with_wb_of_field_9(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(9L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_10[] = "c-data-type-modifier-with-wb-of-field-10";
+static SCM c_data_type_modifier_with_wb_of_field_10(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(10L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_11[] = "c-data-type-modifier-with-wb-of-field-11";
+static SCM c_data_type_modifier_with_wb_of_field_11(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(11L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_12[] = "c-data-type-modifier-with-wb-of-field-12";
+static SCM c_data_type_modifier_with_wb_of_field_12(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(12L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_13[] = "c-data-type-modifier-with-wb-of-field-13";
+static SCM c_data_type_modifier_with_wb_of_field_13(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(13L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_14[] = "c-data-type-modifier-with-wb-of-field-14";
+static SCM c_data_type_modifier_with_wb_of_field_14(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(14L), value, ln_num);
+}
+
+static char s_c_data_type_modifier_with_wb_of_field_15[] = "c-data-type-modifier-with-wb-of-field-15";
+static SCM c_data_type_modifier_with_wb_of_field_15(SCM obj, SCM value, SCM ln_num) {
+    return c_data_type_modifier_with_wb(obj, MAKINUM(15L), value, ln_num);
 }
 
 static char s_make_internal_vector[] = "make-internal-vector";
@@ -496,7 +557,22 @@ static iproc subr2os[] = {
 
 static iproc subr3s[] = {
         {s_c_data_type_modifier, c_data_type_modifier},
-        {s_c_data_type_modifier_with_wb, c_data_type_modifier_with_wb},
+        {s_c_data_type_modifier_with_wb_of_field_0, c_data_type_modifier_with_wb_of_field_0},
+        {s_c_data_type_modifier_with_wb_of_field_1, c_data_type_modifier_with_wb_of_field_1},
+        {s_c_data_type_modifier_with_wb_of_field_2, c_data_type_modifier_with_wb_of_field_2},
+        {s_c_data_type_modifier_with_wb_of_field_3, c_data_type_modifier_with_wb_of_field_3},
+        {s_c_data_type_modifier_with_wb_of_field_4, c_data_type_modifier_with_wb_of_field_4},
+        {s_c_data_type_modifier_with_wb_of_field_5, c_data_type_modifier_with_wb_of_field_5},
+        {s_c_data_type_modifier_with_wb_of_field_6, c_data_type_modifier_with_wb_of_field_6},
+        {s_c_data_type_modifier_with_wb_of_field_7, c_data_type_modifier_with_wb_of_field_7},
+        {s_c_data_type_modifier_with_wb_of_field_8, c_data_type_modifier_with_wb_of_field_8},
+        {s_c_data_type_modifier_with_wb_of_field_9, c_data_type_modifier_with_wb_of_field_9},
+        {s_c_data_type_modifier_with_wb_of_field_10, c_data_type_modifier_with_wb_of_field_10},
+        {s_c_data_type_modifier_with_wb_of_field_11, c_data_type_modifier_with_wb_of_field_11},
+        {s_c_data_type_modifier_with_wb_of_field_12, c_data_type_modifier_with_wb_of_field_12},
+        {s_c_data_type_modifier_with_wb_of_field_13, c_data_type_modifier_with_wb_of_field_13},
+        {s_c_data_type_modifier_with_wb_of_field_14, c_data_type_modifier_with_wb_of_field_14},
+        {s_c_data_type_modifier_with_wb_of_field_15, c_data_type_modifier_with_wb_of_field_15},
         {s_internal_vector_set, internal_vector_set},
         {0, 0}
 };
