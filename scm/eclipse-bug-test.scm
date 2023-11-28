@@ -3,7 +3,7 @@
 ;; CompareEditorInput.java
 (define-data-type 'compare-editor-input '(f-message))
 
-(define (new-compare-editor-input string-message . call-site-info)
+(define (new-compare-editor-input string-message call-site-info)
   (let ((new-instance (make-compare-editor-input '())))
     (begin
       (set-compare-editor-input-f-message! new-instance string-message call-site-info)
@@ -13,7 +13,7 @@
 ;; NavigationHistoryEditorInfo.java
 (define-data-type 'navigation-history-editor-info '(editor-id editor-input ref-count))
 
-(define (new-navigation-history-editor-info editor-part . call-site-info)
+(define (new-navigation-history-editor-info editor-part call-site-info)
   (let ((new-instance (make-navigation-history-editor-info '() '() 0)))
     (begin
       (set-navigation-history-editor-info-editor-id! new-instance (editor-part-editor-id editor-part) call-site-info)
@@ -30,7 +30,7 @@
 ;; NavigationHistoryEntry.java
 (define-data-type 'navigation-history-entry '(page editor-info))
 
-(define (new-navigation-history-entry page editor-info . call-site-info)
+(define (new-navigation-history-entry page editor-info call-site-info)
   (let ((new-instance (make-navigation-history-entry '() '())))
     (begin ;; setterにライトバリアしか実装していないため, fieldの初期化するにはsetterを使う
       (set-navigation-history-entry-page! new-instance page call-site-info)
@@ -46,12 +46,12 @@
 
 (define history-entry-capacity 50)
 
-(define (new-navigation-history page . call-site-info)
+(define (new-navigation-history page call-site-info)
   (let ((new-instance (make-navigation-history '() '() '())))
     (begin
-      (set-navigation-history-history! new-instance (new-linked-list 'navigation-history-entry) call-site-info)
-      (set-navigation-history-editors! new-instance (new-linked-list 'navigation-history-editor-info) call-site-info)
-      (set-navigation-history-page! new-instance page 54)
+      (set-navigation-history-history! new-instance (new-linked-list 'navigation-history-entry call-site-info) call-site-info)
+      (set-navigation-history-editors! new-instance (new-linked-list 'navigation-history-editor-info call-site-info) call-site-info)
+      (set-navigation-history-page! new-instance page call-site-info)
       new-instance)))
 
 (define (update-navigation-history navi-history editor-part)
@@ -89,7 +89,7 @@
         (cond
           ((< i (get-linked-list-size history-entries-to-rm))
             (begin
-              (linked-list-rm-obj history-list (linked-list-ref history-entries-to-rm i))
+              (linked-list-rm-obj history-list (linked-list-ref history-entries-to-rm i) 92)
               (loop (+ i 1)))))))))
 
 (define (create-entry navi-history page part)
@@ -127,7 +127,7 @@
           (set-navigation-history-editor-info-ref-count! editor-info (- (navigation-history-editor-info-ref-count editor-info) 1) 127)
           (cond
             ((<= (navigation-history-editor-info-ref-count editor-info) 0)
-              (linked-list-rm-obj (navigation-history-editors navi-history) editor-info)))
+              (linked-list-rm-obj (navigation-history-editors navi-history) editor-info 130)))
           (history-entry-dispose navi-history-entry))))))
 
 (define (do-add navi-history entry)
@@ -138,7 +138,7 @@
         (let ((oldest-entry (linked-list-ref entry-list 0)))
           (begin
             (dispose-entry navi-history oldest-entry)
-            (linked-list-rm-ref entry-list 0))))
+            (linked-list-rm-ref entry-list 0 141))))
       (linked-list-add entry-list entry 142))))
 
 (define (add-entry navi-history editor-part)
@@ -153,7 +153,7 @@
 ;; EditorPart.java
 (define-data-type 'editor-part '(editor-id editor-input))
 
-(define (new-editor-part editor-id . call-site-info)
+(define (new-editor-part editor-id call-site-info)
   (let ((new-instance (make-editor-part '() '())))
     (begin
       (set-editor-part-editor-id! new-instance editor-id call-site-info)
@@ -164,11 +164,11 @@
 ;; WorkbenchPage.java
 (define-data-type 'work-bench-page '(editors navigation-history))
 
-(define (new-work-bench-page . call-site-info)
+(define (new-work-bench-page call-site-info)
   (let ((new-instance (make-work-bench-page '() '())))
     (begin
-      (set-work-bench-page-editors! new-instance (new-linked-list 'editor-part) call-site-info)
-      (set-work-bench-page-navigation-history! new-instance (new-navigation-history new-instance) call-site-info)
+      (set-work-bench-page-editors! new-instance (new-linked-list 'editor-part call-site-info) call-site-info)
+      (set-work-bench-page-navigation-history! new-instance (new-navigation-history new-instance call-site-info) call-site-info)
       new-instance)))
 
 (define (open-editor page input editor-id)
@@ -186,7 +186,7 @@
             (loop (+ i 1) list-size))))
       (if (null? editor-part)
         (begin
-          (set! editor-part (new-editor-part editor-id))
+          (set! editor-part (new-editor-part editor-id 189))
           (set-editor-part-editor-input! editor-part input 190)
           (linked-list-add editors editor-part 191)))
       (mark-editor navi-history editor-part))))
@@ -220,7 +220,7 @@
         (let ((found-editor-part (linked-list-ref editors found-editor-part-idx)))
           (begin
             (update-navigation-history navi-history found-editor-part)
-            (linked-list-rm-ref editors found-editor-part-idx)))))))
+            (linked-list-rm-ref editors found-editor-part-idx 223)))))))
 
 
 ;; CompareUI.java
@@ -237,7 +237,7 @@
   (let ((input (try-find-exist-editor-input work-bench-page input-context)))
     (begin
       (if (null? input)
-        (set! input (new-compare-editor-input input-context)))
+        (set! input (new-compare-editor-input input-context 240)))
       (open-compare-editor-on-page input work-bench-page)
       (set! input '()) ;; don't reuse this input!
       )))
@@ -251,18 +251,18 @@
 
 
 ;; test data
-(define input-context-string-list (new-linked-list 'string))
-(linked-list-add input-context-string-list "a2b")
-(linked-list-add input-context-string-list "a2c")
-(linked-list-add input-context-string-list "a2d")
-(linked-list-add input-context-string-list "a2e")
-(linked-list-add input-context-string-list "a2f")
-(linked-list-add input-context-string-list "a2g")
-(linked-list-add input-context-string-list "a2h")
-(linked-list-add input-context-string-list "a2i")
-(linked-list-add input-context-string-list "a2j")
-(linked-list-add input-context-string-list "a2k")
-(linked-list-add input-context-string-list "a2l")
+(define input-context-string-list (new-linked-list 'string 254))
+(linked-list-add input-context-string-list "a2b" 255)
+(linked-list-add input-context-string-list "a2c" 256)
+(linked-list-add input-context-string-list "a2d" 257)
+(linked-list-add input-context-string-list "a2e" 258)
+(linked-list-add input-context-string-list "a2f" 259)
+(linked-list-add input-context-string-list "a2g" 260)
+(linked-list-add input-context-string-list "a2h" 261)
+(linked-list-add input-context-string-list "a2i" 262)
+(linked-list-add input-context-string-list "a2j" 263)
+(linked-list-add input-context-string-list "a2k" 264)
+(linked-list-add input-context-string-list "a2l" 265)
 
 
 ;; Simulation Running
