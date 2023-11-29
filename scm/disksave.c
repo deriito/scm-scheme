@@ -201,12 +201,12 @@ SCM disk_save() {
     fwrite(&is_show_gc_related_info, sizeof(char), 1, fp);
     fwrite(&is_gc_cost_time_recording, sizeof(char), 1, fp);
     fwrite(&gc_idx_gc_cost_recording_start_at, sizeof(size_t), 1, fp);
-    fwrite(&current_gc_start_time, sizeof(clock_t), 1, fp);
-    fwrite(&gc_cost_time_sum, sizeof(clock_t), 1, fp);
+    fwrite(&current_gc_start_time, sizeof(double), 1, fp);
+    fwrite(&gc_cost_time_sum, sizeof(double), 1, fp);
     fwrite(&is_exec_cost_time_recoding, sizeof(char), 1, fp);
-    fwrite(&exec_recoding_start_time, sizeof(clock_t), 1, fp);
-    fwrite(&exec_recoding_tmp_gc_start_time, sizeof(clock_t), 1, fp);
-    fwrite(&exec_recoding_gc_cost_time_sum, sizeof(clock_t), 1, fp);
+    fwrite(&exec_recoding_start_time, sizeof(double), 1, fp);
+    fwrite(&exec_recoding_tmp_gc_start_time, sizeof(double), 1, fp);
+    fwrite(&exec_recoding_gc_cost_time_sum, sizeof(double), 1, fp);
     fwrite(&gc_idx_exec_recoding_start_at, sizeof(size_t), 1, fp);
     fwrite(&gc_traced, sizeof(GcTracedInfo *), 1, fp);
     fwrite(&focusing_ref_path_list, sizeof(RefPath *), 1, fp);
