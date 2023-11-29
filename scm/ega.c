@@ -18,12 +18,12 @@ char is_disk_save_on = 0;
 char is_show_gc_related_info = 0;
 char is_gc_cost_time_recording = 0;
 size_t gc_idx_gc_cost_recording_start_at = 0;
-clock_t current_gc_start_time = 0;
-clock_t gc_cost_time_sum = 0;
+double current_gc_start_time = 0;
+double gc_cost_time_sum = 0;
 char is_exec_cost_time_recoding = 0;
-clock_t exec_recoding_start_time = 0;
-clock_t exec_recoding_tmp_gc_start_time = 0;
-clock_t exec_recoding_gc_cost_time_sum = 0;
+double exec_recoding_start_time = 0;
+double exec_recoding_tmp_gc_start_time = 0;
+double exec_recoding_gc_cost_time_sum = 0;
 size_t gc_idx_exec_recoding_start_at = 0;
 
 GcTracedInfo *gc_traced = NULL;
@@ -631,6 +631,9 @@ static void plus_current_gc_count() {
     current_gc_count += 1L;
 }
 
+static void init_this_gc_time_params();
+static void init_tmp_gc_start_time_for_exec_time_recording();
+
 void ega_process_at_gc_start() {
     plus_current_gc_count();
 
@@ -639,14 +642,11 @@ void ega_process_at_gc_start() {
     }
 
     if (is_gc_cost_time_recording) {
-        if (gc_idx_gc_cost_recording_start_at <= 0) {
-            gc_idx_gc_cost_recording_start_at = current_gc_count;
-        }
-        current_gc_start_time = clock();
+        init_this_gc_time_params();
     }
 
     if (is_exec_cost_time_recoding) {
-        exec_recoding_tmp_gc_start_time = clock();
+        init_tmp_gc_start_time_for_exec_time_recording();
     }
 }
 
@@ -797,7 +797,9 @@ static SCM update_type_def_and_wb() {
     return UNSPECIFIED;
 }
 
-static char s_ega_process_after_gc[] = "ega_process_after_gc";
+static void sum_gc_time_for_exec_time_recoding();
+static void calc_this_gc_cost_time();
+
 void ega_process_after_gc() {
     if (is_dynamic_check_mode > 0) {
         check_ref_path_list_after_gc();
@@ -818,26 +820,11 @@ void ega_process_after_gc() {
     }
 
     if (is_exec_cost_time_recoding) {
-        clock_t curr_clock = clock();
-        exec_recoding_gc_cost_time_sum += curr_clock - exec_recoding_tmp_gc_start_time;
+        sum_gc_time_for_exec_time_recoding();
     }
 
     if (is_gc_cost_time_recording) {
-        clock_t curr_clock = clock();
-        clock_t past_clock = curr_clock - current_gc_start_time; // cpu ticks
-        gc_cost_time_sum += past_clock;
-
-        // record info in file
-        FILE *fp;
-        if ((fp = fopen(s_gc_log_filename, "a+")) == NULL) {
-            wta(UNDEFINED, "Can not open or create gc.log", s_ega_process_after_gc);
-        }
-        fprintf(fp,
-                "[GCCostTimeInfo] No.%ld GC end, cost time: %ld ticks. Accumulated GC cost %ld ticks.\n",
-                current_gc_count,
-                past_clock,
-                gc_cost_time_sum);
-        fclose(fp);
+        calc_this_gc_cost_time();
     }
 
     if (is_show_gc_related_info) {
@@ -919,6 +906,27 @@ static SCM int_div(SCM a, SCM b) {
     return MAKINUM(INUM(a) / INUM(b));
 }
 
+static void print_curr_time_str(FILE *fp) {
+    time_t now = time(NULL);
+    struct tm s_tm;
+    s_tm = *localtime(&now);
+
+    fprintf(fp, "\nNEW RECORD AT %d-%02d-%02d %02d:%02d:%02d (%s): \n",
+            s_tm.tm_year + 1900,
+            s_tm.tm_mon + 1,
+            s_tm.tm_mday,
+            s_tm.tm_hour,
+            s_tm.tm_min,
+            s_tm.tm_sec,
+            s_tm.tm_zone);
+}
+
+static double get_curr_user_mode_time() {
+    struct rusage ru;
+    getrusage(RUSAGE_SELF, &ru);
+    return ru.ru_utime.tv_sec + (double) ru.ru_utime.tv_usec * 1e-6;
+}
+
 static char s_start_record_gc_cost_time[] = "start-record-gc-cost-time";
 static SCM start_record_gc_cost_time() {
     is_gc_cost_time_recording = 1;
@@ -926,13 +934,11 @@ static SCM start_record_gc_cost_time() {
     current_gc_start_time = 0;
     gc_cost_time_sum = 0;
 
-    time_t now;
-    time(&now);
     FILE *fp;
     if ((fp = fopen(s_gc_log_filename, "a+")) == NULL) {
         wta(UNDEFINED, "Can not open or create exec.log", s_start_record_gc_cost_time);
     }
-    fprintf(fp, "\nNEW RECORD AT %ld (TIMESTAMP): \n", now);
+    print_curr_time_str(fp);
     fclose(fp);
 
     return UNSPECIFIED;
@@ -947,10 +953,36 @@ static SCM end_record_gc_cost_time() {
     return UNSPECIFIED;
 }
 
+static void init_this_gc_time_params() {
+    if (gc_idx_gc_cost_recording_start_at <= 0) {
+        gc_idx_gc_cost_recording_start_at = current_gc_count;
+    }
+    current_gc_start_time = get_curr_user_mode_time();
+}
+
+static char s_calc_this_gc_cost_time[] = "calc_this_gc_cost_time";
+static void calc_this_gc_cost_time() {
+    double curr_time = get_curr_user_mode_time();
+    double past_time = curr_time - current_gc_start_time;
+    gc_cost_time_sum += past_time;
+
+    // record info in file
+    FILE *fp;
+    if ((fp = fopen(s_gc_log_filename, "a+")) == NULL) {
+        wta(UNDEFINED, "Can not open or create gc.log", s_calc_this_gc_cost_time);
+    }
+    fprintf(fp,
+            "[GCCostTimeInfo] No.%ld GC end, cost time: %f secs. Accumulated GC cost %f secs.\n",
+            current_gc_count,
+            past_time,
+            gc_cost_time_sum);
+    fclose(fp);
+}
+
 static char s_start_record_exec_cost_time[] = "start-record-exec-cost-time";
 static SCM start_record_exec_cost_time() {
     is_exec_cost_time_recoding = 1;
-    exec_recoding_start_time = clock();
+    exec_recoding_start_time = get_curr_user_mode_time();
     exec_recoding_tmp_gc_start_time = 0;
     exec_recoding_gc_cost_time_sum = 0;
     gc_idx_exec_recoding_start_at = current_gc_count;
@@ -959,24 +991,21 @@ static SCM start_record_exec_cost_time() {
 
 static char s_end_record_exec_cost_time[] = "end-record-exec-cost-time";
 static SCM end_record_exec_cost_time() {
-    clock_t curr_time = clock();
-    time_t now;
-    time(&now);
+    double curr_time = get_curr_user_mode_time();
 
-    clock_t total_time = curr_time - exec_recoding_start_time;
+    double total_time = curr_time - exec_recoding_start_time;
 
     // record info in file
     FILE *fp;
     if ((fp = fopen(s_exec_log_filename, "a+")) == NULL) {
         wta(UNDEFINED, "Can not open or create exec.log", s_end_record_exec_cost_time);
     }
+    print_curr_time_str(fp);
     fprintf(fp,
-            "\nNEW RECORD AT %ld (TIMESTAMP): \n"
-            "[ExecCostTimeInfo] Total cost time: %ld ticks. "
-            "Total exec cost %ld ticks. "
-            "Total GC cost %ld ticks. "
+            "[ExecCostTimeInfo] Total cost time: %f secs. "
+            "Total exec cost %f secs. "
+            "Total GC cost %f secs. "
             "Number of GC times is %ld.\n",
-            now,
             total_time,
             total_time - exec_recoding_gc_cost_time_sum,
             exec_recoding_gc_cost_time_sum,
@@ -989,6 +1018,15 @@ static SCM end_record_exec_cost_time() {
     exec_recoding_gc_cost_time_sum = 0;
     gc_idx_exec_recoding_start_at = 0;
     return UNSPECIFIED;
+}
+
+static void init_tmp_gc_start_time_for_exec_time_recording() {
+    exec_recoding_tmp_gc_start_time = get_curr_user_mode_time();
+}
+
+static void sum_gc_time_for_exec_time_recoding() {
+    double curr_time = get_curr_user_mode_time();
+    exec_recoding_gc_cost_time_sum += curr_time - exec_recoding_tmp_gc_start_time;
 }
 
 static iproc subr0s[] = {
