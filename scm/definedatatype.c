@@ -278,7 +278,7 @@ static SCM c_data_type_modifier_with_wb_of_field_4(SCM obj, SCM value, SCM ln_nu
 
 static char s_c_data_type_modifier_with_wb_of_field_5[] = "c-data-type-modifier-with-wb-of-field-5";
 static SCM c_data_type_modifier_with_wb_of_field_5(SCM obj, SCM value, SCM ln_num) {
-    return c_data_type_modifier_with_wb(obj, MAKINUM(0L), value, ln_num);
+    return c_data_type_modifier_with_wb(obj, MAKINUM(5L), value, ln_num);
 }
 
 static char s_c_data_type_modifier_with_wb_of_field_6[] = "c-data-type-modifier-with-wb-of-field-6";
