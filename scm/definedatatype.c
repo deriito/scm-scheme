@@ -113,6 +113,7 @@ SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
     }
     DTI_FVV(data_type_instance) = fvv;
     DTI_RSV(data_type_instance) = EOL; // SCMのNULLである
+
     return data_type_instance;
 }
 
