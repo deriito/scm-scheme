@@ -106,6 +106,7 @@ SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
         }
     }
     DTI_FVV(data_type_instance) = fvv;
+    DTI_RSV(data_type_instance) = EOL; // SCMのNULLである
 
     // 行番号記録スロットvectorの初期化
     SCM rsv = make_vector(MAKINUM(1L + len), EOL); // rec_slots_vector
