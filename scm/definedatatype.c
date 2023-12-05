@@ -112,9 +112,9 @@ SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
         }
     }
     DTI_FVV(data_type_instance) = fvv;
+    DTI_RSV(data_type_instance) = EOL; // SCMのNULLである
 
     // 行番号記録スロットの初期化
-    DTI_RSV(data_type_instance) = EOL; // SCMのNULLである
     if (IC(data_type_def) == DTDWRS_IT_CODE) {
         SCM rsv = make_vector(MAKINUM(1L + len), EOL); // rec_slots_vector
         vector_set(rsv, MAKINUM(0), internal_vector_symbol);
@@ -452,7 +452,7 @@ static SCM c_data_type_modifier_with_wb_of_field_4(SCM obj, SCM value, SCM ln_nu
 
 static char s_c_data_type_modifier_with_wb_of_field_5[] = "c-data-type-modifier-with-wb-of-field-5";
 static SCM c_data_type_modifier_with_wb_of_field_5(SCM obj, SCM value, SCM ln_num) {
-    return c_data_type_modifier_with_wb(obj, MAKINUM(0L), value, ln_num);
+    return c_data_type_modifier_with_wb(obj, MAKINUM(5L), value, ln_num);
 }
 
 static char s_c_data_type_modifier_with_wb_of_field_6[] = "c-data-type-modifier-with-wb-of-field-6";
