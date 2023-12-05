@@ -112,9 +112,9 @@ SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
         }
     }
     DTI_FVV(data_type_instance) = fvv;
+    DTI_RSV(data_type_instance) = EOL; // SCMのNULLである
 
     // 行番号記録スロットの初期化
-    DTI_RSV(data_type_instance) = EOL; // SCMのNULLである
     if (IC(data_type_def) == DTDWRS_IT_CODE) {
         SCM rsv = make_vector(MAKINUM(1L + len), EOL); // rec_slots_vector
         vector_set(rsv, MAKINUM(0), internal_vector_symbol);
