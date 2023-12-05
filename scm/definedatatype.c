@@ -112,6 +112,7 @@ SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
     SCM rsv = make_vector(MAKINUM(1L + len), EOL); // rec_slots_vector
     vector_set(rsv, MAKINUM(0), internal_vector_symbol);
     DTI_RSV(data_type_instance) = rsv;
+
     return data_type_instance;
 }
 
