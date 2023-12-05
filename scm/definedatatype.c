@@ -90,7 +90,7 @@ SCM c_define_data_type(SCM type_name, SCM field_names) {
 
 static char s_c_make_instance[] = "c-make-instance";
 SCM c_make_instance(SCM data_type_def, SCM field_values_vector) {
-    SCM data_type_instance = make_vector(DTI_VECTOR_LEN, UNDEFINED);
+    SCM data_type_instance = make_vector(DTI_VECTOR_LEN, EOL);
 
     MFS(data_type_instance) = module_flag_symbol;
     IC(data_type_instance) = DTI_IT_CODE; // for initialization
