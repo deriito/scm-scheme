@@ -9,7 +9,7 @@ static char s_gc_log_filename[] = "gc_cost_time.log";
 static char s_exec_log_filename[] = "exec_cost_time.log";
 
 size_t line_num_quantity_of_a_ref_pattern_at_least = 3L;
-size_t gc_count_of_a_ref_pattern_at_most = 3L;
+size_t gc_count_of_a_ref_pattern_at_most = 10L;
 char is_print_result = 1;
 size_t current_gc_count = 0;
 char is_dynamic_check_mode = 1;
@@ -44,65 +44,64 @@ SCM assert_dead(SCM ptr) {
     return UNSPECIFIED;
 }
 
-char *type_str(SCM ptr) {
-    if (IMP(ptr)) {
-        return "immediate";
-    }
-    switch (TYP7(ptr)) {
-        case tcs_cons_nimcar:
-        case tcs_cons_imcar:
-        case tcs_cons_gloc:
-            return "cons";
-        case tcs_closures:
-            return "closure";
-        case tc7_specfun:
-            return "specfun";
-        case tc7_vector:
-            if (!is_user_defined_data_type_instance(ptr)) {
+char *type_str(SCM class_obj) {
+    if (class_obj <= tc_free_cell) {
+        if (class_obj < 0) {
+            return "immediate";
+        }
+        switch (class_obj) {
+            case tcs_cons_nimcar:
+            case tcs_cons_imcar:
+            case tcs_cons_gloc:
+                return "cons";
+            case tcs_closures:
+                return "closure";
+            case tc7_specfun:
+                return "specfun";
+            case tc7_vector:
                 return "vector";
-            }
-            return instance_type_name(ptr);
-        case tc7_contin:
-            return "contin";
-        case tc7_string:
-            return "string";
-        case tc7_msymbol:
-        case tc7_ssymbol:
-            return "symbol";
-        case tc7_VfixN8:
-        case tc7_VfixZ8:
-        case tc7_VfixZ16:
-        case tc7_VfixN16:
-        case tc7_VfixZ32:
-        case tc7_VfixN32:
-        case tc7_VfixZ64:
-        case tc7_VfixN64:
-            return "vfix";
-        case tc7_VfloR32:
-        case tc7_VfloC32:
-        case tc7_VfloR64:
-        case tc7_VfloC64:
-            return "vflo";
-        case tc7_Vbool:
-            return "vbool";
-        case tcs_subrs:
-            return "subr";
-        case tc7_port:
-            return "port";
-        case tc7_smob:
-            switch TYP16(ptr) {
-                case tc_free_cell:
-                    return "freeCell";
-                case tcs_bignums:
-                    return "bignum";
-                case tc16_flo:
-                    return "flo";
-                default:
-                    return "smob";
-            }
-        default:
-            return "unsupported";
+            case tc7_contin:
+                return "contin";
+            case tc7_string:
+                return "string";
+            case tc7_msymbol:
+            case tc7_ssymbol:
+                return "symbol";
+            case tc7_VfixN8:
+            case tc7_VfixZ8:
+            case tc7_VfixZ16:
+            case tc7_VfixN16:
+            case tc7_VfixZ32:
+            case tc7_VfixN32:
+            case tc7_VfixZ64:
+            case tc7_VfixN64:
+                return "vfix";
+            case tc7_VfloR32:
+            case tc7_VfloC32:
+            case tc7_VfloR64:
+            case tc7_VfloC64:
+                return "vflo";
+            case tc7_Vbool:
+                return "vbool";
+            case tcs_subrs:
+                return "subr";
+            case tc7_port:
+                return "port";
+            case tc_free_cell:
+                return "freeCell";
+            default:
+                return "unsupported";
+        }
+    } else {
+        return is_user_defined_data_type(class_obj) ? data_type_name(class_obj) : "unsupported";
     }
+}
+
+static SCM get_type_code_or_class_obj(SCM ptr) {
+    if (is_user_defined_data_type_instance(ptr)) {
+        return get_data_type_def_identifier(ptr);
+    }
+    return IMP(ptr) ? -1L : TYP7(ptr);
 }
 
 /**
@@ -118,13 +117,14 @@ static void try_record_metadata(RefPath *ref_path) {
 
     for (long i = 0; i < len - 1L; ++i) {
         RefPathEntry *curr_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i);
-        RefPathEntry *next_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i + 1L);
-        if (!is_user_defined_data_type_instance(curr_entry->ptr)) {
-            continue;
+        if (curr_entry->class_obj <= tc_free_cell) {
+            continue; // fixed type
         }
 
+        RefPathEntry *next_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i + 1L);
+
         WriteBarrierUpdateMetadata *curr_type_metadata;
-        SCM curr_entry_class_obj = get_data_type_def_identifier(curr_entry->ptr);
+        SCM curr_entry_class_obj = curr_entry->class_obj;
         HASH_FIND(hh, wb_update_metadata_hash, &curr_entry_class_obj, sizeof(SCM), curr_type_metadata);
         if (NULL == curr_type_metadata) {
             curr_type_metadata = (WriteBarrierUpdateMetadata *) malloc(sizeof(WriteBarrierUpdateMetadata));
@@ -151,12 +151,7 @@ static void try_record_metadata(RefPath *ref_path) {
         }
 
         UpdateStateByRefType *curr_ref_type_state;
-        SCM next_entry_class_obj_or_fixed_type_code;
-        if (is_user_defined_data_type_instance(next_entry->ptr)) {
-            next_entry_class_obj_or_fixed_type_code = get_data_type_def_identifier(next_entry->ptr);
-        } else {
-            next_entry_class_obj_or_fixed_type_code = IMP(next_entry->ptr) ? -1L : TYP7(next_entry->ptr);
-        }
+        SCM next_entry_class_obj_or_fixed_type_code = next_entry->class_obj;
         HASH_FIND(hh, curr_field_ref_info->update_state_by_ref_type, &next_entry_class_obj_or_fixed_type_code, sizeof(SCM), curr_ref_type_state);
         if (NULL == curr_ref_type_state) {
             curr_ref_type_state = (UpdateStateByRefType *) malloc(sizeof(UpdateStateByRefType));
@@ -181,22 +176,8 @@ static void try_record_metadata(RefPath *ref_path) {
  * @param b
  * @return
  */
-static int is_the_same_type(SCM a, SCM b) {
-    if (is_user_defined_data_type_instance(a)) {
-        if (!is_user_defined_data_type_instance(b)) {
-            return 0;
-        }
-        return get_data_type_def_identifier(a) == get_data_type_def_identifier(b);
-    }
-
-    if (IMP(a)) {
-        if (NIMP(b)) {
-            return 0;
-        }
-        return 1;
-    }
-
-    return TYP7(a) == TYP7(b);
+static int is_the_same_type(SCM class_obj_a, SCM class_obj_b) {
+    return class_obj_a == class_obj_b;
 }
 
 /**
@@ -211,12 +192,12 @@ static int is_the_same_ref_path_entries(RefPathEntry *a, RefPathEntry *b) {
         exit(-1);
     }
 
-    if (!is_the_same_type(a->ptr, b->ptr)) {
+    if (!is_the_same_type(a->class_obj, b->class_obj)) {
         return 0;
     }
 
     if (a->ref_field_index != b->ref_field_index) {
-        if (VECTORP(a->ptr) && VECTORP(b->ptr)) {
+        if (a->class_obj == tc7_vector && b->class_obj == tc7_vector) {
             return 1; // 2023.10.19 vectorなら，fieldの一致するかに関心しない
         }
         return 0;
@@ -246,7 +227,7 @@ static void try_record_line_numbers_into_ref_path_entry(SCM ptr, SCM ref_ptr, Re
         return;
     }
 
-    SCM path_entry_class_obj = get_data_type_def_identifier(ref_ptr);
+    SCM path_entry_class_obj = get_type_code_or_class_obj(ref_ptr);
 
     SCM ln_vector_of_ref_type = EOL;
     for (long i = 1L; i < INUM(vector_length(rec_slot_of_field)); ++i) {
@@ -330,20 +311,25 @@ static RefPath *gen_a_concise_ref_path(SCM ptr, long last_gc_traced_index, int i
             fprintf(stderr, "[new_path_entry]内存分配失败\n");
             exit(1);
         }
-        new_path_entry->ptr = gc_traced[i].ptr;
+        new_path_entry->class_obj = get_type_code_or_class_obj(gc_traced[i].ptr);
         if (i == last_gc_traced_index) {
             new_path_entry->ref_field_index = -1L;
         } else {
-            if (is_user_defined_data_type_instance(new_path_entry->ptr)) {
+            if (is_user_defined_data_type_instance(gc_traced[i].ptr)) {
                 new_path_entry->ref_field_index = gc_traced[i].ref_field_index - 1L;
             } else {
-                new_path_entry->ref_field_index = gc_traced[i].ref_field_index;
+                if (new_path_entry->class_obj == tc7_vector) {
+                    // 2023.10.19 vector的话，也更新一下field（只是为了显示，毕竟是不支持记录行号的数据结构）
+                    new_path_entry->ref_field_index = -1L;
+                } else {
+                    new_path_entry->ref_field_index = gc_traced[i].ref_field_index;
+                }
             }
         }
         if (i == last_gc_traced_index) {
             new_path_entry->is_active = 0;
         } else {
-            if (is_user_defined_data_type_instance(new_path_entry->ptr)) {
+            if (is_user_defined_data_type_instance(gc_traced[i].ptr)) {
                 new_path_entry->is_active = 1;
             } else {
                 new_path_entry->is_active = 0;
@@ -352,7 +338,7 @@ static RefPath *gen_a_concise_ref_path(SCM ptr, long last_gc_traced_index, int i
         new_path_entry->is_repeat = 0;
         new_path_entry->line_numbers = NULL;
         if (is_write_ln && i != last_gc_traced_index) {
-            try_record_line_numbers_into_ref_path_entry(new_path_entry->ptr, gc_traced[i + 1L].ptr, new_path_entry);
+            try_record_line_numbers_into_ref_path_entry(gc_traced[i].ptr, gc_traced[i + 1L].ptr, new_path_entry);
         }
         new_path_entry->gc_count_at_created = current_gc_count;
         new_path_entry->gc_count_at_last_reactivated = current_gc_count;
@@ -366,7 +352,7 @@ static RefPath *gen_a_concise_ref_path(SCM ptr, long last_gc_traced_index, int i
         RefPathEntry *tmp_entry_n_2 = (RefPathEntry *) utarray_eltptr(out->entries, tmp_entry_quantity - 2);
         RefPathEntry *tmp_entry_n_1 = (RefPathEntry *) utarray_eltptr(out->entries, tmp_entry_quantity - 1);
         if (is_the_same_ref_path_entries(tmp_entry_n_2, tmp_entry_n_1) // 代入元の比較
-            && is_the_same_type(tmp_entry_n_1->ptr, new_path_entry->ptr)) // 代入先の比較
+            && is_the_same_type(tmp_entry_n_1->class_obj, new_path_entry->class_obj)) // 代入先の比較
         {
             tmp_entry_n_2->is_active = 1;
             tmp_entry_n_2->is_repeat = 1;
@@ -418,13 +404,12 @@ static void print_ref_path_links(RefPath *ref_path, int is_std_err) {
 
     for (long i = 0; i < len; ++i) {
         RefPathEntry *entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i);
-        SCM p = entry->ptr;
 
         long recorded_lns_quantity = HASH_COUNT(entry->line_numbers);
         if (recorded_lns_quantity <= 0) {
-            fprintf(io_stream_f, "%s#f[%ld]", type_str(p), entry->ref_field_index);
+            fprintf(io_stream_f, "%s#f[%ld]", type_str(entry->class_obj), entry->ref_field_index);
         } else {
-            fprintf(io_stream_f, "%s#f[%ld]@", type_str(p), entry->ref_field_index);
+            fprintf(io_stream_f, "%s#f[%ld]@", type_str(entry->class_obj), entry->ref_field_index);
             CollectedLineNumber *el, *tmp;
             long j = 0;
             HASH_ITER(hh, entry->line_numbers, el, tmp) {
@@ -476,15 +461,6 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
         for (long i = 0; i < len; ++i) {
             RefPathEntry *tmp_entry_same_path = (RefPathEntry *) utarray_eltptr(same_path->entries, i);
             RefPathEntry  *tmp_entry_new_path = (RefPathEntry *) utarray_eltptr(new_ref_path->entries, i);
-
-            tmp_entry_same_path->ptr = tmp_entry_new_path->ptr; // 2023.10.18 总是更新一下ptr, 防止出现显示freeCell的情况
-            if (!is_user_defined_data_type(tmp_entry_same_path->ptr) &&
-                !is_user_defined_data_type_instance(tmp_entry_new_path->ptr) &&
-                VECTORP(tmp_entry_same_path->ptr) &&
-                VECTORP(tmp_entry_new_path->ptr)) {
-                // 2023.10.19 vector的话，也更新一下field（只是为了显示，毕竟是不支持记录行号的数据结构）
-                tmp_entry_same_path->ref_field_index = -1L;
-            }
 
             if (!(tmp_entry_new_path->is_repeat)) {
                 continue;
@@ -585,7 +561,7 @@ static void print_result(RefPath *ref_path) {
     fprintf(stderr, "\nWarning: an object that was asserted dead is reachable.\n"
            "Type: %s;\n"
            "Path to object: ",
-           type_str(((RefPathEntry *) utarray_eltptr(ref_path->entries, len - 1L))->ptr));
+           type_str(((RefPathEntry *) utarray_eltptr(ref_path->entries, len - 1L))->class_obj));
 
     print_ref_path_links(ref_path, 1);
 }
