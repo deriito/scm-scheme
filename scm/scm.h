@@ -164,7 +164,7 @@ typedef struct collected_line_number {
 } CollectedLineNumber;
 
 typedef struct ref_path_entry {
-    SCM ptr;
+    SCM class_obj; // long, user_defined_class_obj or fixed_type_code
     long ref_field_index;
     int is_active; // needs write-barriers and record-slots?
     int is_repeat;
