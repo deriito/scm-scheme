@@ -178,5 +178,5 @@
 
 (define (main)
   (start-record-exec-cost-time)
-  (test-func 18 120)
+  (test-func 18 3600)
   (end-record-exec-cost-time))
