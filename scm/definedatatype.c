@@ -181,10 +181,6 @@ char is_internal_vector(SCM ptr) {
  * @return maybe return EOL
  */
 SCM get_ln_vector_of_field(SCM scm_obj, long field_index) {
-    if (!is_user_defined_data_type_instance(scm_obj)) {
-        return EOL;
-    }
-
     if (field_index < 0) {
         return EOL;
     }
@@ -220,12 +216,12 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value, SCM ln_num) {
 
     // try process write barrier
     SCM rec_slots_vector = DTI_RSV(obj);
-    SCM ln_vector_of_field = VELTS(rec_slots_vector)[INUM(index)];
+    SCM ln_vector_of_field = VELTS(rec_slots_vector)[INUM(index) + 1L];
     if (vectorp(ln_vector_of_field) == BOOL_F) {
         ln_vector_of_field = make_vector(MAKINUM(FIELD_REF_INFO_ALLOCATED_LEN + 2L), EOL);
         VELTS(ln_vector_of_field)[0] = internal_vector_symbol;
         VELTS(ln_vector_of_field)[1] = MAKINUM(2); // used_len
-        VELTS(rec_slots_vector)[INUM(index)] = ln_vector_of_field;
+        VELTS(rec_slots_vector)[INUM(index) + 1L] = ln_vector_of_field;
     }
 
     long used_len = INUM(VELTS(ln_vector_of_field)[1]);
@@ -243,7 +239,7 @@ SCM c_data_type_modifier_with_wb(SCM obj, SCM index, SCM value, SCM ln_num) {
         for (long i = 0; i < used_len; ++i) {
             VELTS(new_ln_vector_of_field)[i] = VELTS(ln_vector_of_field)[i];
         }
-        VELTS(rec_slots_vector)[INUM(index)] = new_ln_vector_of_field;
+        VELTS(rec_slots_vector)[INUM(index) + 1L] = new_ln_vector_of_field;
         ln_vector_of_field = new_ln_vector_of_field;
     }
 

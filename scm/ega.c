@@ -117,15 +117,16 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
     for (long i = 0; i <= last_gc_traced_index; ++i) {
         fprintf(stderr, "%s", type_str(gc_traced[i].ptr));
 
-        long fld_idx = gc_traced[i].ref_field_index;
-        SCM ln_vector_of_field = get_ln_vector_of_field(gc_traced[i].ptr, fld_idx - 1);
-        if (i != last_gc_traced_index && vectorp(ln_vector_of_field) == BOOL_T && INUM(VELTS(ln_vector_of_field)[1]) > 2) {
-            fprintf(stderr, "@ln");
-            long used_len = INUM(VELTS(ln_vector_of_field)[1]);
-            for (long idx = 2; idx < used_len; ++idx) {
-                fprintf(stderr, "%ld", INUM(VELTS(ln_vector_of_field)[idx]));
-                if (idx != used_len - 1) {
-                    fprintf(stderr, ", ");
+        if (is_user_defined_data_type_instance(gc_traced[i].ptr)) {
+            SCM ln_vector_of_field = get_ln_vector_of_field(gc_traced[i].ptr, gc_traced[i].ref_field_index - 1);
+            if (i != last_gc_traced_index && NNULLP(ln_vector_of_field) && INUM(VELTS(ln_vector_of_field)[1]) > 2) {
+                fprintf(stderr, "@ln");
+                long used_len = INUM(VELTS(ln_vector_of_field)[1]);
+                for (long idx = 2; idx < used_len; ++idx) {
+                    fprintf(stderr, "%ld", INUM(VELTS(ln_vector_of_field)[idx]));
+                    if (idx != used_len - 1) {
+                        fprintf(stderr, ", ");
+                    }
                 }
             }
         }
