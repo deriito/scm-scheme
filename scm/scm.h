@@ -178,6 +178,7 @@ typedef struct ref_path_entry {
  */
 typedef struct ref_path {
     UT_array *entries; // RefPathEntry is inside
+    long hash;
     struct ref_path *prev;
     struct ref_path *next;
 } RefPath;
