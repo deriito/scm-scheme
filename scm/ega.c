@@ -288,6 +288,17 @@ static void merge_ref_path_entry_line_nums(RefPathEntry *dest, RefPathEntry *src
     }
 }
 
+static long calc_heap_path_hash(long last_gc_traced_index) {
+    if (last_gc_traced_index < 0) {
+        return 0;
+    }
+
+    SCM class_obj_0 = get_type_code_or_class_obj(gc_traced[0].ptr);
+    SCM class_obj_n = get_type_code_or_class_obj(gc_traced[last_gc_traced_index].ptr);
+
+    return (class_obj_0 << 8) + class_obj_n;
+}
+
 /**
  * TODO 尝试整理path, 现阶段只针对LinkedList的情况, 即只合并相邻的重复entries
  * @param ptr
@@ -301,6 +312,9 @@ static RefPath *gen_a_concise_ref_path(SCM ptr, long last_gc_traced_index, int i
         fprintf(stderr, "[new_ref_path]内存分配失败\n");
         exit(1);
     }
+
+    out->hash = calc_heap_path_hash(last_gc_traced_index);
+
     utarray_new(out->entries, ref_path_entry_icd);
 
     for (long i = 0; i <= last_gc_traced_index; ++i) {
@@ -374,6 +388,10 @@ static RefPath *try_find_same_path_in_focusing_list(RefPath *in) {
     RefPath *tmp_path;
     long input_path_entry_quantity = utarray_len(in->entries);
     DL_FOREACH(focusing_ref_path_list, tmp_path) {
+        if (tmp_path->hash != in->hash) {
+            continue;
+        }
+
         long tmp_path_entry_quantity = utarray_len(tmp_path->entries);
         if (tmp_path_entry_quantity != input_path_entry_quantity) {
             continue;
