@@ -21,23 +21,6 @@
 (define (newEmptyNode callSite)
   (newNode '() '() callSite))
 
-;  Build tree top down, assigning to older objects.
-(define (Populate iDepth thisNode)
-  (if (<= iDepth 0)
-    #f
-    (let ((iDepth (- iDepth 1)))
-      (set-Node-left! thisNode (newEmptyNode 29) 29)
-      (set-Node-right! thisNode (newEmptyNode 30) 30)
-      (Populate iDepth (Node-left thisNode))
-      (Populate iDepth (Node-right thisNode)))))
-
-;  Build tree bottom-up
-(define (MakeTree iDepth)
-  (if (<= iDepth 0)
-    (newEmptyNode 37)
-    (newNode (MakeTree (- iDepth 1))
-      (MakeTree (- iDepth 1)) 39)))
-
 (define-data-type 'A0 '(f1 f2))
 (define-data-type 'A1 '(f1 f2))
 (define-data-type 'A2 '(f1 f2))
@@ -268,7 +251,7 @@
       (set-LeakPath-len! ni len callSite)
       ni)))
 
-(define LEAK_PATHS (new-hash-map 'number 'LeakPath 271))
+(define LEAK_PATHS (new-hash-map 'number 'LeakPath 254))
 
 (define (getPathNameByIdx pathIdx)
   (if (or (< pathIdx 0) (>= pathIdx 20))
@@ -302,32 +285,68 @@
   (let ((leakPath (hash-map-get LEAK_PATHS pathIdx)))
     (if (null? leakPath)
       (let ((newLeakPathNode (createLeakPathNode pathIdx 0)))
-        (hash-map-put LEAK_PATHS pathIdx (newLeakPath newLeakPathNode newLeakPathNode 1 305) 305))
+        (hash-map-put LEAK_PATHS pathIdx (newLeakPath newLeakPathNode newLeakPathNode 1 288) 288))
       (let ((currentPathLen (LeakPath-len leakPath)))
         (if (>= currentPathLen 10)
           (let ((newLeakPathNode (createLeakPathNode pathIdx 0)))
-            (hash-map-put LEAK_PATHS pathIdx (newLeakPath newLeakPathNode newLeakPathNode 1 309) 309))
+            (hash-map-put LEAK_PATHS pathIdx (newLeakPath newLeakPathNode newLeakPathNode 1 292) 292))
           (let ((newLeakPathNode (createLeakPathNode pathIdx currentPathLen)))
-            ((getModifierByIdx pathIdx (- currentPathLen 1)) (LeakPath-last leakPath) newLeakPathNode 311)
-            (set-LeakPath-last! leakPath newLeakPathNode 312)
-            (set-LeakPath-len! leakPath (+ 1 currentPathLen) 313)
+            ((getModifierByIdx pathIdx (- currentPathLen 1)) (LeakPath-last leakPath) newLeakPathNode 294)
+            (set-LeakPath-last! leakPath newLeakPathNode 295)
+            (set-LeakPath-len! leakPath (+ 1 currentPathLen) 296)
             (if (>= (+ 1 currentPathLen) 10)
               (begin
-                (set-LeakPath-last! leakPath '() 316)
+                (set-LeakPath-last! leakPath '() 299)
                 ;; (assert-dead newLeakPathNode) ;; baseがアサーションを提供していない
                 )
               #t)))))))
 
-(define (tak x y z)
-  (cond
-    ((<= x y)
-      z)
-    (else
-      (tak (tak (- x 1) y z) (tak (- y 1) z x) (tak (- z 1) x y)))))
-
 (define (test-func kStretchTreeDepth running-seconds)
-  (let ((kLongLivedTreeDepth (- kStretchTreeDepth 2))
-         (kShortLivedTreeDepth (- kStretchTreeDepth 12)))
+  (let* ((kLongLivedTreeDepth (- kStretchTreeDepth 2))
+          (kMinTreeDepth      4)
+          (kMaxTreeDepth      kLongLivedTreeDepth))
+
+    ;  Build tree top down, assigning to older objects.
+    (define (Populate iDepth thisNode)
+      (if (<= iDepth 0)
+        #f
+        (let ((iDepth (- iDepth 1)))
+          (set-Node-left! thisNode (newEmptyNode 314) 314)
+          (set-Node-right! thisNode (newEmptyNode 315) 315)
+          (Populate iDepth (Node-left thisNode))
+          (Populate iDepth (Node-right thisNode)))))
+
+    ;  Build tree bottom-up
+    (define (MakeTree iDepth)
+      (if (<= iDepth 0)
+        (newEmptyNode 322)
+        (newNode (MakeTree (- iDepth 1))
+          (MakeTree (- iDepth 1)) 324)))
+
+    ;  Nodes used by a tree of a given size
+    (define (TreeSize i)
+      (- (expt 2 (+ i 1)) 1))
+
+    ;  Number of iterations to use for a given tree depth
+    (define (NumIters i)
+      (quotient (* 2 (TreeSize kStretchTreeDepth))
+        (TreeSize i)))
+
+    (define (TimeConstruction depth)
+      (let ((iNumIters (NumIters depth)))
+        (do ((i 0 (+ i 1)))
+          ((>= i iNumIters))
+          (Populate depth (newEmptyNode 339)))
+        (do ((i 0 (+ i 1)))
+          ((>= i iNumIters))
+          (MakeTree depth))))
+
+    (define (tak x y z)
+      (cond
+        ((<= x y)
+          z)
+        (else
+          (tak (tak (- x 1) y z) (tak (- y 1) z x) (tak (- z 1) x y)))))
 
     ;  Stretch the memory space quickly
     (MakeTree kStretchTreeDepth)
@@ -337,7 +356,7 @@
                " Creating a long-lived binary tree of depth "
                (number->string kLongLivedTreeDepth)
                "\n"))
-    (let ((longLivedTree (newEmptyNode 340)))
+    (let ((longLivedTree (newEmptyNode 359)))
       (Populate kLongLivedTreeDepth longLivedTree))
 
     ;  Start long time running
@@ -345,17 +364,17 @@
     (do ((start-time (current-time) start-time))
       ((>= (- (current-time) start-time) running-seconds))
       (begin
-        (do ((tmpPathIdx 0 (+ tmpPathIdx 1))) ((>= tmpPathIdx 5)) (addPathNode tmpPathIdx))
-        (Populate kShortLivedTreeDepth (newEmptyNode 349))
-        (do ((tmpPathIdx 5 (+ tmpPathIdx 1))) ((>= tmpPathIdx 10)) (addPathNode tmpPathIdx))
+        (do ((tmpPathIdx 0 (+ tmpPathIdx 1)))
+          ((>= tmpPathIdx 20))
+          (addPathNode tmpPathIdx))
         (tak 20 10 0)
-        (do ((tmpPathIdx 10 (+ tmpPathIdx 1))) ((>= tmpPathIdx 15)) (addPathNode tmpPathIdx))
-        (MakeTree kShortLivedTreeDepth)
-        (do ((tmpPathIdx 15 (+ tmpPathIdx 1))) ((>= tmpPathIdx 20)) (addPathNode tmpPathIdx))))))
+        (do ((d kMinTreeDepth (+ d 8)))
+          ((> d kMaxTreeDepth))
+          (TimeConstruction d))))))
 
 (define (main)
   (start-record-exec-cost-time)
-  (test-func 18 1800)
+  (test-func 18 3600)
   (end-record-exec-cost-time))
 
 (define (loop-main n)
