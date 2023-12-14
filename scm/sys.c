@@ -1326,7 +1326,7 @@ char *must_realloc(where, olen, len, what)
 #ifdef SHORT_SIZET
     ASRTER(len==size, MAKINUM(len), NALLOC, what);
 #endif
-    ASRTER(!errjmp_bad, MAKINUM(len), NALLOC, what);
+    // ASRTER(!errjmp_bad, MAKINUM(len), NALLOC, what);
 /* printf("must_realloc(%lx, %lu, %lu, %s)\n", where, olen, len, what); fflush(stdout);
    printf("nm = %ld <= mtrigger = %ld: %d; size = %u\n", nm, mtrigger, (nm <= mtrigger), size); fflush(stdout); */
     if (nm <= mtrigger) SYSCALL(ptr = (char *) realloc(where, size););
