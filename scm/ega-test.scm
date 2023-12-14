@@ -301,7 +301,7 @@
                 )
               #t)))))))
 
-(define (test-func kStretchTreeDepth running-seconds)
+(define (test-func kStretchTreeDepth num-of-times)
   (let* ((kLongLivedTreeDepth (- kStretchTreeDepth 2))
           (kMinTreeDepth      4)
           (kMaxTreeDepth      kLongLivedTreeDepth))
@@ -361,8 +361,8 @@
 
     ;  Start long time running
     (display "A long-time-running phase started\n")
-    (do ((start-time (current-time) start-time))
-      ((>= (- (current-time) start-time) running-seconds))
+    (do ((ntimes 0 (+ ntimes 1)))
+      ((>= ntimes num-of-times))
       (begin
         (do ((tmpPathIdx 0 (+ tmpPathIdx 1)))
           ((>= tmpPathIdx 20))
@@ -374,7 +374,7 @@
 
 (define (main)
   (start-record-exec-cost-time)
-  (test-func 18 3600)
+  (test-func 18 720)
   (end-record-exec-cost-time))
 
 (define (loop-main n)
