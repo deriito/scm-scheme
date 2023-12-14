@@ -14,8 +14,7 @@
   (begin
     (gen-constructor type-name field-names-v data-type-def)
     (gen-predicate type-name data-type-def)
-    (gen-accessor type-name field-names-v data-type-def)
-    (gen-modifier type-name field-names-v data-type-def)))
+    (gen-accessor type-name field-names-v data-type-def)))
 
 (define (gen-constructor type-name field-names-v data-type-def)
   (let* ((procname
@@ -64,32 +63,6 @@
                         (error (string-append
                                  ,(symbol->string type-name)
                                  "'s accessor: wrong type of obj"))))))
-          (loop (+ i 1))))
-      #t)))
-
-(define (gen-modifier type-name field-names-v data-type-ref)
-  (let loop ((i 0))
-    (if (< i (vector-length field-names-v))
-      (let ((procname
-              (string->symbol (string-append
-                                "set"
-                                (string-append
-                                  "-"
-                                  (string-append
-                                    (symbol->string type-name)
-                                    (string-append
-                                      "-"
-                                      (string-append
-                                        (symbol->string (vector-ref field-names-v i))
-                                        "!")))))))
-             (c-modifier-with-wb-procname
-               (string->symbol (string-append
-                                 "c-data-type-modifier-with-wb-of-field-"
-                                 (number->string i)))))
-        (begin
-          (eval `(define ,procname
-                         (lambda (obj value call-site-info)
-                           (,c-modifier-with-wb-procname obj value call-site-info)))) ;; 型検査は省略, 人工チェックの代わりに
           (loop (+ i 1))))
       #t)))
 
