@@ -374,7 +374,7 @@
 
 (define (main)
   (start-record-exec-cost-time)
-  (test-func 18 360)
+  (test-func 18 720)
   (end-record-exec-cost-time))
 
 (define (loop-main n)
