@@ -8,8 +8,8 @@
 static char s_gc_log_filename[] = "gc_cost_time.log";
 static char s_exec_log_filename[] = "exec_cost_time.log";
 
-size_t line_num_quantity_of_a_ref_pattern_at_least = 3L;
-size_t gc_count_of_a_ref_pattern_at_most = 10L;
+size_t line_num_quantity_of_a_ref_pattern_at_least = 1L;
+size_t gc_count_of_a_ref_pattern_at_most = 300L;
 char is_print_result = 1;
 size_t current_gc_count = 0;
 char is_dynamic_check_mode = 1;
@@ -595,7 +595,7 @@ static void check_ref_path_list_after_gc() {
     DL_FOREACH_SAFE(focusing_ref_path_list, curr, tmp) {
         long len = utarray_len(curr->entries);
 
-        int ready_to_print_result = 1;
+//        int ready_to_print_result = 1;
         for (long i = 0; i < len - 1L; ++i) {
             RefPathEntry *tmp_entry = (RefPathEntry *) utarray_eltptr(curr->entries, i);
             if (!tmp_entry->is_active) {
@@ -607,18 +607,18 @@ static void check_ref_path_list_after_gc() {
                 tmp_entry->is_active = 0;
                 continue;
             }
-            ready_to_print_result = 0;
+//            ready_to_print_result = 0;
         }
 
         // 尝试记录metadata
         try_record_metadata(curr);
 
-        if (ready_to_print_result) {
+//        if (ready_to_print_result) {
             print_result(curr);
 //            // 2023.10.04 不删除已经收集完成的path
 //            remove_path_info_from_focusing_list(curr);
         }
-    }
+//    }
 }
 
 static void plus_current_gc_count() {
