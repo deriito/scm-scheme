@@ -1454,6 +1454,3006 @@ static SCM set_E9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
     return c_data_type_modifier_with_wb(obj, 1, value, call_site);
 }
 
+static char s_set_F0_f1[] = "set-F0-f1!";
+static SCM set_F0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F0_f1_with_wb[] = "set-F0-f1!-with-wb";
+static SCM set_F0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F0_f2[] = "set-F0-f2!";
+static SCM set_F0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F0_f2_with_wb[] = "set-F0-f2!-with-wb";
+static SCM set_F0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_F1_f1[] = "set-F1-f1!";
+static SCM set_F1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F1_f1_with_wb[] = "set-F1-f1!-with-wb";
+static SCM set_F1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F1_f2[] = "set-F1-f2!";
+static SCM set_F1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F1_f2_with_wb[] = "set-F1-f2!-with-wb";
+static SCM set_F1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_F2_f1[] = "set-F2-f1!";
+static SCM set_F2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F2_f1_with_wb[] = "set-F2-f1!-with-wb";
+static SCM set_F2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F2_f2[] = "set-F2-f2!";
+static SCM set_F2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F2_f2_with_wb[] = "set-F2-f2!-with-wb";
+static SCM set_F2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_F3_f1[] = "set-F3-f1!";
+static SCM set_F3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F3_f1_with_wb[] = "set-F3-f1!-with-wb";
+static SCM set_F3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F3_f2[] = "set-F3-f2!";
+static SCM set_F3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F3_f2_with_wb[] = "set-F3-f2!-with-wb";
+static SCM set_F3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_F4_f1[] = "set-F4-f1!";
+static SCM set_F4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F4_f1_with_wb[] = "set-F4-f1!-with-wb";
+static SCM set_F4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F4_f2[] = "set-F4-f2!";
+static SCM set_F4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F4_f2_with_wb[] = "set-F4-f2!-with-wb";
+static SCM set_F4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_F5_f1[] = "set-F5-f1!";
+static SCM set_F5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F5_f1_with_wb[] = "set-F5-f1!-with-wb";
+static SCM set_F5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F5_f2[] = "set-F5-f2!";
+static SCM set_F5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F5_f2_with_wb[] = "set-F5-f2!-with-wb";
+static SCM set_F5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_F6_f1[] = "set-F6-f1!";
+static SCM set_F6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F6_f1_with_wb[] = "set-F6-f1!-with-wb";
+static SCM set_F6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F6_f2[] = "set-F6-f2!";
+static SCM set_F6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F6_f2_with_wb[] = "set-F6-f2!-with-wb";
+static SCM set_F6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_F7_f1[] = "set-F7-f1!";
+static SCM set_F7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F7_f1_with_wb[] = "set-F7-f1!-with-wb";
+static SCM set_F7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F7_f2[] = "set-F7-f2!";
+static SCM set_F7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F7_f2_with_wb[] = "set-F7-f2!-with-wb";
+static SCM set_F7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_F8_f1[] = "set-F8-f1!";
+static SCM set_F8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F8_f1_with_wb[] = "set-F8-f1!-with-wb";
+static SCM set_F8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F8_f2[] = "set-F8-f2!";
+static SCM set_F8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F8_f2_with_wb[] = "set-F8-f2!-with-wb";
+static SCM set_F8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_F9_f1[] = "set-F9-f1!";
+static SCM set_F9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_F9_f1_with_wb[] = "set-F9-f1!-with-wb";
+static SCM set_F9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_F9_f2[] = "set-F9-f2!";
+static SCM set_F9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_F9_f2_with_wb[] = "set-F9-f2!-with-wb";
+static SCM set_F9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G0_f1[] = "set-G0-f1!";
+static SCM set_G0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G0_f1_with_wb[] = "set-G0-f1!-with-wb";
+static SCM set_G0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G0_f2[] = "set-G0-f2!";
+static SCM set_G0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G0_f2_with_wb[] = "set-G0-f2!-with-wb";
+static SCM set_G0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G1_f1[] = "set-G1-f1!";
+static SCM set_G1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G1_f1_with_wb[] = "set-G1-f1!-with-wb";
+static SCM set_G1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G1_f2[] = "set-G1-f2!";
+static SCM set_G1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G1_f2_with_wb[] = "set-G1-f2!-with-wb";
+static SCM set_G1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G2_f1[] = "set-G2-f1!";
+static SCM set_G2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G2_f1_with_wb[] = "set-G2-f1!-with-wb";
+static SCM set_G2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G2_f2[] = "set-G2-f2!";
+static SCM set_G2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G2_f2_with_wb[] = "set-G2-f2!-with-wb";
+static SCM set_G2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G3_f1[] = "set-G3-f1!";
+static SCM set_G3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G3_f1_with_wb[] = "set-G3-f1!-with-wb";
+static SCM set_G3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G3_f2[] = "set-G3-f2!";
+static SCM set_G3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G3_f2_with_wb[] = "set-G3-f2!-with-wb";
+static SCM set_G3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G4_f1[] = "set-G4-f1!";
+static SCM set_G4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G4_f1_with_wb[] = "set-G4-f1!-with-wb";
+static SCM set_G4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G4_f2[] = "set-G4-f2!";
+static SCM set_G4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G4_f2_with_wb[] = "set-G4-f2!-with-wb";
+static SCM set_G4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G5_f1[] = "set-G5-f1!";
+static SCM set_G5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G5_f1_with_wb[] = "set-G5-f1!-with-wb";
+static SCM set_G5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G5_f2[] = "set-G5-f2!";
+static SCM set_G5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G5_f2_with_wb[] = "set-G5-f2!-with-wb";
+static SCM set_G5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G6_f1[] = "set-G6-f1!";
+static SCM set_G6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G6_f1_with_wb[] = "set-G6-f1!-with-wb";
+static SCM set_G6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G6_f2[] = "set-G6-f2!";
+static SCM set_G6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G6_f2_with_wb[] = "set-G6-f2!-with-wb";
+static SCM set_G6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G7_f1[] = "set-G7-f1!";
+static SCM set_G7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G7_f1_with_wb[] = "set-G7-f1!-with-wb";
+static SCM set_G7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G7_f2[] = "set-G7-f2!";
+static SCM set_G7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G7_f2_with_wb[] = "set-G7-f2!-with-wb";
+static SCM set_G7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G8_f1[] = "set-G8-f1!";
+static SCM set_G8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G8_f1_with_wb[] = "set-G8-f1!-with-wb";
+static SCM set_G8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G8_f2[] = "set-G8-f2!";
+static SCM set_G8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G8_f2_with_wb[] = "set-G8-f2!-with-wb";
+static SCM set_G8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_G9_f1[] = "set-G9-f1!";
+static SCM set_G9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_G9_f1_with_wb[] = "set-G9-f1!-with-wb";
+static SCM set_G9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_G9_f2[] = "set-G9-f2!";
+static SCM set_G9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_G9_f2_with_wb[] = "set-G9-f2!-with-wb";
+static SCM set_G9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H0_f1[] = "set-H0-f1!";
+static SCM set_H0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H0_f1_with_wb[] = "set-H0-f1!-with-wb";
+static SCM set_H0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H0_f2[] = "set-H0-f2!";
+static SCM set_H0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H0_f2_with_wb[] = "set-H0-f2!-with-wb";
+static SCM set_H0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H1_f1[] = "set-H1-f1!";
+static SCM set_H1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H1_f1_with_wb[] = "set-H1-f1!-with-wb";
+static SCM set_H1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H1_f2[] = "set-H1-f2!";
+static SCM set_H1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H1_f2_with_wb[] = "set-H1-f2!-with-wb";
+static SCM set_H1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H2_f1[] = "set-H2-f1!";
+static SCM set_H2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H2_f1_with_wb[] = "set-H2-f1!-with-wb";
+static SCM set_H2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H2_f2[] = "set-H2-f2!";
+static SCM set_H2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H2_f2_with_wb[] = "set-H2-f2!-with-wb";
+static SCM set_H2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H3_f1[] = "set-H3-f1!";
+static SCM set_H3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H3_f1_with_wb[] = "set-H3-f1!-with-wb";
+static SCM set_H3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H3_f2[] = "set-H3-f2!";
+static SCM set_H3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H3_f2_with_wb[] = "set-H3-f2!-with-wb";
+static SCM set_H3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H4_f1[] = "set-H4-f1!";
+static SCM set_H4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H4_f1_with_wb[] = "set-H4-f1!-with-wb";
+static SCM set_H4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H4_f2[] = "set-H4-f2!";
+static SCM set_H4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H4_f2_with_wb[] = "set-H4-f2!-with-wb";
+static SCM set_H4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H5_f1[] = "set-H5-f1!";
+static SCM set_H5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H5_f1_with_wb[] = "set-H5-f1!-with-wb";
+static SCM set_H5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H5_f2[] = "set-H5-f2!";
+static SCM set_H5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H5_f2_with_wb[] = "set-H5-f2!-with-wb";
+static SCM set_H5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H6_f1[] = "set-H6-f1!";
+static SCM set_H6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H6_f1_with_wb[] = "set-H6-f1!-with-wb";
+static SCM set_H6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H6_f2[] = "set-H6-f2!";
+static SCM set_H6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H6_f2_with_wb[] = "set-H6-f2!-with-wb";
+static SCM set_H6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H7_f1[] = "set-H7-f1!";
+static SCM set_H7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H7_f1_with_wb[] = "set-H7-f1!-with-wb";
+static SCM set_H7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H7_f2[] = "set-H7-f2!";
+static SCM set_H7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H7_f2_with_wb[] = "set-H7-f2!-with-wb";
+static SCM set_H7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H8_f1[] = "set-H8-f1!";
+static SCM set_H8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H8_f1_with_wb[] = "set-H8-f1!-with-wb";
+static SCM set_H8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H8_f2[] = "set-H8-f2!";
+static SCM set_H8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H8_f2_with_wb[] = "set-H8-f2!-with-wb";
+static SCM set_H8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_H9_f1[] = "set-H9-f1!";
+static SCM set_H9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_H9_f1_with_wb[] = "set-H9-f1!-with-wb";
+static SCM set_H9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_H9_f2[] = "set-H9-f2!";
+static SCM set_H9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_H9_f2_with_wb[] = "set-H9-f2!-with-wb";
+static SCM set_H9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I0_f1[] = "set-I0-f1!";
+static SCM set_I0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I0_f1_with_wb[] = "set-I0-f1!-with-wb";
+static SCM set_I0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I0_f2[] = "set-I0-f2!";
+static SCM set_I0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I0_f2_with_wb[] = "set-I0-f2!-with-wb";
+static SCM set_I0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I1_f1[] = "set-I1-f1!";
+static SCM set_I1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I1_f1_with_wb[] = "set-I1-f1!-with-wb";
+static SCM set_I1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I1_f2[] = "set-I1-f2!";
+static SCM set_I1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I1_f2_with_wb[] = "set-I1-f2!-with-wb";
+static SCM set_I1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I2_f1[] = "set-I2-f1!";
+static SCM set_I2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I2_f1_with_wb[] = "set-I2-f1!-with-wb";
+static SCM set_I2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I2_f2[] = "set-I2-f2!";
+static SCM set_I2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I2_f2_with_wb[] = "set-I2-f2!-with-wb";
+static SCM set_I2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I3_f1[] = "set-I3-f1!";
+static SCM set_I3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I3_f1_with_wb[] = "set-I3-f1!-with-wb";
+static SCM set_I3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I3_f2[] = "set-I3-f2!";
+static SCM set_I3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I3_f2_with_wb[] = "set-I3-f2!-with-wb";
+static SCM set_I3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I4_f1[] = "set-I4-f1!";
+static SCM set_I4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I4_f1_with_wb[] = "set-I4-f1!-with-wb";
+static SCM set_I4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I4_f2[] = "set-I4-f2!";
+static SCM set_I4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I4_f2_with_wb[] = "set-I4-f2!-with-wb";
+static SCM set_I4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I5_f1[] = "set-I5-f1!";
+static SCM set_I5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I5_f1_with_wb[] = "set-I5-f1!-with-wb";
+static SCM set_I5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I5_f2[] = "set-I5-f2!";
+static SCM set_I5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I5_f2_with_wb[] = "set-I5-f2!-with-wb";
+static SCM set_I5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I6_f1[] = "set-I6-f1!";
+static SCM set_I6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I6_f1_with_wb[] = "set-I6-f1!-with-wb";
+static SCM set_I6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I6_f2[] = "set-I6-f2!";
+static SCM set_I6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I6_f2_with_wb[] = "set-I6-f2!-with-wb";
+static SCM set_I6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I7_f1[] = "set-I7-f1!";
+static SCM set_I7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I7_f1_with_wb[] = "set-I7-f1!-with-wb";
+static SCM set_I7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I7_f2[] = "set-I7-f2!";
+static SCM set_I7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I7_f2_with_wb[] = "set-I7-f2!-with-wb";
+static SCM set_I7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I8_f1[] = "set-I8-f1!";
+static SCM set_I8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I8_f1_with_wb[] = "set-I8-f1!-with-wb";
+static SCM set_I8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I8_f2[] = "set-I8-f2!";
+static SCM set_I8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I8_f2_with_wb[] = "set-I8-f2!-with-wb";
+static SCM set_I8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_I9_f1[] = "set-I9-f1!";
+static SCM set_I9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_I9_f1_with_wb[] = "set-I9-f1!-with-wb";
+static SCM set_I9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_I9_f2[] = "set-I9-f2!";
+static SCM set_I9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_I9_f2_with_wb[] = "set-I9-f2!-with-wb";
+static SCM set_I9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J0_f1[] = "set-J0-f1!";
+static SCM set_J0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J0_f1_with_wb[] = "set-J0-f1!-with-wb";
+static SCM set_J0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J0_f2[] = "set-J0-f2!";
+static SCM set_J0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J0_f2_with_wb[] = "set-J0-f2!-with-wb";
+static SCM set_J0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J1_f1[] = "set-J1-f1!";
+static SCM set_J1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J1_f1_with_wb[] = "set-J1-f1!-with-wb";
+static SCM set_J1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J1_f2[] = "set-J1-f2!";
+static SCM set_J1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J1_f2_with_wb[] = "set-J1-f2!-with-wb";
+static SCM set_J1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J2_f1[] = "set-J2-f1!";
+static SCM set_J2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J2_f1_with_wb[] = "set-J2-f1!-with-wb";
+static SCM set_J2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J2_f2[] = "set-J2-f2!";
+static SCM set_J2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J2_f2_with_wb[] = "set-J2-f2!-with-wb";
+static SCM set_J2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J3_f1[] = "set-J3-f1!";
+static SCM set_J3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J3_f1_with_wb[] = "set-J3-f1!-with-wb";
+static SCM set_J3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J3_f2[] = "set-J3-f2!";
+static SCM set_J3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J3_f2_with_wb[] = "set-J3-f2!-with-wb";
+static SCM set_J3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J4_f1[] = "set-J4-f1!";
+static SCM set_J4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J4_f1_with_wb[] = "set-J4-f1!-with-wb";
+static SCM set_J4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J4_f2[] = "set-J4-f2!";
+static SCM set_J4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J4_f2_with_wb[] = "set-J4-f2!-with-wb";
+static SCM set_J4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J5_f1[] = "set-J5-f1!";
+static SCM set_J5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J5_f1_with_wb[] = "set-J5-f1!-with-wb";
+static SCM set_J5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J5_f2[] = "set-J5-f2!";
+static SCM set_J5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J5_f2_with_wb[] = "set-J5-f2!-with-wb";
+static SCM set_J5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J6_f1[] = "set-J6-f1!";
+static SCM set_J6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J6_f1_with_wb[] = "set-J6-f1!-with-wb";
+static SCM set_J6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J6_f2[] = "set-J6-f2!";
+static SCM set_J6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J6_f2_with_wb[] = "set-J6-f2!-with-wb";
+static SCM set_J6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J7_f1[] = "set-J7-f1!";
+static SCM set_J7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J7_f1_with_wb[] = "set-J7-f1!-with-wb";
+static SCM set_J7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J7_f2[] = "set-J7-f2!";
+static SCM set_J7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J7_f2_with_wb[] = "set-J7-f2!-with-wb";
+static SCM set_J7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J8_f1[] = "set-J8-f1!";
+static SCM set_J8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J8_f1_with_wb[] = "set-J8-f1!-with-wb";
+static SCM set_J8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J8_f2[] = "set-J8-f2!";
+static SCM set_J8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J8_f2_with_wb[] = "set-J8-f2!-with-wb";
+static SCM set_J8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_J9_f1[] = "set-J9-f1!";
+static SCM set_J9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_J9_f1_with_wb[] = "set-J9-f1!-with-wb";
+static SCM set_J9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_J9_f2[] = "set-J9-f2!";
+static SCM set_J9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_J9_f2_with_wb[] = "set-J9-f2!-with-wb";
+static SCM set_J9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K0_f1[] = "set-K0-f1!";
+static SCM set_K0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K0_f1_with_wb[] = "set-K0-f1!-with-wb";
+static SCM set_K0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K0_f2[] = "set-K0-f2!";
+static SCM set_K0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K0_f2_with_wb[] = "set-K0-f2!-with-wb";
+static SCM set_K0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K1_f1[] = "set-K1-f1!";
+static SCM set_K1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K1_f1_with_wb[] = "set-K1-f1!-with-wb";
+static SCM set_K1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K1_f2[] = "set-K1-f2!";
+static SCM set_K1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K1_f2_with_wb[] = "set-K1-f2!-with-wb";
+static SCM set_K1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K2_f1[] = "set-K2-f1!";
+static SCM set_K2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K2_f1_with_wb[] = "set-K2-f1!-with-wb";
+static SCM set_K2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K2_f2[] = "set-K2-f2!";
+static SCM set_K2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K2_f2_with_wb[] = "set-K2-f2!-with-wb";
+static SCM set_K2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K3_f1[] = "set-K3-f1!";
+static SCM set_K3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K3_f1_with_wb[] = "set-K3-f1!-with-wb";
+static SCM set_K3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K3_f2[] = "set-K3-f2!";
+static SCM set_K3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K3_f2_with_wb[] = "set-K3-f2!-with-wb";
+static SCM set_K3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K4_f1[] = "set-K4-f1!";
+static SCM set_K4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K4_f1_with_wb[] = "set-K4-f1!-with-wb";
+static SCM set_K4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K4_f2[] = "set-K4-f2!";
+static SCM set_K4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K4_f2_with_wb[] = "set-K4-f2!-with-wb";
+static SCM set_K4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K5_f1[] = "set-K5-f1!";
+static SCM set_K5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K5_f1_with_wb[] = "set-K5-f1!-with-wb";
+static SCM set_K5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K5_f2[] = "set-K5-f2!";
+static SCM set_K5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K5_f2_with_wb[] = "set-K5-f2!-with-wb";
+static SCM set_K5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K6_f1[] = "set-K6-f1!";
+static SCM set_K6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K6_f1_with_wb[] = "set-K6-f1!-with-wb";
+static SCM set_K6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K6_f2[] = "set-K6-f2!";
+static SCM set_K6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K6_f2_with_wb[] = "set-K6-f2!-with-wb";
+static SCM set_K6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K7_f1[] = "set-K7-f1!";
+static SCM set_K7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K7_f1_with_wb[] = "set-K7-f1!-with-wb";
+static SCM set_K7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K7_f2[] = "set-K7-f2!";
+static SCM set_K7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K7_f2_with_wb[] = "set-K7-f2!-with-wb";
+static SCM set_K7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K8_f1[] = "set-K8-f1!";
+static SCM set_K8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K8_f1_with_wb[] = "set-K8-f1!-with-wb";
+static SCM set_K8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K8_f2[] = "set-K8-f2!";
+static SCM set_K8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K8_f2_with_wb[] = "set-K8-f2!-with-wb";
+static SCM set_K8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_K9_f1[] = "set-K9-f1!";
+static SCM set_K9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_K9_f1_with_wb[] = "set-K9-f1!-with-wb";
+static SCM set_K9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_K9_f2[] = "set-K9-f2!";
+static SCM set_K9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_K9_f2_with_wb[] = "set-K9-f2!-with-wb";
+static SCM set_K9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L0_f1[] = "set-L0-f1!";
+static SCM set_L0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L0_f1_with_wb[] = "set-L0-f1!-with-wb";
+static SCM set_L0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L0_f2[] = "set-L0-f2!";
+static SCM set_L0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L0_f2_with_wb[] = "set-L0-f2!-with-wb";
+static SCM set_L0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L1_f1[] = "set-L1-f1!";
+static SCM set_L1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L1_f1_with_wb[] = "set-L1-f1!-with-wb";
+static SCM set_L1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L1_f2[] = "set-L1-f2!";
+static SCM set_L1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L1_f2_with_wb[] = "set-L1-f2!-with-wb";
+static SCM set_L1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L2_f1[] = "set-L2-f1!";
+static SCM set_L2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L2_f1_with_wb[] = "set-L2-f1!-with-wb";
+static SCM set_L2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L2_f2[] = "set-L2-f2!";
+static SCM set_L2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L2_f2_with_wb[] = "set-L2-f2!-with-wb";
+static SCM set_L2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L3_f1[] = "set-L3-f1!";
+static SCM set_L3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L3_f1_with_wb[] = "set-L3-f1!-with-wb";
+static SCM set_L3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L3_f2[] = "set-L3-f2!";
+static SCM set_L3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L3_f2_with_wb[] = "set-L3-f2!-with-wb";
+static SCM set_L3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L4_f1[] = "set-L4-f1!";
+static SCM set_L4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L4_f1_with_wb[] = "set-L4-f1!-with-wb";
+static SCM set_L4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L4_f2[] = "set-L4-f2!";
+static SCM set_L4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L4_f2_with_wb[] = "set-L4-f2!-with-wb";
+static SCM set_L4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L5_f1[] = "set-L5-f1!";
+static SCM set_L5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L5_f1_with_wb[] = "set-L5-f1!-with-wb";
+static SCM set_L5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L5_f2[] = "set-L5-f2!";
+static SCM set_L5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L5_f2_with_wb[] = "set-L5-f2!-with-wb";
+static SCM set_L5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L6_f1[] = "set-L6-f1!";
+static SCM set_L6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L6_f1_with_wb[] = "set-L6-f1!-with-wb";
+static SCM set_L6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L6_f2[] = "set-L6-f2!";
+static SCM set_L6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L6_f2_with_wb[] = "set-L6-f2!-with-wb";
+static SCM set_L6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L7_f1[] = "set-L7-f1!";
+static SCM set_L7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L7_f1_with_wb[] = "set-L7-f1!-with-wb";
+static SCM set_L7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L7_f2[] = "set-L7-f2!";
+static SCM set_L7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L7_f2_with_wb[] = "set-L7-f2!-with-wb";
+static SCM set_L7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L8_f1[] = "set-L8-f1!";
+static SCM set_L8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L8_f1_with_wb[] = "set-L8-f1!-with-wb";
+static SCM set_L8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L8_f2[] = "set-L8-f2!";
+static SCM set_L8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L8_f2_with_wb[] = "set-L8-f2!-with-wb";
+static SCM set_L8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_L9_f1[] = "set-L9-f1!";
+static SCM set_L9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_L9_f1_with_wb[] = "set-L9-f1!-with-wb";
+static SCM set_L9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_L9_f2[] = "set-L9-f2!";
+static SCM set_L9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_L9_f2_with_wb[] = "set-L9-f2!-with-wb";
+static SCM set_L9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M0_f1[] = "set-M0-f1!";
+static SCM set_M0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M0_f1_with_wb[] = "set-M0-f1!-with-wb";
+static SCM set_M0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M0_f2[] = "set-M0-f2!";
+static SCM set_M0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M0_f2_with_wb[] = "set-M0-f2!-with-wb";
+static SCM set_M0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M1_f1[] = "set-M1-f1!";
+static SCM set_M1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M1_f1_with_wb[] = "set-M1-f1!-with-wb";
+static SCM set_M1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M1_f2[] = "set-M1-f2!";
+static SCM set_M1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M1_f2_with_wb[] = "set-M1-f2!-with-wb";
+static SCM set_M1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M2_f1[] = "set-M2-f1!";
+static SCM set_M2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M2_f1_with_wb[] = "set-M2-f1!-with-wb";
+static SCM set_M2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M2_f2[] = "set-M2-f2!";
+static SCM set_M2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M2_f2_with_wb[] = "set-M2-f2!-with-wb";
+static SCM set_M2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M3_f1[] = "set-M3-f1!";
+static SCM set_M3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M3_f1_with_wb[] = "set-M3-f1!-with-wb";
+static SCM set_M3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M3_f2[] = "set-M3-f2!";
+static SCM set_M3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M3_f2_with_wb[] = "set-M3-f2!-with-wb";
+static SCM set_M3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M4_f1[] = "set-M4-f1!";
+static SCM set_M4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M4_f1_with_wb[] = "set-M4-f1!-with-wb";
+static SCM set_M4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M4_f2[] = "set-M4-f2!";
+static SCM set_M4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M4_f2_with_wb[] = "set-M4-f2!-with-wb";
+static SCM set_M4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M5_f1[] = "set-M5-f1!";
+static SCM set_M5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M5_f1_with_wb[] = "set-M5-f1!-with-wb";
+static SCM set_M5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M5_f2[] = "set-M5-f2!";
+static SCM set_M5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M5_f2_with_wb[] = "set-M5-f2!-with-wb";
+static SCM set_M5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M6_f1[] = "set-M6-f1!";
+static SCM set_M6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M6_f1_with_wb[] = "set-M6-f1!-with-wb";
+static SCM set_M6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M6_f2[] = "set-M6-f2!";
+static SCM set_M6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M6_f2_with_wb[] = "set-M6-f2!-with-wb";
+static SCM set_M6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M7_f1[] = "set-M7-f1!";
+static SCM set_M7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M7_f1_with_wb[] = "set-M7-f1!-with-wb";
+static SCM set_M7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M7_f2[] = "set-M7-f2!";
+static SCM set_M7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M7_f2_with_wb[] = "set-M7-f2!-with-wb";
+static SCM set_M7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M8_f1[] = "set-M8-f1!";
+static SCM set_M8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M8_f1_with_wb[] = "set-M8-f1!-with-wb";
+static SCM set_M8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M8_f2[] = "set-M8-f2!";
+static SCM set_M8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M8_f2_with_wb[] = "set-M8-f2!-with-wb";
+static SCM set_M8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_M9_f1[] = "set-M9-f1!";
+static SCM set_M9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_M9_f1_with_wb[] = "set-M9-f1!-with-wb";
+static SCM set_M9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_M9_f2[] = "set-M9-f2!";
+static SCM set_M9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_M9_f2_with_wb[] = "set-M9-f2!-with-wb";
+static SCM set_M9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N0_f1[] = "set-N0-f1!";
+static SCM set_N0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N0_f1_with_wb[] = "set-N0-f1!-with-wb";
+static SCM set_N0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N0_f2[] = "set-N0-f2!";
+static SCM set_N0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N0_f2_with_wb[] = "set-N0-f2!-with-wb";
+static SCM set_N0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N1_f1[] = "set-N1-f1!";
+static SCM set_N1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N1_f1_with_wb[] = "set-N1-f1!-with-wb";
+static SCM set_N1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N1_f2[] = "set-N1-f2!";
+static SCM set_N1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N1_f2_with_wb[] = "set-N1-f2!-with-wb";
+static SCM set_N1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N2_f1[] = "set-N2-f1!";
+static SCM set_N2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N2_f1_with_wb[] = "set-N2-f1!-with-wb";
+static SCM set_N2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N2_f2[] = "set-N2-f2!";
+static SCM set_N2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N2_f2_with_wb[] = "set-N2-f2!-with-wb";
+static SCM set_N2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N3_f1[] = "set-N3-f1!";
+static SCM set_N3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N3_f1_with_wb[] = "set-N3-f1!-with-wb";
+static SCM set_N3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N3_f2[] = "set-N3-f2!";
+static SCM set_N3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N3_f2_with_wb[] = "set-N3-f2!-with-wb";
+static SCM set_N3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N4_f1[] = "set-N4-f1!";
+static SCM set_N4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N4_f1_with_wb[] = "set-N4-f1!-with-wb";
+static SCM set_N4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N4_f2[] = "set-N4-f2!";
+static SCM set_N4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N4_f2_with_wb[] = "set-N4-f2!-with-wb";
+static SCM set_N4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N5_f1[] = "set-N5-f1!";
+static SCM set_N5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N5_f1_with_wb[] = "set-N5-f1!-with-wb";
+static SCM set_N5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N5_f2[] = "set-N5-f2!";
+static SCM set_N5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N5_f2_with_wb[] = "set-N5-f2!-with-wb";
+static SCM set_N5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N6_f1[] = "set-N6-f1!";
+static SCM set_N6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N6_f1_with_wb[] = "set-N6-f1!-with-wb";
+static SCM set_N6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N6_f2[] = "set-N6-f2!";
+static SCM set_N6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N6_f2_with_wb[] = "set-N6-f2!-with-wb";
+static SCM set_N6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N7_f1[] = "set-N7-f1!";
+static SCM set_N7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N7_f1_with_wb[] = "set-N7-f1!-with-wb";
+static SCM set_N7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N7_f2[] = "set-N7-f2!";
+static SCM set_N7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N7_f2_with_wb[] = "set-N7-f2!-with-wb";
+static SCM set_N7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N8_f1[] = "set-N8-f1!";
+static SCM set_N8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N8_f1_with_wb[] = "set-N8-f1!-with-wb";
+static SCM set_N8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N8_f2[] = "set-N8-f2!";
+static SCM set_N8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N8_f2_with_wb[] = "set-N8-f2!-with-wb";
+static SCM set_N8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_N9_f1[] = "set-N9-f1!";
+static SCM set_N9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_N9_f1_with_wb[] = "set-N9-f1!-with-wb";
+static SCM set_N9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_N9_f2[] = "set-N9-f2!";
+static SCM set_N9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_N9_f2_with_wb[] = "set-N9-f2!-with-wb";
+static SCM set_N9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O0_f1[] = "set-O0-f1!";
+static SCM set_O0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O0_f1_with_wb[] = "set-O0-f1!-with-wb";
+static SCM set_O0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O0_f2[] = "set-O0-f2!";
+static SCM set_O0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O0_f2_with_wb[] = "set-O0-f2!-with-wb";
+static SCM set_O0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O1_f1[] = "set-O1-f1!";
+static SCM set_O1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O1_f1_with_wb[] = "set-O1-f1!-with-wb";
+static SCM set_O1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O1_f2[] = "set-O1-f2!";
+static SCM set_O1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O1_f2_with_wb[] = "set-O1-f2!-with-wb";
+static SCM set_O1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O2_f1[] = "set-O2-f1!";
+static SCM set_O2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O2_f1_with_wb[] = "set-O2-f1!-with-wb";
+static SCM set_O2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O2_f2[] = "set-O2-f2!";
+static SCM set_O2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O2_f2_with_wb[] = "set-O2-f2!-with-wb";
+static SCM set_O2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O3_f1[] = "set-O3-f1!";
+static SCM set_O3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O3_f1_with_wb[] = "set-O3-f1!-with-wb";
+static SCM set_O3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O3_f2[] = "set-O3-f2!";
+static SCM set_O3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O3_f2_with_wb[] = "set-O3-f2!-with-wb";
+static SCM set_O3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O4_f1[] = "set-O4-f1!";
+static SCM set_O4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O4_f1_with_wb[] = "set-O4-f1!-with-wb";
+static SCM set_O4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O4_f2[] = "set-O4-f2!";
+static SCM set_O4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O4_f2_with_wb[] = "set-O4-f2!-with-wb";
+static SCM set_O4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O5_f1[] = "set-O5-f1!";
+static SCM set_O5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O5_f1_with_wb[] = "set-O5-f1!-with-wb";
+static SCM set_O5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O5_f2[] = "set-O5-f2!";
+static SCM set_O5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O5_f2_with_wb[] = "set-O5-f2!-with-wb";
+static SCM set_O5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O6_f1[] = "set-O6-f1!";
+static SCM set_O6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O6_f1_with_wb[] = "set-O6-f1!-with-wb";
+static SCM set_O6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O6_f2[] = "set-O6-f2!";
+static SCM set_O6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O6_f2_with_wb[] = "set-O6-f2!-with-wb";
+static SCM set_O6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O7_f1[] = "set-O7-f1!";
+static SCM set_O7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O7_f1_with_wb[] = "set-O7-f1!-with-wb";
+static SCM set_O7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O7_f2[] = "set-O7-f2!";
+static SCM set_O7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O7_f2_with_wb[] = "set-O7-f2!-with-wb";
+static SCM set_O7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O8_f1[] = "set-O8-f1!";
+static SCM set_O8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O8_f1_with_wb[] = "set-O8-f1!-with-wb";
+static SCM set_O8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O8_f2[] = "set-O8-f2!";
+static SCM set_O8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O8_f2_with_wb[] = "set-O8-f2!-with-wb";
+static SCM set_O8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_O9_f1[] = "set-O9-f1!";
+static SCM set_O9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_O9_f1_with_wb[] = "set-O9-f1!-with-wb";
+static SCM set_O9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_O9_f2[] = "set-O9-f2!";
+static SCM set_O9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_O9_f2_with_wb[] = "set-O9-f2!-with-wb";
+static SCM set_O9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P0_f1[] = "set-P0-f1!";
+static SCM set_P0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P0_f1_with_wb[] = "set-P0-f1!-with-wb";
+static SCM set_P0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P0_f2[] = "set-P0-f2!";
+static SCM set_P0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P0_f2_with_wb[] = "set-P0-f2!-with-wb";
+static SCM set_P0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P1_f1[] = "set-P1-f1!";
+static SCM set_P1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P1_f1_with_wb[] = "set-P1-f1!-with-wb";
+static SCM set_P1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P1_f2[] = "set-P1-f2!";
+static SCM set_P1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P1_f2_with_wb[] = "set-P1-f2!-with-wb";
+static SCM set_P1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P2_f1[] = "set-P2-f1!";
+static SCM set_P2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P2_f1_with_wb[] = "set-P2-f1!-with-wb";
+static SCM set_P2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P2_f2[] = "set-P2-f2!";
+static SCM set_P2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P2_f2_with_wb[] = "set-P2-f2!-with-wb";
+static SCM set_P2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P3_f1[] = "set-P3-f1!";
+static SCM set_P3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P3_f1_with_wb[] = "set-P3-f1!-with-wb";
+static SCM set_P3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P3_f2[] = "set-P3-f2!";
+static SCM set_P3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P3_f2_with_wb[] = "set-P3-f2!-with-wb";
+static SCM set_P3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P4_f1[] = "set-P4-f1!";
+static SCM set_P4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P4_f1_with_wb[] = "set-P4-f1!-with-wb";
+static SCM set_P4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P4_f2[] = "set-P4-f2!";
+static SCM set_P4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P4_f2_with_wb[] = "set-P4-f2!-with-wb";
+static SCM set_P4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P5_f1[] = "set-P5-f1!";
+static SCM set_P5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P5_f1_with_wb[] = "set-P5-f1!-with-wb";
+static SCM set_P5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P5_f2[] = "set-P5-f2!";
+static SCM set_P5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P5_f2_with_wb[] = "set-P5-f2!-with-wb";
+static SCM set_P5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P6_f1[] = "set-P6-f1!";
+static SCM set_P6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P6_f1_with_wb[] = "set-P6-f1!-with-wb";
+static SCM set_P6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P6_f2[] = "set-P6-f2!";
+static SCM set_P6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P6_f2_with_wb[] = "set-P6-f2!-with-wb";
+static SCM set_P6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P7_f1[] = "set-P7-f1!";
+static SCM set_P7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P7_f1_with_wb[] = "set-P7-f1!-with-wb";
+static SCM set_P7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P7_f2[] = "set-P7-f2!";
+static SCM set_P7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P7_f2_with_wb[] = "set-P7-f2!-with-wb";
+static SCM set_P7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P8_f1[] = "set-P8-f1!";
+static SCM set_P8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P8_f1_with_wb[] = "set-P8-f1!-with-wb";
+static SCM set_P8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P8_f2[] = "set-P8-f2!";
+static SCM set_P8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P8_f2_with_wb[] = "set-P8-f2!-with-wb";
+static SCM set_P8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_P9_f1[] = "set-P9-f1!";
+static SCM set_P9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_P9_f1_with_wb[] = "set-P9-f1!-with-wb";
+static SCM set_P9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_P9_f2[] = "set-P9-f2!";
+static SCM set_P9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_P9_f2_with_wb[] = "set-P9-f2!-with-wb";
+static SCM set_P9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q0_f1[] = "set-Q0-f1!";
+static SCM set_Q0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q0_f1_with_wb[] = "set-Q0-f1!-with-wb";
+static SCM set_Q0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q0_f2[] = "set-Q0-f2!";
+static SCM set_Q0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q0_f2_with_wb[] = "set-Q0-f2!-with-wb";
+static SCM set_Q0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q1_f1[] = "set-Q1-f1!";
+static SCM set_Q1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q1_f1_with_wb[] = "set-Q1-f1!-with-wb";
+static SCM set_Q1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q1_f2[] = "set-Q1-f2!";
+static SCM set_Q1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q1_f2_with_wb[] = "set-Q1-f2!-with-wb";
+static SCM set_Q1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q2_f1[] = "set-Q2-f1!";
+static SCM set_Q2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q2_f1_with_wb[] = "set-Q2-f1!-with-wb";
+static SCM set_Q2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q2_f2[] = "set-Q2-f2!";
+static SCM set_Q2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q2_f2_with_wb[] = "set-Q2-f2!-with-wb";
+static SCM set_Q2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q3_f1[] = "set-Q3-f1!";
+static SCM set_Q3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q3_f1_with_wb[] = "set-Q3-f1!-with-wb";
+static SCM set_Q3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q3_f2[] = "set-Q3-f2!";
+static SCM set_Q3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q3_f2_with_wb[] = "set-Q3-f2!-with-wb";
+static SCM set_Q3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q4_f1[] = "set-Q4-f1!";
+static SCM set_Q4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q4_f1_with_wb[] = "set-Q4-f1!-with-wb";
+static SCM set_Q4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q4_f2[] = "set-Q4-f2!";
+static SCM set_Q4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q4_f2_with_wb[] = "set-Q4-f2!-with-wb";
+static SCM set_Q4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q5_f1[] = "set-Q5-f1!";
+static SCM set_Q5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q5_f1_with_wb[] = "set-Q5-f1!-with-wb";
+static SCM set_Q5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q5_f2[] = "set-Q5-f2!";
+static SCM set_Q5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q5_f2_with_wb[] = "set-Q5-f2!-with-wb";
+static SCM set_Q5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q6_f1[] = "set-Q6-f1!";
+static SCM set_Q6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q6_f1_with_wb[] = "set-Q6-f1!-with-wb";
+static SCM set_Q6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q6_f2[] = "set-Q6-f2!";
+static SCM set_Q6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q6_f2_with_wb[] = "set-Q6-f2!-with-wb";
+static SCM set_Q6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q7_f1[] = "set-Q7-f1!";
+static SCM set_Q7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q7_f1_with_wb[] = "set-Q7-f1!-with-wb";
+static SCM set_Q7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q7_f2[] = "set-Q7-f2!";
+static SCM set_Q7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q7_f2_with_wb[] = "set-Q7-f2!-with-wb";
+static SCM set_Q7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q8_f1[] = "set-Q8-f1!";
+static SCM set_Q8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q8_f1_with_wb[] = "set-Q8-f1!-with-wb";
+static SCM set_Q8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q8_f2[] = "set-Q8-f2!";
+static SCM set_Q8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q8_f2_with_wb[] = "set-Q8-f2!-with-wb";
+static SCM set_Q8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_Q9_f1[] = "set-Q9-f1!";
+static SCM set_Q9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_Q9_f1_with_wb[] = "set-Q9-f1!-with-wb";
+static SCM set_Q9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_Q9_f2[] = "set-Q9-f2!";
+static SCM set_Q9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_Q9_f2_with_wb[] = "set-Q9-f2!-with-wb";
+static SCM set_Q9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R0_f1[] = "set-R0-f1!";
+static SCM set_R0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R0_f1_with_wb[] = "set-R0-f1!-with-wb";
+static SCM set_R0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R0_f2[] = "set-R0-f2!";
+static SCM set_R0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R0_f2_with_wb[] = "set-R0-f2!-with-wb";
+static SCM set_R0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R1_f1[] = "set-R1-f1!";
+static SCM set_R1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R1_f1_with_wb[] = "set-R1-f1!-with-wb";
+static SCM set_R1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R1_f2[] = "set-R1-f2!";
+static SCM set_R1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R1_f2_with_wb[] = "set-R1-f2!-with-wb";
+static SCM set_R1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R2_f1[] = "set-R2-f1!";
+static SCM set_R2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R2_f1_with_wb[] = "set-R2-f1!-with-wb";
+static SCM set_R2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R2_f2[] = "set-R2-f2!";
+static SCM set_R2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R2_f2_with_wb[] = "set-R2-f2!-with-wb";
+static SCM set_R2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R3_f1[] = "set-R3-f1!";
+static SCM set_R3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R3_f1_with_wb[] = "set-R3-f1!-with-wb";
+static SCM set_R3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R3_f2[] = "set-R3-f2!";
+static SCM set_R3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R3_f2_with_wb[] = "set-R3-f2!-with-wb";
+static SCM set_R3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R4_f1[] = "set-R4-f1!";
+static SCM set_R4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R4_f1_with_wb[] = "set-R4-f1!-with-wb";
+static SCM set_R4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R4_f2[] = "set-R4-f2!";
+static SCM set_R4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R4_f2_with_wb[] = "set-R4-f2!-with-wb";
+static SCM set_R4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R5_f1[] = "set-R5-f1!";
+static SCM set_R5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R5_f1_with_wb[] = "set-R5-f1!-with-wb";
+static SCM set_R5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R5_f2[] = "set-R5-f2!";
+static SCM set_R5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R5_f2_with_wb[] = "set-R5-f2!-with-wb";
+static SCM set_R5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R6_f1[] = "set-R6-f1!";
+static SCM set_R6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R6_f1_with_wb[] = "set-R6-f1!-with-wb";
+static SCM set_R6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R6_f2[] = "set-R6-f2!";
+static SCM set_R6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R6_f2_with_wb[] = "set-R6-f2!-with-wb";
+static SCM set_R6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R7_f1[] = "set-R7-f1!";
+static SCM set_R7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R7_f1_with_wb[] = "set-R7-f1!-with-wb";
+static SCM set_R7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R7_f2[] = "set-R7-f2!";
+static SCM set_R7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R7_f2_with_wb[] = "set-R7-f2!-with-wb";
+static SCM set_R7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R8_f1[] = "set-R8-f1!";
+static SCM set_R8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R8_f1_with_wb[] = "set-R8-f1!-with-wb";
+static SCM set_R8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R8_f2[] = "set-R8-f2!";
+static SCM set_R8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R8_f2_with_wb[] = "set-R8-f2!-with-wb";
+static SCM set_R8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_R9_f1[] = "set-R9-f1!";
+static SCM set_R9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_R9_f1_with_wb[] = "set-R9-f1!-with-wb";
+static SCM set_R9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_R9_f2[] = "set-R9-f2!";
+static SCM set_R9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_R9_f2_with_wb[] = "set-R9-f2!-with-wb";
+static SCM set_R9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S0_f1[] = "set-S0-f1!";
+static SCM set_S0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S0_f1_with_wb[] = "set-S0-f1!-with-wb";
+static SCM set_S0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S0_f2[] = "set-S0-f2!";
+static SCM set_S0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S0_f2_with_wb[] = "set-S0-f2!-with-wb";
+static SCM set_S0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S1_f1[] = "set-S1-f1!";
+static SCM set_S1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S1_f1_with_wb[] = "set-S1-f1!-with-wb";
+static SCM set_S1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S1_f2[] = "set-S1-f2!";
+static SCM set_S1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S1_f2_with_wb[] = "set-S1-f2!-with-wb";
+static SCM set_S1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S2_f1[] = "set-S2-f1!";
+static SCM set_S2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S2_f1_with_wb[] = "set-S2-f1!-with-wb";
+static SCM set_S2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S2_f2[] = "set-S2-f2!";
+static SCM set_S2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S2_f2_with_wb[] = "set-S2-f2!-with-wb";
+static SCM set_S2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S3_f1[] = "set-S3-f1!";
+static SCM set_S3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S3_f1_with_wb[] = "set-S3-f1!-with-wb";
+static SCM set_S3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S3_f2[] = "set-S3-f2!";
+static SCM set_S3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S3_f2_with_wb[] = "set-S3-f2!-with-wb";
+static SCM set_S3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S4_f1[] = "set-S4-f1!";
+static SCM set_S4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S4_f1_with_wb[] = "set-S4-f1!-with-wb";
+static SCM set_S4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S4_f2[] = "set-S4-f2!";
+static SCM set_S4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S4_f2_with_wb[] = "set-S4-f2!-with-wb";
+static SCM set_S4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S5_f1[] = "set-S5-f1!";
+static SCM set_S5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S5_f1_with_wb[] = "set-S5-f1!-with-wb";
+static SCM set_S5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S5_f2[] = "set-S5-f2!";
+static SCM set_S5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S5_f2_with_wb[] = "set-S5-f2!-with-wb";
+static SCM set_S5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S6_f1[] = "set-S6-f1!";
+static SCM set_S6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S6_f1_with_wb[] = "set-S6-f1!-with-wb";
+static SCM set_S6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S6_f2[] = "set-S6-f2!";
+static SCM set_S6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S6_f2_with_wb[] = "set-S6-f2!-with-wb";
+static SCM set_S6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S7_f1[] = "set-S7-f1!";
+static SCM set_S7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S7_f1_with_wb[] = "set-S7-f1!-with-wb";
+static SCM set_S7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S7_f2[] = "set-S7-f2!";
+static SCM set_S7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S7_f2_with_wb[] = "set-S7-f2!-with-wb";
+static SCM set_S7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S8_f1[] = "set-S8-f1!";
+static SCM set_S8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S8_f1_with_wb[] = "set-S8-f1!-with-wb";
+static SCM set_S8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S8_f2[] = "set-S8-f2!";
+static SCM set_S8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S8_f2_with_wb[] = "set-S8-f2!-with-wb";
+static SCM set_S8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_S9_f1[] = "set-S9-f1!";
+static SCM set_S9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_S9_f1_with_wb[] = "set-S9-f1!-with-wb";
+static SCM set_S9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_S9_f2[] = "set-S9-f2!";
+static SCM set_S9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_S9_f2_with_wb[] = "set-S9-f2!-with-wb";
+static SCM set_S9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T0_f1[] = "set-T0-f1!";
+static SCM set_T0_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T0_f1_with_wb[] = "set-T0-f1!-with-wb";
+static SCM set_T0_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T0_f2[] = "set-T0-f2!";
+static SCM set_T0_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T0_f2_with_wb[] = "set-T0-f2!-with-wb";
+static SCM set_T0_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T1_f1[] = "set-T1-f1!";
+static SCM set_T1_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T1_f1_with_wb[] = "set-T1-f1!-with-wb";
+static SCM set_T1_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T1_f2[] = "set-T1-f2!";
+static SCM set_T1_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T1_f2_with_wb[] = "set-T1-f2!-with-wb";
+static SCM set_T1_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T2_f1[] = "set-T2-f1!";
+static SCM set_T2_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T2_f1_with_wb[] = "set-T2-f1!-with-wb";
+static SCM set_T2_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T2_f2[] = "set-T2-f2!";
+static SCM set_T2_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T2_f2_with_wb[] = "set-T2-f2!-with-wb";
+static SCM set_T2_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T3_f1[] = "set-T3-f1!";
+static SCM set_T3_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T3_f1_with_wb[] = "set-T3-f1!-with-wb";
+static SCM set_T3_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T3_f2[] = "set-T3-f2!";
+static SCM set_T3_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T3_f2_with_wb[] = "set-T3-f2!-with-wb";
+static SCM set_T3_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T4_f1[] = "set-T4-f1!";
+static SCM set_T4_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T4_f1_with_wb[] = "set-T4-f1!-with-wb";
+static SCM set_T4_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T4_f2[] = "set-T4-f2!";
+static SCM set_T4_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T4_f2_with_wb[] = "set-T4-f2!-with-wb";
+static SCM set_T4_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T5_f1[] = "set-T5-f1!";
+static SCM set_T5_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T5_f1_with_wb[] = "set-T5-f1!-with-wb";
+static SCM set_T5_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T5_f2[] = "set-T5-f2!";
+static SCM set_T5_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T5_f2_with_wb[] = "set-T5-f2!-with-wb";
+static SCM set_T5_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T6_f1[] = "set-T6-f1!";
+static SCM set_T6_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T6_f1_with_wb[] = "set-T6-f1!-with-wb";
+static SCM set_T6_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T6_f2[] = "set-T6-f2!";
+static SCM set_T6_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T6_f2_with_wb[] = "set-T6-f2!-with-wb";
+static SCM set_T6_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T7_f1[] = "set-T7-f1!";
+static SCM set_T7_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T7_f1_with_wb[] = "set-T7-f1!-with-wb";
+static SCM set_T7_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T7_f2[] = "set-T7-f2!";
+static SCM set_T7_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T7_f2_with_wb[] = "set-T7-f2!-with-wb";
+static SCM set_T7_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T8_f1[] = "set-T8-f1!";
+static SCM set_T8_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T8_f1_with_wb[] = "set-T8-f1!-with-wb";
+static SCM set_T8_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T8_f2[] = "set-T8-f2!";
+static SCM set_T8_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T8_f2_with_wb[] = "set-T8-f2!-with-wb";
+static SCM set_T8_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
+static char s_set_T9_f1[] = "set-T9-f1!";
+static SCM set_T9_f1(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 0, value);
+}
+
+static char s_set_T9_f1_with_wb[] = "set-T9-f1!-with-wb";
+static SCM set_T9_f1_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 0, value, call_site);
+}
+
+static char s_set_T9_f2[] = "set-T9-f2!";
+static SCM set_T9_f2(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier(obj, 1, value);
+}
+
+static char s_set_T9_f2_with_wb[] = "set-T9-f2!-with-wb";
+static SCM set_T9_f2_with_wb(SCM obj, SCM value, SCM call_site) {
+    return c_data_type_modifier_with_wb(obj, 1, value, call_site);
+}
+
 static char s_set_LeakPath_first[] = "set-LeakPath-first!";
 static SCM set_LeakPath_first(SCM obj, SCM value, SCM call_site) {
     return c_data_type_modifier(obj, 0, value);
@@ -1779,6 +4779,606 @@ static iproc subr3s[] = {
         {s_set_E9_f1_with_wb, set_E9_f1_with_wb},
         {s_set_E9_f2, set_E9_f2},
         {s_set_E9_f2_with_wb, set_E9_f2_with_wb},
+        {s_set_F0_f1, set_F0_f1},
+        {s_set_F0_f1_with_wb, set_F0_f1_with_wb},
+        {s_set_F0_f2, set_F0_f2},
+        {s_set_F0_f2_with_wb, set_F0_f2_with_wb},
+        {s_set_F1_f1, set_F1_f1},
+        {s_set_F1_f1_with_wb, set_F1_f1_with_wb},
+        {s_set_F1_f2, set_F1_f2},
+        {s_set_F1_f2_with_wb, set_F1_f2_with_wb},
+        {s_set_F2_f1, set_F2_f1},
+        {s_set_F2_f1_with_wb, set_F2_f1_with_wb},
+        {s_set_F2_f2, set_F2_f2},
+        {s_set_F2_f2_with_wb, set_F2_f2_with_wb},
+        {s_set_F3_f1, set_F3_f1},
+        {s_set_F3_f1_with_wb, set_F3_f1_with_wb},
+        {s_set_F3_f2, set_F3_f2},
+        {s_set_F3_f2_with_wb, set_F3_f2_with_wb},
+        {s_set_F4_f1, set_F4_f1},
+        {s_set_F4_f1_with_wb, set_F4_f1_with_wb},
+        {s_set_F4_f2, set_F4_f2},
+        {s_set_F4_f2_with_wb, set_F4_f2_with_wb},
+        {s_set_F5_f1, set_F5_f1},
+        {s_set_F5_f1_with_wb, set_F5_f1_with_wb},
+        {s_set_F5_f2, set_F5_f2},
+        {s_set_F5_f2_with_wb, set_F5_f2_with_wb},
+        {s_set_F6_f1, set_F6_f1},
+        {s_set_F6_f1_with_wb, set_F6_f1_with_wb},
+        {s_set_F6_f2, set_F6_f2},
+        {s_set_F6_f2_with_wb, set_F6_f2_with_wb},
+        {s_set_F7_f1, set_F7_f1},
+        {s_set_F7_f1_with_wb, set_F7_f1_with_wb},
+        {s_set_F7_f2, set_F7_f2},
+        {s_set_F7_f2_with_wb, set_F7_f2_with_wb},
+        {s_set_F8_f1, set_F8_f1},
+        {s_set_F8_f1_with_wb, set_F8_f1_with_wb},
+        {s_set_F8_f2, set_F8_f2},
+        {s_set_F8_f2_with_wb, set_F8_f2_with_wb},
+        {s_set_F9_f1, set_F9_f1},
+        {s_set_F9_f1_with_wb, set_F9_f1_with_wb},
+        {s_set_F9_f2, set_F9_f2},
+        {s_set_F9_f2_with_wb, set_F9_f2_with_wb},
+        {s_set_G0_f1, set_G0_f1},
+        {s_set_G0_f1_with_wb, set_G0_f1_with_wb},
+        {s_set_G0_f2, set_G0_f2},
+        {s_set_G0_f2_with_wb, set_G0_f2_with_wb},
+        {s_set_G1_f1, set_G1_f1},
+        {s_set_G1_f1_with_wb, set_G1_f1_with_wb},
+        {s_set_G1_f2, set_G1_f2},
+        {s_set_G1_f2_with_wb, set_G1_f2_with_wb},
+        {s_set_G2_f1, set_G2_f1},
+        {s_set_G2_f1_with_wb, set_G2_f1_with_wb},
+        {s_set_G2_f2, set_G2_f2},
+        {s_set_G2_f2_with_wb, set_G2_f2_with_wb},
+        {s_set_G3_f1, set_G3_f1},
+        {s_set_G3_f1_with_wb, set_G3_f1_with_wb},
+        {s_set_G3_f2, set_G3_f2},
+        {s_set_G3_f2_with_wb, set_G3_f2_with_wb},
+        {s_set_G4_f1, set_G4_f1},
+        {s_set_G4_f1_with_wb, set_G4_f1_with_wb},
+        {s_set_G4_f2, set_G4_f2},
+        {s_set_G4_f2_with_wb, set_G4_f2_with_wb},
+        {s_set_G5_f1, set_G5_f1},
+        {s_set_G5_f1_with_wb, set_G5_f1_with_wb},
+        {s_set_G5_f2, set_G5_f2},
+        {s_set_G5_f2_with_wb, set_G5_f2_with_wb},
+        {s_set_G6_f1, set_G6_f1},
+        {s_set_G6_f1_with_wb, set_G6_f1_with_wb},
+        {s_set_G6_f2, set_G6_f2},
+        {s_set_G6_f2_with_wb, set_G6_f2_with_wb},
+        {s_set_G7_f1, set_G7_f1},
+        {s_set_G7_f1_with_wb, set_G7_f1_with_wb},
+        {s_set_G7_f2, set_G7_f2},
+        {s_set_G7_f2_with_wb, set_G7_f2_with_wb},
+        {s_set_G8_f1, set_G8_f1},
+        {s_set_G8_f1_with_wb, set_G8_f1_with_wb},
+        {s_set_G8_f2, set_G8_f2},
+        {s_set_G8_f2_with_wb, set_G8_f2_with_wb},
+        {s_set_G9_f1, set_G9_f1},
+        {s_set_G9_f1_with_wb, set_G9_f1_with_wb},
+        {s_set_G9_f2, set_G9_f2},
+        {s_set_G9_f2_with_wb, set_G9_f2_with_wb},
+        {s_set_H0_f1, set_H0_f1},
+        {s_set_H0_f1_with_wb, set_H0_f1_with_wb},
+        {s_set_H0_f2, set_H0_f2},
+        {s_set_H0_f2_with_wb, set_H0_f2_with_wb},
+        {s_set_H1_f1, set_H1_f1},
+        {s_set_H1_f1_with_wb, set_H1_f1_with_wb},
+        {s_set_H1_f2, set_H1_f2},
+        {s_set_H1_f2_with_wb, set_H1_f2_with_wb},
+        {s_set_H2_f1, set_H2_f1},
+        {s_set_H2_f1_with_wb, set_H2_f1_with_wb},
+        {s_set_H2_f2, set_H2_f2},
+        {s_set_H2_f2_with_wb, set_H2_f2_with_wb},
+        {s_set_H3_f1, set_H3_f1},
+        {s_set_H3_f1_with_wb, set_H3_f1_with_wb},
+        {s_set_H3_f2, set_H3_f2},
+        {s_set_H3_f2_with_wb, set_H3_f2_with_wb},
+        {s_set_H4_f1, set_H4_f1},
+        {s_set_H4_f1_with_wb, set_H4_f1_with_wb},
+        {s_set_H4_f2, set_H4_f2},
+        {s_set_H4_f2_with_wb, set_H4_f2_with_wb},
+        {s_set_H5_f1, set_H5_f1},
+        {s_set_H5_f1_with_wb, set_H5_f1_with_wb},
+        {s_set_H5_f2, set_H5_f2},
+        {s_set_H5_f2_with_wb, set_H5_f2_with_wb},
+        {s_set_H6_f1, set_H6_f1},
+        {s_set_H6_f1_with_wb, set_H6_f1_with_wb},
+        {s_set_H6_f2, set_H6_f2},
+        {s_set_H6_f2_with_wb, set_H6_f2_with_wb},
+        {s_set_H7_f1, set_H7_f1},
+        {s_set_H7_f1_with_wb, set_H7_f1_with_wb},
+        {s_set_H7_f2, set_H7_f2},
+        {s_set_H7_f2_with_wb, set_H7_f2_with_wb},
+        {s_set_H8_f1, set_H8_f1},
+        {s_set_H8_f1_with_wb, set_H8_f1_with_wb},
+        {s_set_H8_f2, set_H8_f2},
+        {s_set_H8_f2_with_wb, set_H8_f2_with_wb},
+        {s_set_H9_f1, set_H9_f1},
+        {s_set_H9_f1_with_wb, set_H9_f1_with_wb},
+        {s_set_H9_f2, set_H9_f2},
+        {s_set_H9_f2_with_wb, set_H9_f2_with_wb},
+        {s_set_I0_f1, set_I0_f1},
+        {s_set_I0_f1_with_wb, set_I0_f1_with_wb},
+        {s_set_I0_f2, set_I0_f2},
+        {s_set_I0_f2_with_wb, set_I0_f2_with_wb},
+        {s_set_I1_f1, set_I1_f1},
+        {s_set_I1_f1_with_wb, set_I1_f1_with_wb},
+        {s_set_I1_f2, set_I1_f2},
+        {s_set_I1_f2_with_wb, set_I1_f2_with_wb},
+        {s_set_I2_f1, set_I2_f1},
+        {s_set_I2_f1_with_wb, set_I2_f1_with_wb},
+        {s_set_I2_f2, set_I2_f2},
+        {s_set_I2_f2_with_wb, set_I2_f2_with_wb},
+        {s_set_I3_f1, set_I3_f1},
+        {s_set_I3_f1_with_wb, set_I3_f1_with_wb},
+        {s_set_I3_f2, set_I3_f2},
+        {s_set_I3_f2_with_wb, set_I3_f2_with_wb},
+        {s_set_I4_f1, set_I4_f1},
+        {s_set_I4_f1_with_wb, set_I4_f1_with_wb},
+        {s_set_I4_f2, set_I4_f2},
+        {s_set_I4_f2_with_wb, set_I4_f2_with_wb},
+        {s_set_I5_f1, set_I5_f1},
+        {s_set_I5_f1_with_wb, set_I5_f1_with_wb},
+        {s_set_I5_f2, set_I5_f2},
+        {s_set_I5_f2_with_wb, set_I5_f2_with_wb},
+        {s_set_I6_f1, set_I6_f1},
+        {s_set_I6_f1_with_wb, set_I6_f1_with_wb},
+        {s_set_I6_f2, set_I6_f2},
+        {s_set_I6_f2_with_wb, set_I6_f2_with_wb},
+        {s_set_I7_f1, set_I7_f1},
+        {s_set_I7_f1_with_wb, set_I7_f1_with_wb},
+        {s_set_I7_f2, set_I7_f2},
+        {s_set_I7_f2_with_wb, set_I7_f2_with_wb},
+        {s_set_I8_f1, set_I8_f1},
+        {s_set_I8_f1_with_wb, set_I8_f1_with_wb},
+        {s_set_I8_f2, set_I8_f2},
+        {s_set_I8_f2_with_wb, set_I8_f2_with_wb},
+        {s_set_I9_f1, set_I9_f1},
+        {s_set_I9_f1_with_wb, set_I9_f1_with_wb},
+        {s_set_I9_f2, set_I9_f2},
+        {s_set_I9_f2_with_wb, set_I9_f2_with_wb},
+        {s_set_J0_f1, set_J0_f1},
+        {s_set_J0_f1_with_wb, set_J0_f1_with_wb},
+        {s_set_J0_f2, set_J0_f2},
+        {s_set_J0_f2_with_wb, set_J0_f2_with_wb},
+        {s_set_J1_f1, set_J1_f1},
+        {s_set_J1_f1_with_wb, set_J1_f1_with_wb},
+        {s_set_J1_f2, set_J1_f2},
+        {s_set_J1_f2_with_wb, set_J1_f2_with_wb},
+        {s_set_J2_f1, set_J2_f1},
+        {s_set_J2_f1_with_wb, set_J2_f1_with_wb},
+        {s_set_J2_f2, set_J2_f2},
+        {s_set_J2_f2_with_wb, set_J2_f2_with_wb},
+        {s_set_J3_f1, set_J3_f1},
+        {s_set_J3_f1_with_wb, set_J3_f1_with_wb},
+        {s_set_J3_f2, set_J3_f2},
+        {s_set_J3_f2_with_wb, set_J3_f2_with_wb},
+        {s_set_J4_f1, set_J4_f1},
+        {s_set_J4_f1_with_wb, set_J4_f1_with_wb},
+        {s_set_J4_f2, set_J4_f2},
+        {s_set_J4_f2_with_wb, set_J4_f2_with_wb},
+        {s_set_J5_f1, set_J5_f1},
+        {s_set_J5_f1_with_wb, set_J5_f1_with_wb},
+        {s_set_J5_f2, set_J5_f2},
+        {s_set_J5_f2_with_wb, set_J5_f2_with_wb},
+        {s_set_J6_f1, set_J6_f1},
+        {s_set_J6_f1_with_wb, set_J6_f1_with_wb},
+        {s_set_J6_f2, set_J6_f2},
+        {s_set_J6_f2_with_wb, set_J6_f2_with_wb},
+        {s_set_J7_f1, set_J7_f1},
+        {s_set_J7_f1_with_wb, set_J7_f1_with_wb},
+        {s_set_J7_f2, set_J7_f2},
+        {s_set_J7_f2_with_wb, set_J7_f2_with_wb},
+        {s_set_J8_f1, set_J8_f1},
+        {s_set_J8_f1_with_wb, set_J8_f1_with_wb},
+        {s_set_J8_f2, set_J8_f2},
+        {s_set_J8_f2_with_wb, set_J8_f2_with_wb},
+        {s_set_J9_f1, set_J9_f1},
+        {s_set_J9_f1_with_wb, set_J9_f1_with_wb},
+        {s_set_J9_f2, set_J9_f2},
+        {s_set_J9_f2_with_wb, set_J9_f2_with_wb},
+        {s_set_K0_f1, set_K0_f1},
+        {s_set_K0_f1_with_wb, set_K0_f1_with_wb},
+        {s_set_K0_f2, set_K0_f2},
+        {s_set_K0_f2_with_wb, set_K0_f2_with_wb},
+        {s_set_K1_f1, set_K1_f1},
+        {s_set_K1_f1_with_wb, set_K1_f1_with_wb},
+        {s_set_K1_f2, set_K1_f2},
+        {s_set_K1_f2_with_wb, set_K1_f2_with_wb},
+        {s_set_K2_f1, set_K2_f1},
+        {s_set_K2_f1_with_wb, set_K2_f1_with_wb},
+        {s_set_K2_f2, set_K2_f2},
+        {s_set_K2_f2_with_wb, set_K2_f2_with_wb},
+        {s_set_K3_f1, set_K3_f1},
+        {s_set_K3_f1_with_wb, set_K3_f1_with_wb},
+        {s_set_K3_f2, set_K3_f2},
+        {s_set_K3_f2_with_wb, set_K3_f2_with_wb},
+        {s_set_K4_f1, set_K4_f1},
+        {s_set_K4_f1_with_wb, set_K4_f1_with_wb},
+        {s_set_K4_f2, set_K4_f2},
+        {s_set_K4_f2_with_wb, set_K4_f2_with_wb},
+        {s_set_K5_f1, set_K5_f1},
+        {s_set_K5_f1_with_wb, set_K5_f1_with_wb},
+        {s_set_K5_f2, set_K5_f2},
+        {s_set_K5_f2_with_wb, set_K5_f2_with_wb},
+        {s_set_K6_f1, set_K6_f1},
+        {s_set_K6_f1_with_wb, set_K6_f1_with_wb},
+        {s_set_K6_f2, set_K6_f2},
+        {s_set_K6_f2_with_wb, set_K6_f2_with_wb},
+        {s_set_K7_f1, set_K7_f1},
+        {s_set_K7_f1_with_wb, set_K7_f1_with_wb},
+        {s_set_K7_f2, set_K7_f2},
+        {s_set_K7_f2_with_wb, set_K7_f2_with_wb},
+        {s_set_K8_f1, set_K8_f1},
+        {s_set_K8_f1_with_wb, set_K8_f1_with_wb},
+        {s_set_K8_f2, set_K8_f2},
+        {s_set_K8_f2_with_wb, set_K8_f2_with_wb},
+        {s_set_K9_f1, set_K9_f1},
+        {s_set_K9_f1_with_wb, set_K9_f1_with_wb},
+        {s_set_K9_f2, set_K9_f2},
+        {s_set_K9_f2_with_wb, set_K9_f2_with_wb},
+        {s_set_L0_f1, set_L0_f1},
+        {s_set_L0_f1_with_wb, set_L0_f1_with_wb},
+        {s_set_L0_f2, set_L0_f2},
+        {s_set_L0_f2_with_wb, set_L0_f2_with_wb},
+        {s_set_L1_f1, set_L1_f1},
+        {s_set_L1_f1_with_wb, set_L1_f1_with_wb},
+        {s_set_L1_f2, set_L1_f2},
+        {s_set_L1_f2_with_wb, set_L1_f2_with_wb},
+        {s_set_L2_f1, set_L2_f1},
+        {s_set_L2_f1_with_wb, set_L2_f1_with_wb},
+        {s_set_L2_f2, set_L2_f2},
+        {s_set_L2_f2_with_wb, set_L2_f2_with_wb},
+        {s_set_L3_f1, set_L3_f1},
+        {s_set_L3_f1_with_wb, set_L3_f1_with_wb},
+        {s_set_L3_f2, set_L3_f2},
+        {s_set_L3_f2_with_wb, set_L3_f2_with_wb},
+        {s_set_L4_f1, set_L4_f1},
+        {s_set_L4_f1_with_wb, set_L4_f1_with_wb},
+        {s_set_L4_f2, set_L4_f2},
+        {s_set_L4_f2_with_wb, set_L4_f2_with_wb},
+        {s_set_L5_f1, set_L5_f1},
+        {s_set_L5_f1_with_wb, set_L5_f1_with_wb},
+        {s_set_L5_f2, set_L5_f2},
+        {s_set_L5_f2_with_wb, set_L5_f2_with_wb},
+        {s_set_L6_f1, set_L6_f1},
+        {s_set_L6_f1_with_wb, set_L6_f1_with_wb},
+        {s_set_L6_f2, set_L6_f2},
+        {s_set_L6_f2_with_wb, set_L6_f2_with_wb},
+        {s_set_L7_f1, set_L7_f1},
+        {s_set_L7_f1_with_wb, set_L7_f1_with_wb},
+        {s_set_L7_f2, set_L7_f2},
+        {s_set_L7_f2_with_wb, set_L7_f2_with_wb},
+        {s_set_L8_f1, set_L8_f1},
+        {s_set_L8_f1_with_wb, set_L8_f1_with_wb},
+        {s_set_L8_f2, set_L8_f2},
+        {s_set_L8_f2_with_wb, set_L8_f2_with_wb},
+        {s_set_L9_f1, set_L9_f1},
+        {s_set_L9_f1_with_wb, set_L9_f1_with_wb},
+        {s_set_L9_f2, set_L9_f2},
+        {s_set_L9_f2_with_wb, set_L9_f2_with_wb},
+        {s_set_M0_f1, set_M0_f1},
+        {s_set_M0_f1_with_wb, set_M0_f1_with_wb},
+        {s_set_M0_f2, set_M0_f2},
+        {s_set_M0_f2_with_wb, set_M0_f2_with_wb},
+        {s_set_M1_f1, set_M1_f1},
+        {s_set_M1_f1_with_wb, set_M1_f1_with_wb},
+        {s_set_M1_f2, set_M1_f2},
+        {s_set_M1_f2_with_wb, set_M1_f2_with_wb},
+        {s_set_M2_f1, set_M2_f1},
+        {s_set_M2_f1_with_wb, set_M2_f1_with_wb},
+        {s_set_M2_f2, set_M2_f2},
+        {s_set_M2_f2_with_wb, set_M2_f2_with_wb},
+        {s_set_M3_f1, set_M3_f1},
+        {s_set_M3_f1_with_wb, set_M3_f1_with_wb},
+        {s_set_M3_f2, set_M3_f2},
+        {s_set_M3_f2_with_wb, set_M3_f2_with_wb},
+        {s_set_M4_f1, set_M4_f1},
+        {s_set_M4_f1_with_wb, set_M4_f1_with_wb},
+        {s_set_M4_f2, set_M4_f2},
+        {s_set_M4_f2_with_wb, set_M4_f2_with_wb},
+        {s_set_M5_f1, set_M5_f1},
+        {s_set_M5_f1_with_wb, set_M5_f1_with_wb},
+        {s_set_M5_f2, set_M5_f2},
+        {s_set_M5_f2_with_wb, set_M5_f2_with_wb},
+        {s_set_M6_f1, set_M6_f1},
+        {s_set_M6_f1_with_wb, set_M6_f1_with_wb},
+        {s_set_M6_f2, set_M6_f2},
+        {s_set_M6_f2_with_wb, set_M6_f2_with_wb},
+        {s_set_M7_f1, set_M7_f1},
+        {s_set_M7_f1_with_wb, set_M7_f1_with_wb},
+        {s_set_M7_f2, set_M7_f2},
+        {s_set_M7_f2_with_wb, set_M7_f2_with_wb},
+        {s_set_M8_f1, set_M8_f1},
+        {s_set_M8_f1_with_wb, set_M8_f1_with_wb},
+        {s_set_M8_f2, set_M8_f2},
+        {s_set_M8_f2_with_wb, set_M8_f2_with_wb},
+        {s_set_M9_f1, set_M9_f1},
+        {s_set_M9_f1_with_wb, set_M9_f1_with_wb},
+        {s_set_M9_f2, set_M9_f2},
+        {s_set_M9_f2_with_wb, set_M9_f2_with_wb},
+        {s_set_N0_f1, set_N0_f1},
+        {s_set_N0_f1_with_wb, set_N0_f1_with_wb},
+        {s_set_N0_f2, set_N0_f2},
+        {s_set_N0_f2_with_wb, set_N0_f2_with_wb},
+        {s_set_N1_f1, set_N1_f1},
+        {s_set_N1_f1_with_wb, set_N1_f1_with_wb},
+        {s_set_N1_f2, set_N1_f2},
+        {s_set_N1_f2_with_wb, set_N1_f2_with_wb},
+        {s_set_N2_f1, set_N2_f1},
+        {s_set_N2_f1_with_wb, set_N2_f1_with_wb},
+        {s_set_N2_f2, set_N2_f2},
+        {s_set_N2_f2_with_wb, set_N2_f2_with_wb},
+        {s_set_N3_f1, set_N3_f1},
+        {s_set_N3_f1_with_wb, set_N3_f1_with_wb},
+        {s_set_N3_f2, set_N3_f2},
+        {s_set_N3_f2_with_wb, set_N3_f2_with_wb},
+        {s_set_N4_f1, set_N4_f1},
+        {s_set_N4_f1_with_wb, set_N4_f1_with_wb},
+        {s_set_N4_f2, set_N4_f2},
+        {s_set_N4_f2_with_wb, set_N4_f2_with_wb},
+        {s_set_N5_f1, set_N5_f1},
+        {s_set_N5_f1_with_wb, set_N5_f1_with_wb},
+        {s_set_N5_f2, set_N5_f2},
+        {s_set_N5_f2_with_wb, set_N5_f2_with_wb},
+        {s_set_N6_f1, set_N6_f1},
+        {s_set_N6_f1_with_wb, set_N6_f1_with_wb},
+        {s_set_N6_f2, set_N6_f2},
+        {s_set_N6_f2_with_wb, set_N6_f2_with_wb},
+        {s_set_N7_f1, set_N7_f1},
+        {s_set_N7_f1_with_wb, set_N7_f1_with_wb},
+        {s_set_N7_f2, set_N7_f2},
+        {s_set_N7_f2_with_wb, set_N7_f2_with_wb},
+        {s_set_N8_f1, set_N8_f1},
+        {s_set_N8_f1_with_wb, set_N8_f1_with_wb},
+        {s_set_N8_f2, set_N8_f2},
+        {s_set_N8_f2_with_wb, set_N8_f2_with_wb},
+        {s_set_N9_f1, set_N9_f1},
+        {s_set_N9_f1_with_wb, set_N9_f1_with_wb},
+        {s_set_N9_f2, set_N9_f2},
+        {s_set_N9_f2_with_wb, set_N9_f2_with_wb},
+        {s_set_O0_f1, set_O0_f1},
+        {s_set_O0_f1_with_wb, set_O0_f1_with_wb},
+        {s_set_O0_f2, set_O0_f2},
+        {s_set_O0_f2_with_wb, set_O0_f2_with_wb},
+        {s_set_O1_f1, set_O1_f1},
+        {s_set_O1_f1_with_wb, set_O1_f1_with_wb},
+        {s_set_O1_f2, set_O1_f2},
+        {s_set_O1_f2_with_wb, set_O1_f2_with_wb},
+        {s_set_O2_f1, set_O2_f1},
+        {s_set_O2_f1_with_wb, set_O2_f1_with_wb},
+        {s_set_O2_f2, set_O2_f2},
+        {s_set_O2_f2_with_wb, set_O2_f2_with_wb},
+        {s_set_O3_f1, set_O3_f1},
+        {s_set_O3_f1_with_wb, set_O3_f1_with_wb},
+        {s_set_O3_f2, set_O3_f2},
+        {s_set_O3_f2_with_wb, set_O3_f2_with_wb},
+        {s_set_O4_f1, set_O4_f1},
+        {s_set_O4_f1_with_wb, set_O4_f1_with_wb},
+        {s_set_O4_f2, set_O4_f2},
+        {s_set_O4_f2_with_wb, set_O4_f2_with_wb},
+        {s_set_O5_f1, set_O5_f1},
+        {s_set_O5_f1_with_wb, set_O5_f1_with_wb},
+        {s_set_O5_f2, set_O5_f2},
+        {s_set_O5_f2_with_wb, set_O5_f2_with_wb},
+        {s_set_O6_f1, set_O6_f1},
+        {s_set_O6_f1_with_wb, set_O6_f1_with_wb},
+        {s_set_O6_f2, set_O6_f2},
+        {s_set_O6_f2_with_wb, set_O6_f2_with_wb},
+        {s_set_O7_f1, set_O7_f1},
+        {s_set_O7_f1_with_wb, set_O7_f1_with_wb},
+        {s_set_O7_f2, set_O7_f2},
+        {s_set_O7_f2_with_wb, set_O7_f2_with_wb},
+        {s_set_O8_f1, set_O8_f1},
+        {s_set_O8_f1_with_wb, set_O8_f1_with_wb},
+        {s_set_O8_f2, set_O8_f2},
+        {s_set_O8_f2_with_wb, set_O8_f2_with_wb},
+        {s_set_O9_f1, set_O9_f1},
+        {s_set_O9_f1_with_wb, set_O9_f1_with_wb},
+        {s_set_O9_f2, set_O9_f2},
+        {s_set_O9_f2_with_wb, set_O9_f2_with_wb},
+        {s_set_P0_f1, set_P0_f1},
+        {s_set_P0_f1_with_wb, set_P0_f1_with_wb},
+        {s_set_P0_f2, set_P0_f2},
+        {s_set_P0_f2_with_wb, set_P0_f2_with_wb},
+        {s_set_P1_f1, set_P1_f1},
+        {s_set_P1_f1_with_wb, set_P1_f1_with_wb},
+        {s_set_P1_f2, set_P1_f2},
+        {s_set_P1_f2_with_wb, set_P1_f2_with_wb},
+        {s_set_P2_f1, set_P2_f1},
+        {s_set_P2_f1_with_wb, set_P2_f1_with_wb},
+        {s_set_P2_f2, set_P2_f2},
+        {s_set_P2_f2_with_wb, set_P2_f2_with_wb},
+        {s_set_P3_f1, set_P3_f1},
+        {s_set_P3_f1_with_wb, set_P3_f1_with_wb},
+        {s_set_P3_f2, set_P3_f2},
+        {s_set_P3_f2_with_wb, set_P3_f2_with_wb},
+        {s_set_P4_f1, set_P4_f1},
+        {s_set_P4_f1_with_wb, set_P4_f1_with_wb},
+        {s_set_P4_f2, set_P4_f2},
+        {s_set_P4_f2_with_wb, set_P4_f2_with_wb},
+        {s_set_P5_f1, set_P5_f1},
+        {s_set_P5_f1_with_wb, set_P5_f1_with_wb},
+        {s_set_P5_f2, set_P5_f2},
+        {s_set_P5_f2_with_wb, set_P5_f2_with_wb},
+        {s_set_P6_f1, set_P6_f1},
+        {s_set_P6_f1_with_wb, set_P6_f1_with_wb},
+        {s_set_P6_f2, set_P6_f2},
+        {s_set_P6_f2_with_wb, set_P6_f2_with_wb},
+        {s_set_P7_f1, set_P7_f1},
+        {s_set_P7_f1_with_wb, set_P7_f1_with_wb},
+        {s_set_P7_f2, set_P7_f2},
+        {s_set_P7_f2_with_wb, set_P7_f2_with_wb},
+        {s_set_P8_f1, set_P8_f1},
+        {s_set_P8_f1_with_wb, set_P8_f1_with_wb},
+        {s_set_P8_f2, set_P8_f2},
+        {s_set_P8_f2_with_wb, set_P8_f2_with_wb},
+        {s_set_P9_f1, set_P9_f1},
+        {s_set_P9_f1_with_wb, set_P9_f1_with_wb},
+        {s_set_P9_f2, set_P9_f2},
+        {s_set_P9_f2_with_wb, set_P9_f2_with_wb},
+        {s_set_Q0_f1, set_Q0_f1},
+        {s_set_Q0_f1_with_wb, set_Q0_f1_with_wb},
+        {s_set_Q0_f2, set_Q0_f2},
+        {s_set_Q0_f2_with_wb, set_Q0_f2_with_wb},
+        {s_set_Q1_f1, set_Q1_f1},
+        {s_set_Q1_f1_with_wb, set_Q1_f1_with_wb},
+        {s_set_Q1_f2, set_Q1_f2},
+        {s_set_Q1_f2_with_wb, set_Q1_f2_with_wb},
+        {s_set_Q2_f1, set_Q2_f1},
+        {s_set_Q2_f1_with_wb, set_Q2_f1_with_wb},
+        {s_set_Q2_f2, set_Q2_f2},
+        {s_set_Q2_f2_with_wb, set_Q2_f2_with_wb},
+        {s_set_Q3_f1, set_Q3_f1},
+        {s_set_Q3_f1_with_wb, set_Q3_f1_with_wb},
+        {s_set_Q3_f2, set_Q3_f2},
+        {s_set_Q3_f2_with_wb, set_Q3_f2_with_wb},
+        {s_set_Q4_f1, set_Q4_f1},
+        {s_set_Q4_f1_with_wb, set_Q4_f1_with_wb},
+        {s_set_Q4_f2, set_Q4_f2},
+        {s_set_Q4_f2_with_wb, set_Q4_f2_with_wb},
+        {s_set_Q5_f1, set_Q5_f1},
+        {s_set_Q5_f1_with_wb, set_Q5_f1_with_wb},
+        {s_set_Q5_f2, set_Q5_f2},
+        {s_set_Q5_f2_with_wb, set_Q5_f2_with_wb},
+        {s_set_Q6_f1, set_Q6_f1},
+        {s_set_Q6_f1_with_wb, set_Q6_f1_with_wb},
+        {s_set_Q6_f2, set_Q6_f2},
+        {s_set_Q6_f2_with_wb, set_Q6_f2_with_wb},
+        {s_set_Q7_f1, set_Q7_f1},
+        {s_set_Q7_f1_with_wb, set_Q7_f1_with_wb},
+        {s_set_Q7_f2, set_Q7_f2},
+        {s_set_Q7_f2_with_wb, set_Q7_f2_with_wb},
+        {s_set_Q8_f1, set_Q8_f1},
+        {s_set_Q8_f1_with_wb, set_Q8_f1_with_wb},
+        {s_set_Q8_f2, set_Q8_f2},
+        {s_set_Q8_f2_with_wb, set_Q8_f2_with_wb},
+        {s_set_Q9_f1, set_Q9_f1},
+        {s_set_Q9_f1_with_wb, set_Q9_f1_with_wb},
+        {s_set_Q9_f2, set_Q9_f2},
+        {s_set_Q9_f2_with_wb, set_Q9_f2_with_wb},
+        {s_set_R0_f1, set_R0_f1},
+        {s_set_R0_f1_with_wb, set_R0_f1_with_wb},
+        {s_set_R0_f2, set_R0_f2},
+        {s_set_R0_f2_with_wb, set_R0_f2_with_wb},
+        {s_set_R1_f1, set_R1_f1},
+        {s_set_R1_f1_with_wb, set_R1_f1_with_wb},
+        {s_set_R1_f2, set_R1_f2},
+        {s_set_R1_f2_with_wb, set_R1_f2_with_wb},
+        {s_set_R2_f1, set_R2_f1},
+        {s_set_R2_f1_with_wb, set_R2_f1_with_wb},
+        {s_set_R2_f2, set_R2_f2},
+        {s_set_R2_f2_with_wb, set_R2_f2_with_wb},
+        {s_set_R3_f1, set_R3_f1},
+        {s_set_R3_f1_with_wb, set_R3_f1_with_wb},
+        {s_set_R3_f2, set_R3_f2},
+        {s_set_R3_f2_with_wb, set_R3_f2_with_wb},
+        {s_set_R4_f1, set_R4_f1},
+        {s_set_R4_f1_with_wb, set_R4_f1_with_wb},
+        {s_set_R4_f2, set_R4_f2},
+        {s_set_R4_f2_with_wb, set_R4_f2_with_wb},
+        {s_set_R5_f1, set_R5_f1},
+        {s_set_R5_f1_with_wb, set_R5_f1_with_wb},
+        {s_set_R5_f2, set_R5_f2},
+        {s_set_R5_f2_with_wb, set_R5_f2_with_wb},
+        {s_set_R6_f1, set_R6_f1},
+        {s_set_R6_f1_with_wb, set_R6_f1_with_wb},
+        {s_set_R6_f2, set_R6_f2},
+        {s_set_R6_f2_with_wb, set_R6_f2_with_wb},
+        {s_set_R7_f1, set_R7_f1},
+        {s_set_R7_f1_with_wb, set_R7_f1_with_wb},
+        {s_set_R7_f2, set_R7_f2},
+        {s_set_R7_f2_with_wb, set_R7_f2_with_wb},
+        {s_set_R8_f1, set_R8_f1},
+        {s_set_R8_f1_with_wb, set_R8_f1_with_wb},
+        {s_set_R8_f2, set_R8_f2},
+        {s_set_R8_f2_with_wb, set_R8_f2_with_wb},
+        {s_set_R9_f1, set_R9_f1},
+        {s_set_R9_f1_with_wb, set_R9_f1_with_wb},
+        {s_set_R9_f2, set_R9_f2},
+        {s_set_R9_f2_with_wb, set_R9_f2_with_wb},
+        {s_set_S0_f1, set_S0_f1},
+        {s_set_S0_f1_with_wb, set_S0_f1_with_wb},
+        {s_set_S0_f2, set_S0_f2},
+        {s_set_S0_f2_with_wb, set_S0_f2_with_wb},
+        {s_set_S1_f1, set_S1_f1},
+        {s_set_S1_f1_with_wb, set_S1_f1_with_wb},
+        {s_set_S1_f2, set_S1_f2},
+        {s_set_S1_f2_with_wb, set_S1_f2_with_wb},
+        {s_set_S2_f1, set_S2_f1},
+        {s_set_S2_f1_with_wb, set_S2_f1_with_wb},
+        {s_set_S2_f2, set_S2_f2},
+        {s_set_S2_f2_with_wb, set_S2_f2_with_wb},
+        {s_set_S3_f1, set_S3_f1},
+        {s_set_S3_f1_with_wb, set_S3_f1_with_wb},
+        {s_set_S3_f2, set_S3_f2},
+        {s_set_S3_f2_with_wb, set_S3_f2_with_wb},
+        {s_set_S4_f1, set_S4_f1},
+        {s_set_S4_f1_with_wb, set_S4_f1_with_wb},
+        {s_set_S4_f2, set_S4_f2},
+        {s_set_S4_f2_with_wb, set_S4_f2_with_wb},
+        {s_set_S5_f1, set_S5_f1},
+        {s_set_S5_f1_with_wb, set_S5_f1_with_wb},
+        {s_set_S5_f2, set_S5_f2},
+        {s_set_S5_f2_with_wb, set_S5_f2_with_wb},
+        {s_set_S6_f1, set_S6_f1},
+        {s_set_S6_f1_with_wb, set_S6_f1_with_wb},
+        {s_set_S6_f2, set_S6_f2},
+        {s_set_S6_f2_with_wb, set_S6_f2_with_wb},
+        {s_set_S7_f1, set_S7_f1},
+        {s_set_S7_f1_with_wb, set_S7_f1_with_wb},
+        {s_set_S7_f2, set_S7_f2},
+        {s_set_S7_f2_with_wb, set_S7_f2_with_wb},
+        {s_set_S8_f1, set_S8_f1},
+        {s_set_S8_f1_with_wb, set_S8_f1_with_wb},
+        {s_set_S8_f2, set_S8_f2},
+        {s_set_S8_f2_with_wb, set_S8_f2_with_wb},
+        {s_set_S9_f1, set_S9_f1},
+        {s_set_S9_f1_with_wb, set_S9_f1_with_wb},
+        {s_set_S9_f2, set_S9_f2},
+        {s_set_S9_f2_with_wb, set_S9_f2_with_wb},
+        {s_set_T0_f1, set_T0_f1},
+        {s_set_T0_f1_with_wb, set_T0_f1_with_wb},
+        {s_set_T0_f2, set_T0_f2},
+        {s_set_T0_f2_with_wb, set_T0_f2_with_wb},
+        {s_set_T1_f1, set_T1_f1},
+        {s_set_T1_f1_with_wb, set_T1_f1_with_wb},
+        {s_set_T1_f2, set_T1_f2},
+        {s_set_T1_f2_with_wb, set_T1_f2_with_wb},
+        {s_set_T2_f1, set_T2_f1},
+        {s_set_T2_f1_with_wb, set_T2_f1_with_wb},
+        {s_set_T2_f2, set_T2_f2},
+        {s_set_T2_f2_with_wb, set_T2_f2_with_wb},
+        {s_set_T3_f1, set_T3_f1},
+        {s_set_T3_f1_with_wb, set_T3_f1_with_wb},
+        {s_set_T3_f2, set_T3_f2},
+        {s_set_T3_f2_with_wb, set_T3_f2_with_wb},
+        {s_set_T4_f1, set_T4_f1},
+        {s_set_T4_f1_with_wb, set_T4_f1_with_wb},
+        {s_set_T4_f2, set_T4_f2},
+        {s_set_T4_f2_with_wb, set_T4_f2_with_wb},
+        {s_set_T5_f1, set_T5_f1},
+        {s_set_T5_f1_with_wb, set_T5_f1_with_wb},
+        {s_set_T5_f2, set_T5_f2},
+        {s_set_T5_f2_with_wb, set_T5_f2_with_wb},
+        {s_set_T6_f1, set_T6_f1},
+        {s_set_T6_f1_with_wb, set_T6_f1_with_wb},
+        {s_set_T6_f2, set_T6_f2},
+        {s_set_T6_f2_with_wb, set_T6_f2_with_wb},
+        {s_set_T7_f1, set_T7_f1},
+        {s_set_T7_f1_with_wb, set_T7_f1_with_wb},
+        {s_set_T7_f2, set_T7_f2},
+        {s_set_T7_f2_with_wb, set_T7_f2_with_wb},
+        {s_set_T8_f1, set_T8_f1},
+        {s_set_T8_f1_with_wb, set_T8_f1_with_wb},
+        {s_set_T8_f2, set_T8_f2},
+        {s_set_T8_f2_with_wb, set_T8_f2_with_wb},
+        {s_set_T9_f1, set_T9_f1},
+        {s_set_T9_f1_with_wb, set_T9_f1_with_wb},
+        {s_set_T9_f2, set_T9_f2},
+        {s_set_T9_f2_with_wb, set_T9_f2_with_wb},
         {s_set_LeakPath_first, set_LeakPath_first},
         {s_set_LeakPath_first_with_wb, set_LeakPath_first_with_wb},
         {s_set_LeakPath_last, set_LeakPath_last},
