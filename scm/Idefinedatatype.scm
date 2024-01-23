@@ -73,51 +73,21 @@
       (let ((procname
               (string->symbol (string-append
                                 "set"
-                                (string-append
-                                  "-"
-                                  (string-append
-                                    (symbol->string type-name)
-                                    (string-append
-                                      "-"
-                                      (string-append
-                                        (symbol->string (vector-ref field-names-v i))
-                                        "!")))))))
+                                "-"
+                                (symbol->string type-name)
+                                "-"
+                                (symbol->string (vector-ref field-names-v i))
+                                "!")))
              (procname-bakup
                (string->symbol (string-append
                                  "set"
-                                 (string-append
-                                   "-"
-                                   (string-append
-                                     (symbol->string type-name)
-                                     (string-append
-                                       "-"
-                                       (string-append
-                                         (symbol->string (vector-ref field-names-v i))
-                                         "!-bakup")))))))
-             (procname-with-wb
-               (string->symbol (string-append
-                                 "set"
-                                 (string-append
-                                   "-"
-                                   (string-append
-                                     (symbol->string type-name)
-                                     (string-append
-                                       "-"
-                                       (string-append
-                                         (symbol->string (vector-ref field-names-v i))
-                                         "!-with-wb")))))))
-             (c-modifier-with-wb-procname
-               (string->symbol (string-append
-                                 "c-data-type-modifier-with-wb-of-field-"
-                                 (number->string i)))))
+                                 "-"
+                                 (symbol->string type-name)
+                                 "-"
+                                 (symbol->string (vector-ref field-names-v i))
+                                 "!-bakup"))))
         (begin
-          (eval `(define ,procname
-                         (lambda (obj value call-site-info) ;; 引数call-site-infoは使わない，WB付きのmodifierの引数個数と同じために
-                           (c-data-type-modifier obj ,i value)))) ;; 型検査は省略, 人工チェックの代わりに
           (eval `(define ,procname-bakup ,procname))
-          (eval `(define ,procname-with-wb
-                         (lambda (obj value call-site-info)
-                           (,c-modifier-with-wb-procname obj value call-site-info)))) ;; 型検査は省略, 人工チェックの代わりに
           (loop (+ i 1))))
       #t)))
 
