@@ -166,10 +166,7 @@ typedef struct collected_line_number {
 typedef struct ref_path_entry {
     SCM class_obj; // long, user_defined_class_obj or fixed_type_code
     long ref_field_index;
-    int is_active; // needs write-barriers and record-slots?
     int is_repeat;
-    size_t gc_count_at_created;
-    size_t gc_count_at_last_reactivated;
     CollectedLineNumber *line_numbers;
 } RefPathEntry;
 
@@ -177,6 +174,8 @@ typedef struct ref_path_entry {
  * Entry Definition in focusing_ref_path_list
  */
 typedef struct ref_path {
+    long active_index;
+    long gc_count_of_active_index_switching;
     UT_array *entries; // RefPathEntry is inside
     long hash;
     struct ref_path *prev;

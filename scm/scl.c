@@ -682,7 +682,7 @@ double pmantexp2dbl(bmant, point)
   if (BOOL_F == bmant) return REAL(scm_narn);
   if (point >= 0) {
     if (point < 23 && INUM(scm_intlength(bmant)) <= dbl_mant_dig)
-      return ldexp(num2dbl(bmant,ARG1,s_str2number) * dpows5[point], point);
+      return ldexp(num2dbl(bmant, (char *) ARG1, s_str2number) * dpows5[point], point);
     {
       SCM quo, num = product(bmant, VELTS(pows5)[(long) point]);
       int bex = INUM(scm_intlength(num)) - dbl_mant_dig;
@@ -712,7 +712,7 @@ double pmantexp2dbl(bmant, point)
     }
   }
   if (-point < 23 && INUM(scm_intlength(bmant)) <= dbl_mant_dig)
-    return ldexp(num2dbl(bmant,ARG1,s_str2number) / dpows5[-point], point);
+    return ldexp(num2dbl(bmant, (char *) ARG1, s_str2number) / dpows5[-point], point);
   {
     int maxpow = LENGTH(pows5) - 1;
     SCM num, quo, scl = (-point <= maxpow) ?

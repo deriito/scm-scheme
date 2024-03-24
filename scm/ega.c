@@ -115,56 +115,112 @@ static void try_record_metadata(RefPath *ref_path) {
         return;
     }
 
-    for (long i = 0; i < len - 1L; ++i) {
-        RefPathEntry *curr_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i);
-        if (curr_entry->class_obj <= tc_free_cell) {
-            continue; // fixed type
+    RefPathEntry *prev_entry = NULL;
+    RefPathEntry *curr_entry = NULL;
+    RefPathEntry *post_entry = NULL;
+
+    if (ref_path->active_index == 0) { // 先頭
+        curr_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, ref_path->active_index);
+        post_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, ref_path->active_index + 1L);
+    } else if (ref_path->active_index == (len - 1L)) { // 末尾
+        prev_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, ref_path->active_index - 1L);
+        curr_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, ref_path->active_index);
+    } else if (0 < ref_path->active_index && ref_path->active_index < len - 1L) { // 真ん中
+        prev_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, ref_path->active_index - 1L);
+        curr_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, ref_path->active_index);
+        post_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, ref_path->active_index + 1L);
+    } else {
+        wta(UNDEFINED, "WTF???", s_try_record_metadata);
+    }
+
+    if (NULL != prev_entry && prev_entry->class_obj > tc_free_cell) { // not fixed type
+        if (NULL != curr_entry) {
+            WriteBarrierUpdateMetadata *prev_type_metadata;
+            SCM prev_entry_class_obj = prev_entry->class_obj;
+            HASH_FIND(hh, wb_update_metadata_hash, &prev_entry_class_obj, sizeof(SCM), prev_type_metadata);
+            if (NULL == prev_type_metadata) {
+                prev_type_metadata = (WriteBarrierUpdateMetadata *) malloc(sizeof(WriteBarrierUpdateMetadata));
+                if (NULL == prev_type_metadata) {
+                    fprintf(stderr, "[prev_type_metadata]内存分配失败!\n");
+                    exit(-1);
+                }
+                prev_type_metadata->data_type_def = prev_entry_class_obj;
+                prev_type_metadata->field_ref_info = NULL;
+                HASH_ADD(hh, wb_update_metadata_hash, data_type_def, sizeof(SCM), prev_type_metadata);
+            }
+
+            MetadataPerField *prev_field_ref_info;
+            HASH_FIND(hh, prev_type_metadata->field_ref_info, &(prev_entry->ref_field_index), sizeof(long), prev_field_ref_info);
+            if (NULL == prev_field_ref_info) {
+                prev_field_ref_info = (MetadataPerField *) malloc(sizeof(MetadataPerField));
+                if (NULL == prev_field_ref_info) {
+                    fprintf(stderr, "[prev_field_ref_info]内存分配失败!\n");
+                    exit(-1);
+                }
+                prev_field_ref_info->field_index = curr_entry->ref_field_index;
+                prev_field_ref_info->update_state_by_ref_type = NULL;
+                HASH_ADD(hh, prev_type_metadata->field_ref_info, field_index, sizeof(long), prev_field_ref_info);
+            }
+
+            UpdateStateByRefType *prev_ref_type_state;
+            SCM curr_entry_class_obj_or_fixed_type_code = curr_entry->class_obj;
+            HASH_FIND(hh, prev_field_ref_info->update_state_by_ref_type, &curr_entry_class_obj_or_fixed_type_code, sizeof(SCM), prev_ref_type_state);
+            if (NULL == prev_ref_type_state) {
+                prev_ref_type_state = (UpdateStateByRefType *) malloc(sizeof(UpdateStateByRefType));
+                if (NULL == prev_ref_type_state) {
+                    fprintf(stderr, "[prev_ref_type_state]内存分配失败!\n");
+                    exit(-1);
+                }
+                prev_ref_type_state->ref_data_type = curr_entry_class_obj_or_fixed_type_code;
+                prev_ref_type_state->is_to_add = 0;
+                HASH_ADD(hh, prev_field_ref_info->update_state_by_ref_type, ref_data_type, sizeof(SCM), prev_ref_type_state);
+            }
         }
+    }
 
-        RefPathEntry *next_entry = (RefPathEntry *) utarray_eltptr(ref_path->entries, i + 1L);
-
-        WriteBarrierUpdateMetadata *curr_type_metadata;
-        SCM curr_entry_class_obj = curr_entry->class_obj;
-        HASH_FIND(hh, wb_update_metadata_hash, &curr_entry_class_obj, sizeof(SCM), curr_type_metadata);
-        if (NULL == curr_type_metadata) {
-            curr_type_metadata = (WriteBarrierUpdateMetadata *) malloc(sizeof(WriteBarrierUpdateMetadata));
+    if (NULL != curr_entry && curr_entry->class_obj > tc_free_cell) {
+        if (NULL != post_entry) {
+            WriteBarrierUpdateMetadata *curr_type_metadata;
+            SCM curr_entry_class_obj = curr_entry->class_obj;
+            HASH_FIND(hh, wb_update_metadata_hash, &curr_entry_class_obj, sizeof(SCM), curr_type_metadata);
             if (NULL == curr_type_metadata) {
-                fprintf(stderr, "[curr_type_metadata]内存分配失败!\n");
-                exit(-1);
+                curr_type_metadata = (WriteBarrierUpdateMetadata *) malloc(sizeof(WriteBarrierUpdateMetadata));
+                if (NULL == curr_type_metadata) {
+                    fprintf(stderr, "[curr_type_metadata]内存分配失败!\n");
+                    exit(-1);
+                }
+                curr_type_metadata->data_type_def = curr_entry_class_obj;
+                curr_type_metadata->field_ref_info = NULL;
+                HASH_ADD(hh, wb_update_metadata_hash, data_type_def, sizeof(SCM), curr_type_metadata);
             }
-            curr_type_metadata->data_type_def = curr_entry_class_obj;
-            curr_type_metadata->field_ref_info = NULL;
-            HASH_ADD(hh, wb_update_metadata_hash, data_type_def, sizeof(SCM), curr_type_metadata);
-        }
 
-        MetadataPerField *curr_field_ref_info;
-        HASH_FIND(hh, curr_type_metadata->field_ref_info, &(curr_entry->ref_field_index), sizeof(long), curr_field_ref_info);
-        if (NULL == curr_field_ref_info) {
-            curr_field_ref_info = (MetadataPerField *) malloc(sizeof(MetadataPerField));
+            MetadataPerField *curr_field_ref_info;
+            HASH_FIND(hh, curr_type_metadata->field_ref_info, &(curr_entry->ref_field_index), sizeof(long), curr_field_ref_info);
             if (NULL == curr_field_ref_info) {
-                fprintf(stderr, "[curr_field_ref_info]内存分配失败!\n");
-                exit(-1);
+                curr_field_ref_info = (MetadataPerField *) malloc(sizeof(MetadataPerField));
+                if (NULL == curr_field_ref_info) {
+                    fprintf(stderr, "[curr_field_ref_info]内存分配失败!\n");
+                    exit(-1);
+                }
+                curr_field_ref_info->field_index = curr_entry->ref_field_index;
+                curr_field_ref_info->update_state_by_ref_type = NULL;
+                HASH_ADD(hh, curr_type_metadata->field_ref_info, field_index, sizeof(long), curr_field_ref_info);
             }
-            curr_field_ref_info->field_index = curr_entry->ref_field_index;
-            curr_field_ref_info->update_state_by_ref_type = NULL;
-            HASH_ADD(hh, curr_type_metadata->field_ref_info, field_index, sizeof(long), curr_field_ref_info);
-        }
 
-        UpdateStateByRefType *curr_ref_type_state;
-        SCM next_entry_class_obj_or_fixed_type_code = next_entry->class_obj;
-        HASH_FIND(hh, curr_field_ref_info->update_state_by_ref_type, &next_entry_class_obj_or_fixed_type_code, sizeof(SCM), curr_ref_type_state);
-        if (NULL == curr_ref_type_state) {
-            curr_ref_type_state = (UpdateStateByRefType *) malloc(sizeof(UpdateStateByRefType));
+            UpdateStateByRefType *curr_ref_type_state;
+            SCM post_entry_class_obj_or_fixed_type_code = post_entry->class_obj;
+            HASH_FIND(hh, curr_field_ref_info->update_state_by_ref_type, &post_entry_class_obj_or_fixed_type_code, sizeof(SCM), curr_ref_type_state);
             if (NULL == curr_ref_type_state) {
-                fprintf(stderr, "[curr_ref_type_state]内存分配失败!\n");
-                exit(-1);
-            }
-            curr_ref_type_state->ref_data_type = next_entry_class_obj_or_fixed_type_code;
-            curr_ref_type_state->is_to_add = curr_entry->is_active;
-            HASH_ADD(hh, curr_field_ref_info->update_state_by_ref_type, ref_data_type, sizeof(SCM), curr_ref_type_state);
-        } else {
-            if (curr_ref_type_state->is_to_add <= 0) {
-                curr_ref_type_state->is_to_add = curr_entry->is_active;
+                curr_ref_type_state = (UpdateStateByRefType *) malloc(sizeof(UpdateStateByRefType));
+                if (NULL == curr_ref_type_state) {
+                    fprintf(stderr, "[curr_ref_type_state]内存分配失败!\n");
+                    exit(-1);
+                }
+                curr_ref_type_state->ref_data_type = post_entry_class_obj_or_fixed_type_code;
+                curr_ref_type_state->is_to_add = 1;
+                HASH_ADD(hh, curr_field_ref_info->update_state_by_ref_type, ref_data_type, sizeof(SCM), curr_ref_type_state);
+            } else {
+                curr_ref_type_state->is_to_add = 1;
             }
         }
     }
@@ -340,22 +396,11 @@ static RefPath *gen_a_concise_ref_path(SCM ptr, long last_gc_traced_index, int i
                 }
             }
         }
-        if (i == last_gc_traced_index) {
-            new_path_entry->is_active = 0;
-        } else {
-            if (is_user_defined_data_type_instance(gc_traced[i].ptr)) {
-                new_path_entry->is_active = 1;
-            } else {
-                new_path_entry->is_active = 0;
-            }
-        }
         new_path_entry->is_repeat = 0;
         new_path_entry->line_numbers = NULL;
         if (is_write_ln && i != last_gc_traced_index) {
             try_record_line_numbers_into_ref_path_entry(gc_traced[i].ptr, gc_traced[i + 1L].ptr, new_path_entry);
         }
-        new_path_entry->gc_count_at_created = current_gc_count;
-        new_path_entry->gc_count_at_last_reactivated = current_gc_count;
 
         // 至少要有两个元素, 也就是需要至少一个link, 才能够开始比较link是否相同
         if (tmp_entry_quantity < 2) {
@@ -368,9 +413,7 @@ static RefPath *gen_a_concise_ref_path(SCM ptr, long last_gc_traced_index, int i
         if (is_the_same_ref_path_entries(tmp_entry_n_2, tmp_entry_n_1) // 代入元の比較
             && is_the_same_type(tmp_entry_n_1->class_obj, new_path_entry->class_obj)) // 代入先の比較
         {
-            tmp_entry_n_2->is_active = 1;
             tmp_entry_n_2->is_repeat = 1;
-            tmp_entry_n_2->gc_count_at_last_reactivated = current_gc_count;
             merge_ref_path_entry_line_nums(tmp_entry_n_2, tmp_entry_n_1);
 
             utarray_pop_back(out->entries); // remove&free "tmp_entry_n_1" from the arraylist
@@ -378,6 +421,9 @@ static RefPath *gen_a_concise_ref_path(SCM ptr, long last_gc_traced_index, int i
 
         utarray_push_back(out->entries, new_path_entry);
     }
+
+    out->active_index = 0;
+    out->gc_count_of_active_index_switching = current_gc_count;
 
     return out;
 }
@@ -477,18 +523,12 @@ void try_gather_new_ref_path(SCM ptr, long last_gc_traced_index) {
         // 尝试更新原有的path中的子link的信息 (如: 是否重复等)
         long len = utarray_len(new_ref_path->entries);
         for (long i = 0; i < len; ++i) {
-            RefPathEntry *tmp_entry_same_path = (RefPathEntry *) utarray_eltptr(same_path->entries, i);
             RefPathEntry  *tmp_entry_new_path = (RefPathEntry *) utarray_eltptr(new_ref_path->entries, i);
 
-            if (!(tmp_entry_new_path->is_repeat)) {
-                continue;
+            if (tmp_entry_new_path->is_repeat) {
+                RefPathEntry *tmp_entry_same_path = (RefPathEntry *) utarray_eltptr(same_path->entries, i);
+                tmp_entry_same_path->is_repeat = 1;
             }
-            if (tmp_entry_same_path->is_repeat) {
-                continue;
-            }
-            tmp_entry_same_path->is_active = 1;
-            tmp_entry_same_path->is_repeat = 1;
-            tmp_entry_same_path->gc_count_at_last_reactivated = current_gc_count;
         }
     }
 
@@ -540,13 +580,14 @@ void try_gather_new_line_num(SCM ptr, long last_gc_traced_index) {
     }
 
     long entry_quantity = utarray_len(curr_path->entries);
+    if (same_path->active_index >= entry_quantity - 1L) {
+        try_free_ref_path_obj(curr_path);
+        return;
+    }
+
     for (long i = 0; i < entry_quantity; ++i) {
         RefPathEntry *curr_path_tmp_entry = (RefPathEntry *) utarray_eltptr(curr_path->entries, i);
         RefPathEntry *same_path_tmp_entry = (RefPathEntry *) utarray_eltptr(same_path->entries, i);
-
-        if (!same_path_tmp_entry->is_active) {
-            continue;
-        }
 
         CollectedLineNumber *curr, *tmp;
         HASH_ITER(hh, curr_path_tmp_entry->line_numbers, curr, tmp) {
@@ -594,31 +635,24 @@ static void check_ref_path_list_after_gc() {
     RefPath *curr, *tmp;
     DL_FOREACH_SAFE(focusing_ref_path_list, curr, tmp) {
         long len = utarray_len(curr->entries);
-
-//        int ready_to_print_result = 1;
-        for (long i = 0; i < len - 1L; ++i) {
-            RefPathEntry *tmp_entry = (RefPathEntry *) utarray_eltptr(curr->entries, i);
-            if (!tmp_entry->is_active) {
-                continue;
-            }
-            size_t passed_gc_count = current_gc_count - tmp_entry->gc_count_at_last_reactivated;
+        if (curr->active_index < len - 1L) {
+            RefPathEntry *tmp_entry = (RefPathEntry *) utarray_eltptr(curr->entries, curr->active_index);
+            size_t passed_gc_count = current_gc_count - curr->gc_count_of_active_index_switching;
             if (passed_gc_count >= gc_count_of_a_ref_pattern_at_most
                 || HASH_COUNT(tmp_entry->line_numbers) >= line_num_quantity_of_a_ref_pattern_at_least) {
-                tmp_entry->is_active = 0;
-                continue;
+                curr->active_index += 1L;
+                curr->gc_count_of_active_index_switching = current_gc_count;
             }
-//            ready_to_print_result = 0;
-        }
 
-        // 尝试记录metadata
-        try_record_metadata(curr);
+            // 尝试记录metadata
+            try_record_metadata(curr);
 
-//        if (ready_to_print_result) {
-            print_result(curr);
 //            // 2023.10.04 不删除已经收集完成的path
 //            remove_path_info_from_focusing_list(curr);
         }
-//    }
+
+        print_result(curr);
+    }
 }
 
 static void plus_current_gc_count() {
